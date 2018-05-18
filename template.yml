@@ -31,7 +31,6 @@ Resources:
   HelloWorld:
     Type: AWS::Serverless::Function
     Properties:
-      Runtime: nodejs4.3
       Environment:
         Variables:
           NODE_ENV: production
