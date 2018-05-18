@@ -52,7 +52,7 @@ Resources:
   PingFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: hello_world/
+      CodeUri: .
       Environment:
         Variables:
           PARAM1: VALUE
