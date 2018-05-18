@@ -60,7 +60,7 @@ Resources:
         Fn::ImportValue:
           !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
       Events:
-        Hello:
+        GetApiEndpoint:
           Type: Api
           Properties:
             Method: get
