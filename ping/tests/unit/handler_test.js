@@ -3,7 +3,7 @@
 const index = require('../../index.js');
 const chai = require('chai');
 
-const { expect } = chai.expect;
+const { expect } = chai;
 let event;
 let context;
 
