@@ -17,12 +17,20 @@ Parameters:
 #     DeploymentPreference:
 #       Enabled: true
 #       Type: Canary10Percent5Minutes
+#     Environment:
+#       Variables:
+#         TABLE_NAME: data-table
+
+Globals:
+  Function:
+    Runtime: nodejs8.10
+    Timeout: 180
+    Handler: index.handler
 
 Resources:
   HelloWorld:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: index.handler
       Runtime: nodejs4.3
       Environment:
         Variables:
@@ -41,3 +49,18 @@ Resources:
           Properties:
             Path: /
             Method: post
+
+  PingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: hello_world/
+      Environment:
+        Variables:
+          PARAM1: VALUE
+      Events:
+        Hello:
+          Type: Api
+          Properties:
+            Method: get
+            Path: /hello
+Transform: AWS::Serverless-2016-10-31
