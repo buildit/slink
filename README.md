@@ -1,6 +1,5 @@
 # Slink Project #
-_Slink_ is a SmartRecruiters to SAP integration service.  It is implemented using AWS Lambda, using  
-the Javascript/Node "flavor", and is built and deployed using AWS' CodeStar CI/CD product.
+_Slink_ is a SmartRecruiters to SAP integration service.  It is implemented using AWS Lambda, using the Javascript/Node "flavor", and is built and deployed using AWS' CodeStar CI/CD product.
 
 # Building and Deploying #
 
