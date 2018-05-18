@@ -1,3 +1,44 @@
+# Slink Project #
+_Slink_ is a SmartRecruiters to SAP integration service.  It is implemented using AWS Lambda, using  
+the Javascript/Node "flavor", and is built and deployed using AWS' CodeStar CI/CD product.
+
+# Building and Deploying #
+
+## Dependencies ##
+- Node 8.10+ / NPM 5.6.0+
+- It is highly recommended to use `nvm` [https://github.com/creationix/nvm]
+
+## Building Locally ##
+- Clone this repository
+- `nvm use`
+- `npm install`
+- `npm test`
+
+_Note_:  The solution is modular.  That is, there are several "module" subdirectories within the source tree.  Each
+module represents a Lambda function and has its own `package.json`.  We are striving to keep the commands the same
+within a given module as within the project root.  However, since `npm` does not support hierarchical project structures
+in the same way as say Java's Maven or Gradle, when in doubt, run `npm` commands from within the module you're
+working with first, since that's what is actually built by the CI/CD pipeline.
+
+## AWS Deployment ##
+The code is automatically built and deployed by CodeStar when code is committed to `master`.  Currently, branches
+are not built by the CI/CD system.
+
+Please see the [CodeStar Dashboard](http://tinyurl.com/yc4ymbrm) to check deployment status.  
+Contact a team member, if you don't have access.
+
+## Team Practices ##
+- We track work using Github issues and the [project board](https://github.com/buildit/slink/projects/1).
+- We use trunk-based development using `master` as "trunk".  
+- We encourage the use of _short-lived_ Feature Branches followed by Pull Requests (PRs).
+- PR author performs the merge, and we prefer at least one approval from a PR reviewer before merge.
+- We encourage Github "squash merges" for branches with messy commits. 
+- Minor fixes/doc changes, etc, can go straight to `master`.
+
+---
+
+# AWS CodeStar Stuff #
+
 Welcome to the AWS CodeStar sample web service
 ==============================================
 
