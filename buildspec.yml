@@ -7,10 +7,10 @@ phases:
       - node --version
       - npm --version
       - npm install
-      - cd ./ping && npm install
+      - cd ./ping && npm install && cd ..
   pre_build:
     commands:
-      - cd ./ping && npm test
+      - cd ./ping && npm test && cd ..
   build:
     commands:
       - aws cloudformation package --template template.yml --s3-bucket $S3_BUCKET --output-template template-export.yml
