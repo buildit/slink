@@ -52,7 +52,7 @@ Resources:
   PingFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: .
+      CodeUri: ./ping/
       Environment:
         Variables:
           PARAM1: VALUE
@@ -64,6 +64,6 @@ Resources:
           Type: Api
           Properties:
             Method: get
-            Path: /hello
+            Path: /ping
 
 Transform: AWS::Serverless-2016-10-31
