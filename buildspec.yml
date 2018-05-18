@@ -6,7 +6,6 @@ phases:
       - pip install --upgrade awscli
       - node --version
       - npm --version
-      - npm install
       - cd ./ping && npm install && cd ..
   pre_build:
     commands:
