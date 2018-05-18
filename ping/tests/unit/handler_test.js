@@ -2,23 +2,25 @@
 
 const index = require('../../index.js');
 const chai = require('chai');
-const expect = chai.expect;
-var event, context;
+
+const { expect } = chai.expect;
+let event;
+let context;
 
 
-describe('Tests index', function () {
-    it('verifies successful response', async () => {
-        const result = await index.handler(event, context, (err, result) => {
-            expect(result).to.be.an('object');
-            expect(result.statusCode).to.equal(200);
-            expect(result.body).to.be.an('string');
+describe('Tests index', () => {
+  it('verifies successful response', async () => {
+    await index.handler(event, context, (err, result) => {
+      expect(result).to.be.an('object');
+      expect(result.statusCode).to.equal(200);
+      expect(result.body).to.be.an('string');
 
-            let response = JSON.parse(result.body);
+      const response = JSON.parse(result.body);
 
-            expect(response).to.be.an('object');
-            expect(response.message).to.be.equal("hello world");
-            expect(response.location).to.be.an("string");
-        });
+      expect(response).to.be.an('object');
+      expect(response.message).to.be.equal('hello world');
+      expect(response.location).to.be.an('string');
     });
+  });
 });
 

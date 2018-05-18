@@ -1,0 +1,25 @@
+{
+//  "plugins": ["node"],
+  "extends": ["airbnb-base"
+//  , "plugin:node/recommended"
+  ],
+  "env": {
+    "mocha": true,
+    "es6": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 2017,
+    "sourceType": "script"
+  },
+  "rules": {
+    "brace-style": ["error", "stroustrup"],
+    "no-param-reassign": 0,
+    "no-underscore-dangle": 0,
+    "no-console": 0,
+    "no-restricted-syntax": 0,
+    "comma-dangle": 0,
+    "import/no-extraneous-dependencies": ["error",
+      {"devDependencies": ["**/*.unit.js", "**/*_test.js", "**/*.e2e.js", "**/test/**"]}]
+//    "node/exports-style": ["error", "module.exports"]
+  }
+}
