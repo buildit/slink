@@ -18,7 +18,9 @@
     "node": ">=8.0.0"
   },
   "jest": {
-    "testMatch": ["**/tests/**/*.js?(x)"],
+    "testMatch": [
+      "**/tests/**/*.js?(x)"
+    ],
     "testEnvironment": "node"
-}
+  }
 }

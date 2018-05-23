@@ -1,10 +1,10 @@
 'use strict';
+
 const getType = require('jest-get-type');
 const index = require('../../index.js');
+
 let event;
 let context;
-
-
 
 describe('Tests index', () => {
   it('verifies successful response', async () => {
