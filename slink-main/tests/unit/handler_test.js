@@ -1,5 +1,6 @@
 'use strict';
 
+const getType = require('jest-get-type');
 const index = require('../../index.js');
 
 let event;

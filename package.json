@@ -12,7 +12,8 @@
     "eslint-plugin-jsx-a11y": "^6.0.3",
     "eslint-plugin-node": "^6.0.1",
     "eslint-plugin-react": "^7.8.2",
-    "jest": "^22.4.4"
+    "jest": "^22.4.4",
+    "jest-get-type": "^22.4.3"
   },
   "engines": {
     "node": ">=8.0.0"
