@@ -63,4 +63,22 @@ Resources:
             Method: get
             Path: /slink
 
+  SlinkMainFunction2:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./slink-main/
+      Environment:
+        Variables:
+          SR_API_TOKEN: override_me
+          SR_CANDIDATE_SUMMARY_URL: https://api.smartrecruiters.com/candidates?updatedAfter=2018-02-01T10%3A15%3A00.500%2B00%3A00&status=OFFERED&subStatus=Offer Accepted
+      Role:
+        Fn::ImportValue:
+          !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
+      Events:
+        GetApiEndpoint:
+          Type: Api
+          Properties:
+            Method: get
+            Path: /slink2
+
 Transform: AWS::Serverless-2016-10-31
