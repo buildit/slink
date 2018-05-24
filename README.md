@@ -19,16 +19,6 @@ within a given module as within the project root.  However, since `npm` does not
 in the same way as say Java's Maven or Gradle, when in doubt, run `npm` commands from within the module you're
 working with first, since that's what is actually built by the CI/CD pipeline.
 
-## Local Development Environment Setup
-Install Git pre-commit hook for ESlint to validate JS before committing code
-
-- clone the project repo on your local machine
-- `cd <<project root>>`
-- `cp pre-commit.sh .git/hooks/pre-commit`
-- `chmod +x .git/hooks/pre-commit`
-
-You should also install the ESlint plugin in your IDE.
-
 ## Running Lambda Functions Locally via "SAM Local" ##
 There is a CodeStar-managed CodePipeline in AWS that runs tests and deploys the function(s) in this package.  But what if you want to run/test locally?
 
