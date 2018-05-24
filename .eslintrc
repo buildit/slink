@@ -15,6 +15,7 @@
     "no-console": 0,
     "no-restricted-syntax": 0,
     "comma-dangle": 0,
+    "import/no-unresolved": "off",
     "import/no-extraneous-dependencies": ["error",
     {"devDependencies": ["**/*.unit.js", "**/*_test.js", "**/*.e2e.js", "**/test/**"]}]
   }
