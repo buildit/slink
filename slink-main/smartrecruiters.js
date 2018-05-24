@@ -24,7 +24,7 @@ const getCandidateSummaries = async () => {
     console.log(err);
   }
   return {
-    message: 'Candidates found',
+    message: 'Could not retrieve candidates',
     count: reply.data.content.length
   };
 };
