@@ -22,11 +22,8 @@ const getCandidateSummaries = async () => {
   }
   catch (err) {
     console.log(err);
+    return err;
   }
-  return {
-    message: 'Could not retrieve candidates',
-    count: reply.data.content.length
-  };
 };
 
 module.exports = { getCandidateSummaries };
