@@ -1,13 +1,21 @@
 'use strict';
 
+const axios = require('axios');
 const getType = require('jest-get-type');
 const index = require('../../index.js');
+
+jest.mock('axios');
 
 let event;
 let context;
 
 describe('Tests index', () => {
+  beforeEach(() => {
+    axios.mockClear();
+  });
   it('verifies successful response', async () => {
+    const mockResponse = { data: 'my location' };
+    axios.mockResolvedValue(mockResponse);
     await index.handler(event, context, (err, result) => {
       expect(getType(result)).toEqual('object');
       expect(result.statusCode).toEqual(200);
@@ -18,6 +26,14 @@ describe('Tests index', () => {
       expect(getType(response)).toEqual('object');
       expect(response.message).toEqual('hello world');
       expect(getType(response.location)).toEqual('string');
+    });
+  });
+  it('returns an error from failed response', async () => {
+    axios.mockRejectedValue(new Error('a mock error'));
+    await index.handler(event, context, (err, result) => {
+      expect(result).toBeNull();
+      const isError = err instanceof Error;
+      expect(isError).toBe(true);
     });
   });
 });
