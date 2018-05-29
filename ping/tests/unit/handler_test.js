@@ -10,8 +10,11 @@ let event;
 let context;
 
 describe('Tests index', () => {
+  beforeEach(() => {
+    axios.mockClear();
+  });
   it('verifies successful response', async () => {
-    const mockResponse = { data: { content: [{ name: 'Mock candidate' }] } };
+    const mockResponse = { data: 'my location' };
     axios.mockResolvedValue(mockResponse);
     await index.handler(event, context, (err, result) => {
       expect(getType(result)).toEqual('object');

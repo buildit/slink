@@ -16,11 +16,10 @@ module.exports.handler = async (event, context, callback) => {
         location: ret.data.trim()
       })
     };
+    callback(null, response);
   }
   catch (err) {
     console.log(err);
     callback(err, null);
   }
-
-  callback(null, response);
 };
