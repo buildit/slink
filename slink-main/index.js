@@ -4,11 +4,12 @@ const sr = require('./smartrecruiters');
 
 module.exports.handler = async (event, context, callback) => {
   try {
-    const summaries = await sr.getCandidateSummaries();
-    console.log(`getCandidateSummaries(): ${JSON.stringify(summaries)}`);
+    const result = await sr.getCandidates();
+
     const response = {
       statusCode: 200,
-      body: JSON.stringify(summaries)
+      body: JSON.stringify(`Processed ${result.candidatesList.length} candidates`),
+      data: JSON.stringify(result.candidatesList)
     };
 
     callback(null, response);
