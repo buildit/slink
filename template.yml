@@ -53,6 +53,7 @@ Resources:
         Variables:
           SR_API_TOKEN: override_me
           SR_CANDIDATE_SUMMARY_URL: https://api.smartrecruiters.com/candidates?updatedAfter=2018-02-01T10%3A15%3A00.500%2B00%3A00&status=OFFERED&subStatus=Offer Accepted
+          SR_CANDIDATE_DETAIL_URL: https://api.smartrecruiters.com/candidates/
       Role:
         Fn::ImportValue:
           !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
