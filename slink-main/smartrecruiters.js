@@ -22,8 +22,7 @@ const getCandidateDetails = async (candidateId) => {
       message: 'Candidate details found',
       candidateDetails: reply.data
     };
-  }
-  catch (err) {
+  } catch (err) {
     console.log(err);
     throw err;
   }
@@ -36,8 +35,7 @@ const loadCandidateDetails = async (candidatesList) => {
   for (const candidate of candidatesList) {
     try {
       results.push(getCandidateDetails(candidate.id));
-    }
-    catch (err) {
+    } catch (err) {
       console.log(err);
       throw err;
     }
@@ -63,8 +61,7 @@ const getCandidateSummaries = async () => {
     const result = await axios(options);
 
     return utils.processRawSummaries(result.data.content);
-  }
-  catch (err) {
+  } catch (err) {
     console.log(err);
     throw err;
   }
