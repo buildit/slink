@@ -13,8 +13,7 @@ module.exports.handler = async (event, context, callback) => {
     };
 
     callback(null, response);
-  }
-  catch (e) {
+  } catch (e) {
     callback(null, {
       statusCode: 500,
       body: {}

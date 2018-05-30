@@ -42,8 +42,7 @@ const processRawDetails = (detailsList, candidatesList) => {
 
     if (candidate != null) {
       decorateModelFromDetails(candidate, detailRec.candidateDetails);
-    }
-    else {
+    } else {
       console.log(`Unable to find candidate id in master list of candidates: ${JSON.stringify(detailRec.candidateDetails.id)}`);
     }
   }

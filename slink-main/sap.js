@@ -135,8 +135,7 @@ const postApplicant = async (applicant) => {
       return null;
     }
     return sapResponse.output.EmployeeId;
-  }
-  catch (err) {
+  } catch (err) {
     console.log(err);
     throw err;
   }

@@ -83,8 +83,7 @@ const getCandidates = async () => {
       message: 'Candidates found',
       candidatesList: list
     };
-  }
-  catch (err) {
+  } catch (err) {
     console.log(err);
   }
   return {

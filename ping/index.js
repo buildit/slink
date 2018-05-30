@@ -17,8 +17,7 @@ module.exports.handler = async (event, context, callback) => {
       })
     };
     callback(null, response);
-  }
-  catch (err) {
+  } catch (err) {
     console.log(err);
     callback(err, null);
   }
