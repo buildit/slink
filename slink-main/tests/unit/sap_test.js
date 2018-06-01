@@ -39,19 +39,19 @@ describe('Post Employee Data', () => {
   it('returns employee ID if a good response', async () => {
     axios.mockResolvedValue(mockResponseGood);
 
-    const result = await sap.postEmployee(applicant);
+    const result = await sap.postApplicant(applicant);
     expect(result).toEqual('123456');
   });
 
   it('returns null if a bad response', async () => {
     axios.mockResolvedValue(mockResponseBad);
-    const result = await sap.postEmployee(applicant);
+    const result = await sap.postApplicant(applicant);
     expect(result).toEqual(null);
   });
 
   it.skip('throws an exception on failure', async () => {
     axios.mockRejectedValue(new Error('There is an error'));
-    const result = await sap.postEmployee();
+    const result = await sap.postApplicant();
     expect(result instanceof Error).toBe(true);
   });
 });
