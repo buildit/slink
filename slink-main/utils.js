@@ -17,11 +17,13 @@ const decorateModelFromSummary = (candidate, summary) => {
   candidate.lastName = summary.lastName;
   candidate.email = summary.email;
   candidate.location = {};
-  candidate.location.country = summary.location.country;
-  candidate.location.city = summary.location.city;
-  candidate.primaryAssinment = {};
-  candidate.primaryAssinment.job = {};
-  candidate.primaryAssinment.job.id = summary.primaryAssignment.job.id;
+  if (summary.location != null) {
+    candidate.location.country = summary.location.country;
+    candidate.location.city = summary.location.city;
+  }
+  candidate.primaryAssignment = {};
+  candidate.primaryAssignment.job = {};
+  candidate.primaryAssignment.job.id = summary.primaryAssignment.job.id;
 };
 
 
@@ -31,14 +33,17 @@ const decorateModelFromDetails = (candidate, details) => {
 
   if (details.experience != null) {
     const experience = details.experience[0];
-    candidate.experience.location = experience.location;
+    if (experience != null) {
+      candidate.experience = {};
+      candidate.experience.location = experience.location;
+    }
   }
 };
 
 
-const processRawDetails = (detailsList, candidatesList) => {
+const processRawDetails = (detailsList, applicantsList) => {
   for (const detailRec of detailsList) {
-    const candidate = findCandidate(candidatesList, detailRec.candidateDetails.id);
+    const candidate = findCandidate(applicantsList, detailRec.candidateDetails.id);
 
     if (candidate != null) {
       decorateModelFromDetails(candidate, detailRec.candidateDetails);
@@ -47,7 +52,7 @@ const processRawDetails = (detailsList, candidatesList) => {
     }
   }
 
-  return candidatesList;
+  return applicantsList;
 };
 
 

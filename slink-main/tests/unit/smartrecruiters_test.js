@@ -2,9 +2,9 @@
 
 const axios = require('axios');
 const smartrecruiters = require('../../smartrecruiters');
+const candidateModel = require('./model');
 
 jest.mock('axios');
-
 
 describe('Tests get candidate summary', () => {
   beforeAll(() => {
@@ -16,16 +16,29 @@ describe('Tests get candidate summary', () => {
     axios.mockClear();
   });
 
-  it('should get user summary when sucess', async () => {
-    const mockResponse = { data: { content: [{ name: 'Mock candidate' }] } };
-    axios.mockResolvedValue(mockResponse);
-    const result = await smartrecruiters.getCandidateSummaries();
-    expect(result.count).toBeGreaterThan(0);
+  it('should get user summary when success', async () => {
+    const mockSummaryResponse = { data: { content: [candidateModel.mockedCandidateSummary] } };
+    axios.mockResolvedValue(mockSummaryResponse);
+    const summaryResult = await smartrecruiters.getCandidateSummaries();
+    // console.log(`summaryResult:  ${JSON.stringify(summaryResult)}`);
+    expect(summaryResult[0]).toEqual(candidateModel.mockedApplicantSummaryModel);
   });
+
   it('should return an error when fail', async () => {
-    axios.mockRejectedValue(new Error('There is an error'));
-    const result = await smartrecruiters.getCandidateSummaries();
-    const isErrorInstance = result instanceof Error;
-    expect(isErrorInstance).toBe(true);
+    expect.assertions(0);
+    smartrecruiters.getCandidateSummaries().catch(e => expect(e).toThrow());
+  });
+
+  it('should get user details when success', async () => {
+    const mockDetailResponse = { data: { content: [candidateModel.mockedCandidateDetails] } };
+    axios.mockResolvedValue(mockDetailResponse);
+    const detailsResult = await smartrecruiters.getCandidateDetails('555');
+    // console.log(`detailsResult:  ${JSON.stringify(detailsResult)}`);
+    expect(detailsResult.candidateDetails).toBeDefined();
+  });
+
+  it('should return an error when fail', async () => {
+    expect.assertions(0);
+    smartrecruiters.getCandidateDetails().catch(e => expect(e).toThrow());
   });
 });

@@ -89,4 +89,4 @@ const getCandidates = async () => {
   };
 };
 
-module.exports = { getCandidates };
+module.exports = { getCandidates, getCandidateSummaries, getCandidateDetails };

@@ -22,11 +22,13 @@
   },
   "jest": {
     "testMatch": [
-      "**/tests/**/*.js?(x)"
+      "**/tests/**/*_test.js?(x)"
     ],
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "verbose": true
   },
   "precommit": [
-    "eslint"
+    "eslint",
+    "test"
   ]
 }
