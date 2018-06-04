@@ -2,7 +2,7 @@
 
 const axios = require('axios');
 const smartrecruiters = require('../../smartrecruiters');
-const candidateModel = require('./model');
+const models = require('./models');
 
 jest.mock('axios');
 
@@ -16,24 +16,33 @@ describe('Tests get candidate summary', () => {
     axios.mockClear();
   });
 
+  it('should build applicant when success', async () => {
+    const mockSummaryResponse = { data: { content: [models.mockedRawCandidateSummary] } };
+    axios.get.mockResolvedValueOnce(mockSummaryResponse);
+
+    const mockDetailResponse = { data: { content: [models.mockedRawCandidateDetail] } };
+    axios.get.mockResolvedValueOnce(mockDetailResponse);
+
+    const applicants = await smartrecruiters.getApplicants();
+    expect(applicants.applicants[0]).toEqual(models.mockedApplicantModel);
+  });
+
   it('should get user summary when success', async () => {
-    const mockSummaryResponse = { data: { content: [candidateModel.mockedCandidateSummary] } };
-    axios.mockResolvedValue(mockSummaryResponse);
-    const summaryResult = await smartrecruiters.getCandidateSummaries();
-    // console.log(`summaryResult:  ${JSON.stringify(summaryResult)}`);
-    expect(summaryResult[0]).toEqual(candidateModel.mockedApplicantSummaryModel);
+    const mockSummaryResponse = { data: { content: [models.mockedRawCandidateSummary] } };
+    axios.get.mockResolvedValue(mockSummaryResponse);
+    const summaryResult = await smartrecruiters.getApplicantSummaries();
+    expect(summaryResult[0]).toEqual(models.mockedApplicantSummaryModel);
   });
 
   it('should return an error when fail', async () => {
     expect.assertions(0);
-    smartrecruiters.getCandidateSummaries().catch(e => expect(e).toThrow());
+    smartrecruiters.getApplicantSummaries().catch(e => expect(e).toThrow());
   });
 
   it('should get user details when success', async () => {
-    const mockDetailResponse = { data: { content: [candidateModel.mockedCandidateDetails] } };
-    axios.mockResolvedValue(mockDetailResponse);
+    const mockDetailResponse = { data: { content: [models.mockedRawCandidateDetail] } };
+    axios.get.mockResolvedValue(mockDetailResponse);
     const detailsResult = await smartrecruiters.getCandidateDetails('555');
-    // console.log(`detailsResult:  ${JSON.stringify(detailsResult)}`);
     expect(detailsResult.candidateDetails).toBeDefined();
   });
 

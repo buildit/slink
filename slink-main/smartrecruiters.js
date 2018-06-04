@@ -14,9 +14,7 @@ const getCandidateDetails = async (candidateId) => {
       url: apiEndpoint
     };
 
-    reply = await axios(options);
-
-    // console.log(`reply.data: ${JSON.stringify(reply.data.id)}`);
+    reply = await axios.get(options);
 
     return {
       message: 'Candidate details found',
@@ -29,38 +27,37 @@ const getCandidateDetails = async (candidateId) => {
 };
 
 
-const loadCandidateDetails = async (candidatesList) => {
-  const results = [];
+const loadCandidateDetails = async (candidateSummaries) => {
+  const candidateDetails = [];
+
   // Get candidate details asynchronously
-  for (const candidate of candidatesList) {
+  for (const summary of candidateSummaries) {
     try {
-      results.push(getCandidateDetails(candidate.id));
+      candidateDetails.push(getCandidateDetails(summary.id));
     } catch (err) {
       console.log(err);
       throw err;
     }
   }
+  // Now wait for all calls to complete before processing details
+  const resolvedCandidateDetails = await Promise.all(candidateDetails);
 
-  // Now wait for all calls to complete before processing results
-  const detailsList = await Promise.all(results);
-
-  return utils.processRawDetails(detailsList, candidatesList);
+  return utils.processCandidateDetails(resolvedCandidateDetails, candidateSummaries);
 };
 
 
-const getCandidateSummaries = async () => {
+const getApplicantSummaries = async () => {
   try {
     const apiToken = process.env.SR_API_TOKEN;
-    console.log(`API TOKEN: ${apiToken}`);
     const options = {
       method: 'GET',
       headers: { 'X-SmartToken': apiToken },
       url: process.env.SR_CANDIDATE_SUMMARY_URL
     };
 
-    const result = await axios(options);
+    const result = await axios.get(options);
 
-    return utils.processRawSummaries(result.data.content);
+    return utils.createApplicantsFromSummaries(result.data.content);
   } catch (err) {
     console.log(err);
     throw err;
@@ -68,17 +65,14 @@ const getCandidateSummaries = async () => {
 };
 
 
-const getCandidates = async () => {
+const getApplicants = async () => {
   try {
-    const summaryList = await getCandidateSummaries();
-
-    const list = await loadCandidateDetails(summaryList);
-
-    // console.log(`final candidate list: ${JSON.stringify(list)}`);
+    const applicantSummaries = await getApplicantSummaries();
+    const applicants = await loadCandidateDetails(applicantSummaries);
 
     return {
       message: 'Candidates found',
-      candidatesList: list
+      applicants
     };
   } catch (err) {
     console.log(err);
@@ -89,4 +83,8 @@ const getCandidates = async () => {
   };
 };
 
-module.exports = { getCandidates, getCandidateSummaries, getCandidateDetails };
+module.exports = {
+  getApplicants,
+  getApplicantSummaries,
+  getCandidateDetails
+};

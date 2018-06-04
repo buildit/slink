@@ -8,7 +8,7 @@ module.exports.handler = async (event, context, callback) => {
   let response;
 
   try {
-    const ret = await axios(url);
+    const ret = await axios.get(url);
     response = {
       statusCode: 200,
       body: JSON.stringify({

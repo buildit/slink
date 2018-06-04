@@ -15,7 +15,7 @@ describe('Tests index', () => {
   });
   it('verifies successful response', async () => {
     const mockResponse = { data: 'my location' };
-    axios.mockResolvedValue(mockResponse);
+    axios.get.mockResolvedValue(mockResponse);
     await index.handler(event, context, (err, result) => {
       expect(getType(result)).toEqual('object');
       expect(result.statusCode).toEqual(200);
@@ -29,7 +29,7 @@ describe('Tests index', () => {
     });
   });
   it('returns an error from failed response', async () => {
-    axios.mockRejectedValue(new Error('a mock error'));
+    axios.get.mockRejectedValue(new Error('a mock error'));
     await index.handler(event, context, (err, result) => {
       expect(result).toBeNull();
       const isError = err instanceof Error;

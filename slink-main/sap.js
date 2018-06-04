@@ -129,7 +129,7 @@ const postApplicant = async (applicant) => {
       data: buildPostBody()
     };
 
-    const sapResponse = await axios(options);
+    const sapResponse = await axios.post(options);
 
     if (sapResponse.output && sapResponse.output.ReturnFlag === 'F') {
       return null;
