@@ -158,4 +158,9 @@ const mockedCandidateDetails = {
   }
 };
 
-module.exports = { mockedCandidateSummary, mockedCandidateDetails, mockedApplicantModel, mockedApplicantSummaryModel };
+module.exports = {
+  mockedCandidateSummary,
+  mockedCandidateDetails,
+  mockedApplicantModel,
+  mockedApplicantSummaryModel
+};
