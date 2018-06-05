@@ -7,13 +7,12 @@ const getCandidateSummaries = async () => {
     const apiToken = process.env.SR_API_TOKEN;
     const options = {
       method: 'GET',
-      headers: { 'X-SmartToken': apiToken },
-      url: process.env.SR_CANDIDATE_SUMMARY_URL
+      headers: { 'X-SmartToken': apiToken }
     };
 
-    const result = await axios.get(options);
+    const reply = await axios.get(process.env.SR_CANDIDATE_SUMMARY_URL, options);
 
-    return result.data.content;
+    return reply.data.content;
   } catch (err) {
     console.log(err);
     throw err;
@@ -27,12 +26,11 @@ const getCandidateDetail = async (candidateId) => {
     const apiEndpoint = process.env.SR_CANDIDATE_DETAIL_URL + candidateId;
     const options = {
       method: 'GET',
-      headers: { 'X-SmartToken': apiToken },
-      url: apiEndpoint
+      headers: { 'X-SmartToken': apiToken }
     };
 
-    reply = await axios.get(options);
-    return reply.data.content;
+    reply = await axios.get(apiEndpoint, options);
+    return reply.data;
   } catch (err) {
     console.log(err);
     throw err;
@@ -43,7 +41,7 @@ const getCandidateDetail = async (candidateId) => {
 const getApplicants = async () => {
   const summaries = await getCandidateSummaries();
 
-  return Promise.all(summaries.map(async (summary) => {
+  const applicants = Promise.all(summaries.map(async (summary) => {
     const detail = await getCandidateDetail(summary.id);
 
     const applicant = {
@@ -62,15 +60,17 @@ const getApplicants = async () => {
       }
     };
 
-    if (detail[0]) {
-      applicant.phoneNumber = detail[0].phoneNumber || null;
+    if (detail) {
+      applicant.phoneNumber = detail.phoneNumber || null;
       applicant.experience = {
-        location: (detail[0].experience[0].location) || null
+        location: (detail.experience && detail.experience[0].location) || null
       };
     }
 
     return applicant;
   }));
+
+  return applicants;
 };
 
 module.exports = {

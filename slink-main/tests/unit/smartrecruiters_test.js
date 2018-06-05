@@ -20,11 +20,11 @@ describe('Get candidate summary', () => {
     const mockSummaryResponse = { data: { content: [models.mockedRawCandidateSummary] } };
     axios.get.mockResolvedValueOnce(mockSummaryResponse);
 
-    const mockDetailResponse = { data: { content: [models.mockedRawCandidateDetail] } };
+    const mockDetailResponse = { data: models.mockedRawCandidateDetail };
     axios.get.mockResolvedValueOnce(mockDetailResponse);
 
-    const applicants = await smartrecruiters.getApplicants();
-    expect(applicants[0]).toEqual(models.mockedApplicantModel);
+    const response = await smartrecruiters.getApplicants();
+    expect(response[0]).toEqual(models.mockedApplicantModel);
   });
 
   it.skip('should return an error on failure', async () => {

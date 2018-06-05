@@ -5,18 +5,19 @@ const sr = require('./smartrecruiters');
 module.exports.handler = async (event, context, callback) => {
   try {
     const result = await sr.getApplicants();
+    result.forEach((applicant) => {
+      console.log(`Applicant created: ${applicant.id}, ${applicant.lastName}, ${applicant.firstName}`);
+    });
 
     const response = {
       statusCode: 200,
-      body: JSON.stringify(`Processed ${result.applicants.length} candidates`),
-      data: JSON.stringify(result.applicants)
+      body: { message: JSON.stringify(`Processed ${result.length} candidates`) }
     };
-
     callback(null, response);
   } catch (e) {
-    callback(null, {
+    callback(e, {
       statusCode: 500,
-      body: {}
+      body: { message: e.toString() }
     });
   }
 };
