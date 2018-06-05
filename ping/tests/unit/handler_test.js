@@ -9,11 +9,11 @@ jest.mock('axios');
 let event;
 let context;
 
-describe('Tests index', () => {
+describe('handler method', () => {
   beforeEach(() => {
     axios.mockClear();
   });
-  it('verifies successful response', async () => {
+  it('returns successful response', async () => {
     const mockResponse = { data: 'my location' };
     axios.get.mockResolvedValue(mockResponse);
     await index.handler(event, context, (err, result) => {

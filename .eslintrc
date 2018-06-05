@@ -1,5 +1,7 @@
 {
-  "extends": ["airbnb-base"],
+  "extends": [
+    "airbnb-base"
+  ],
   "env": {
     "jest": true,
     "es6": true
@@ -9,14 +11,25 @@
     "sourceType": "script"
   },
   "rules": {
-    "brace-style": ["error", "stroustrup"],
+    "brace-style": ["error", "1tbs"
+    ],
     "no-param-reassign": 0,
     "no-underscore-dangle": 0,
     "no-console": 0,
     "no-restricted-syntax": 0,
     "comma-dangle": 0,
     "import/no-unresolved": "off",
-    "import/no-extraneous-dependencies": ["error",
-    {"devDependencies": ["**/*.unit.js", "**/*_test.js", "**/*.e2e.js", "**/test/**"]}]
+    "no-use-before-define": [2, { "functions": false, "classes": true, "variables": true }],
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        "devDependencies": [
+          "**/*.unit.js",
+          "**/*_test.js",
+          "**/*.e2e.js",
+          "**/test/**"
+        ]
+      }
+    ]
   }
 }
