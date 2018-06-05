@@ -11,7 +11,7 @@ module.exports.handler = async (event, context, callback) => {
 
     const response = {
       statusCode: 200,
-      body: { message: JSON.stringify(`Processed ${result.length} candidates`) }
+      body: JSON.stringify({ message: `Processed ${result.length} candidate(s)` })
     };
     callback(null, response);
   } catch (e) {

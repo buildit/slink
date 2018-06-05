@@ -19,7 +19,8 @@ describe('Tests index', () => {
 
     await index.handler(event, context, (err, result) => {
       expect(result.statusCode).toBe(200);
-      expect(getType(result.body)).toEqual('object');
+      expect(getType(result.body)).toEqual('string');
+      expect(result.body).toEqual(JSON.stringify({message: 'Processed 1 candidate(s)'}));
     });
   });
 
