@@ -37,12 +37,42 @@ const getCandidateDetail = async (candidateId) => {
   }
 };
 
+const getJobProperties = async (candidateId, jobId) => {
+  let reply;
+  try {
+    const apiToken = process.env.SR_API_TOKEN;
+    let apiEndpoint = process.env.SR_JOB_PROPS_URL;
+    if (apiEndpoint != null) {
+      apiEndpoint = apiEndpoint.replace('{candidateId}', candidateId);
+      apiEndpoint = apiEndpoint.replace('{jobId}', jobId);
+    }
+
+    const options = {
+      method: 'GET',
+      headers: { 'X-SmartToken': apiToken }
+    };
+
+    reply = await axios.get(apiEndpoint, options);
+    return reply.data;
+  } catch (err) {
+    console.log(err);
+    throw err;
+  }
+};
+
+const findKeyValue = (props, keyName) => {
+  const foundElement = props.find(element => element.label === keyName);
+  return (foundElement === undefined ? null : foundElement.value);
+};
+
+const getKeyAmount = element => (element != null ? element.value : null);
 
 const getApplicants = async () => {
   const summaries = await getCandidateSummaries();
 
   const applicants = Promise.all(summaries.map(async (summary) => {
     const detail = await getCandidateDetail(summary.id);
+    const jobProps = await getJobProperties(summary.id, summary.primaryAssignment.job.id);
 
     const applicant = {
       id: summary.id,
@@ -55,7 +85,13 @@ const getApplicants = async () => {
       },
       primaryAssignment: {
         job: {
-          id: summary.primaryAssignment.job.id
+          id: summary.primaryAssignment.job.id,
+          startDate: findKeyValue(jobProps.content, 'Start Date'),
+          zipCode: findKeyValue(jobProps.content, 'Zip Code'),
+          country: findKeyValue(jobProps.content, 'Country'),
+          annualSalary: getKeyAmount(findKeyValue(jobProps.content, 'Annual Salary')),
+          annualBonus: getKeyAmount(findKeyValue(jobProps.content, 'Annual Bonus')),
+          signingBonus: getKeyAmount(findKeyValue(jobProps.content, 'Signing Bonus'))
         }
       }
     };
@@ -66,6 +102,8 @@ const getApplicants = async () => {
         location: (detail.experience && detail.experience[0].location) || null
       };
     }
+
+    console.log(`applicant: ${JSON.stringify(applicant)}`);
 
     return applicant;
   }));
