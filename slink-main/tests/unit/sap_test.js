@@ -2,7 +2,7 @@
 
 const axios = require('axios');
 const sap = require('../../sap');
-const models = require('./models');
+const testmodels = require('./models');
 
 jest.mock('axios');
 
@@ -38,27 +38,27 @@ describe('Post Employee Data', () => {
   it('returns employee ID if a good response', async () => {
     axios.post.mockResolvedValue(mockResponseGood);
 
-    const result = await sap.postApplicant(models.mockedApplicantModel);
+    const result = await sap.postApplicant(testmodels.applicant);
     expect(result).toEqual('123456');
   });
 
   it('returns null if a bad response', async () => {
     axios.post.mockResolvedValue(mockResponseBad);
-    const result = await sap.postApplicant(models.mockedApplicantModel);
+    const result = await sap.postApplicant(testmodels.applicant);
     expect(result).toEqual(null);
   });
 
   it('throws an exception on failure', () => {
     const error = new Error('Error from unit test');
     axios.post.mockRejectedValue(error);
-    return expect(sap.postApplicant(models.mockedApplicantModel)).rejects.toBe(error);
+    return expect(sap.postApplicant(testmodels.applicant)).rejects.toBe(error);
   });
 });
 
 
 describe('Build an SAP post body', () => {
   it('results in a POSTable object', () => {
-    const applicantWithProperties = models.mockedApplicantModel;
+    const applicantWithProperties = testmodels.applicant;
     const asOfDate = new Date(2018, 0, 5);
     const body = sap.buildPostBody(applicantWithProperties, 1234, asOfDate);
 
