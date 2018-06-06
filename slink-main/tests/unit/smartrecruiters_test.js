@@ -23,6 +23,9 @@ describe('Get candidate summary', () => {
     const mockDetailResponse = { data: models.mockedRawCandidateDetail };
     axios.get.mockResolvedValueOnce(mockDetailResponse);
 
+    const mockJobPropsResponse = { data: models.mockedRawJobProperties };
+    axios.get.mockResolvedValueOnce(mockJobPropsResponse);
+
     const response = await smartrecruiters.getApplicants();
     expect(response[0]).toEqual(models.mockedApplicantModel);
   });
