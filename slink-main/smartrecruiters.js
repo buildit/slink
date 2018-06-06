@@ -23,7 +23,10 @@ const getCandidateDetail = async (candidateId) => {
   let reply;
   try {
     const apiToken = process.env.SR_API_TOKEN;
-    const apiEndpoint = process.env.SR_CANDIDATE_DETAIL_URL + candidateId;
+    let apiEndpoint = process.env.SR_CANDIDATE_DETAIL_URL;
+    if (apiEndpoint != null) {
+      apiEndpoint = apiEndpoint.replace('{candidateId}', candidateId);
+    }
     const options = {
       method: 'GET',
       headers: { 'X-SmartToken': apiToken }
@@ -102,8 +105,6 @@ const getApplicants = async () => {
         location: (detail.experience && detail.experience[0].location) || null
       };
     }
-
-    console.log(`applicant: ${JSON.stringify(applicant)}`);
 
     return applicant;
   }));
