@@ -63,12 +63,13 @@ const getJobProperties = async (candidateId, jobId) => {
   }
 };
 
-const findKeyValue = (props, keyName) => {
-  const foundElement = props.find(element => element.label === keyName);
-  return (foundElement === undefined ? null : foundElement.value);
+const findPropertyValue = (props, propertyLabel) => {
+  const foundProperty = props.find(property => property.label === propertyLabel);
+  return (foundProperty === undefined ? null : foundProperty.value);
 };
 
-const getKeyAmount = element => (element != null ? element.value : null);
+const getValue = property => (property != null ? property.value : null);
+const getCode = property => (property != null ? property.code : null);
 
 const getApplicants = async () => {
   const summaries = await getCandidateSummaries();
@@ -76,6 +77,9 @@ const getApplicants = async () => {
   const applicants = Promise.all(summaries.map(async (summary) => {
     const detail = await getCandidateDetail(summary.id);
     const jobProps = await getJobProperties(summary.id, summary.primaryAssignment.job.id);
+    const salaryPropertyValue = findPropertyValue(jobProps.content, 'Annual Salary');
+    const annualBonusValue = findPropertyValue(jobProps.content, 'Annual Bonus');
+    const signingBonusValue = findPropertyValue(jobProps.content, 'Signing Bonus');
 
     const applicant = {
       id: summary.id,
@@ -89,12 +93,13 @@ const getApplicants = async () => {
       primaryAssignment: {
         job: {
           id: summary.primaryAssignment.job.id,
-          startDate: findKeyValue(jobProps.content, 'Start Date'),
-          zipCode: findKeyValue(jobProps.content, 'Zip Code'),
-          country: findKeyValue(jobProps.content, 'Country'),
-          annualSalary: getKeyAmount(findKeyValue(jobProps.content, 'Annual Salary')),
-          annualBonus: getKeyAmount(findKeyValue(jobProps.content, 'Annual Bonus')),
-          signingBonus: getKeyAmount(findKeyValue(jobProps.content, 'Signing Bonus'))
+          startDate: findPropertyValue(jobProps.content, 'Start Date'),
+          zipCode: findPropertyValue(jobProps.content, 'Zip Code'),
+          country: findPropertyValue(jobProps.content, 'Country'),
+          annualSalary: getValue(salaryPropertyValue),
+          offeredCurrency: getCode(salaryPropertyValue), // Assume currency is salary currency.
+          annualBonus: getValue(annualBonusValue),
+          signingBonus: getValue(signingBonusValue)
         }
       }
     };
