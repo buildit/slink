@@ -1,6 +1,9 @@
 'use strict';
 
 const axios = require('axios');
+const util = require('./util');
+
+const MISSING_STRING = '';
 
 /**
  * Builds an SAP POST body for introducing an applicant to SAP.<br/>
@@ -27,15 +30,15 @@ const buildPostBody = (applicant, resumeNumber, offerDate = new Date()) => (
         Form_of_Address: '1',
         Nationality: 'US',
         Language: 'EN',
-        Street: 'NA',
-        CITY: applicant.location.city || 'NA',
-        District: 'NA',
-        Pin_Code: applicant.primaryAssignment.job.zipCode || 'NA',
-        Country: applicant.location.country || 'NA', // TODO:  mapping needed?
+        Street: MISSING_STRING,
+        CITY: applicant.location.city || MISSING_STRING,
+        District: MISSING_STRING,
+        Pin_Code: applicant.primaryAssignment.job.zipCode || MISSING_STRING,
+        Country: applicant.location.country || MISSING_STRING, // TODO:  mapping needed?
         Contact_Number: applicant.phoneNumber,
         Source: '00001197',
         Recruiter_Id: '10068175',
-        Employer_City: applicant.experience.location || 'NA',
+        Employer_City: applicant.experience.location || MISSING_STRING,
         External_AppId: 'SR',
         proactive_flag: 'Y'
       },
@@ -57,7 +60,7 @@ const buildPostBody = (applicant, resumeNumber, offerDate = new Date()) => (
           },
           {
             compCode: 'QPLC',
-            compValue: applicant.primaryAssignment.job.annualBonus
+            compValue: `${applicant.primaryAssignment.job.annualBonus}` || '0'
           },
           {
             compCode: 'PF',
@@ -89,7 +92,7 @@ const buildPostBody = (applicant, resumeNumber, offerDate = new Date()) => (
         Applicant_Level: 'G1',
         Stream_Description: '',
         Designation: 'Denver', // Differs from document, per Chris Mundt
-        Candidate_Email: applicant.email || 'NA',
+        Candidate_Email: applicant.email || MISSING_STRING,
         FTE_End_Date: '',
         Previous_Education_Start_Date: '01-Jan-1900',
         Previous_Education_End_Date: '01-Jan-1900',
@@ -127,41 +130,34 @@ const buildPostBody = (applicant, resumeNumber, offerDate = new Date()) => (
  * @param applicant The object to submit to SAP.
  * @returns {Promise<String>} Employee ID.
  */
-const postApplicant = async (applicant) => {
+const postApplicant = async (applicant, resumeNumber) => {
   try {
     const apiEndpoint = process.env.SAP_ADD_EMPLOYEE_URL;
     const options = {
       method: 'POST',
       headers: {
         Username: process.env.SAP_USERNAME,
-        Password: process.env.SAP_USERNAME
-      },
-      data: buildPostBody(applicant, generateResumeNumber())
+        Password: process.env.SAP_PASSWORD,
+        'Content-Type': 'application/json'
+      }
     };
 
-    const sapResponse = await axios.post(apiEndpoint, options);
+    const postBody = buildPostBody(applicant, resumeNumber);
+    // console.log(`'postBody', ${JSON.stringify(postBody)}`);
+    const sapResponse = await axios.post(apiEndpoint, postBody, options);
 
-    if (sapResponse.output && sapResponse.output.ReturnFlag === 'F') {
+    const { output } = sapResponse.data;
+    if (output && output.ReturnFlag === 'F') {
+      console.log(`SAP post failed.  Applicant:  ${JSON.stringify(util.secureApplicant(applicant))}, Response: ${JSON.stringify(output)}`);
       return null;
     }
-    return sapResponse.output.EmployeeId;
+    return output.EmployeeId;
   } catch (err) {
-    console.log(`Issue posting applicant to SAP: ${err.message}`);
+    console.log(`Exception posting applicant to SAP: ${err.message}`);
     throw err;
   }
 };
 
-
-/**
- * Creates a half-assed, semi-random, hopefully-unique number to give to the SAP API.<br/>
- * This number is very poorly defined at the moment, thus this code exists, which is horrifying.
- * @returns {number}
- */
-function generateResumeNumber() {
-  const max = 99999999;
-  const min = 3450000;
-  return Math.floor((Math.random() * (max - min)) + min);
-}
 
 function formatSapDate(date) {
   const pieces = date.toDateString().split(' ');
