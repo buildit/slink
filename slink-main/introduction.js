@@ -10,23 +10,22 @@ const util = require('./util');
  */
 const process = async () => {
   const applicants = await sr.getApplicants();
-  const successfulApplicants = [];
 
-  // TODO: only process one for now
-  Promise.all(applicants.forEach(async (applicant) => {
-    const secureApplicant = util.secureApplicant(applicant);
-    console.log(`Preparing to post applicant to SAP: ${JSON.stringify(secureApplicant)}`);
+  const processedApplicants = await Promise.all(applicants.map(async (applicant) => {
+    const sanitizedApplicant = util.sanitizeApplicant(applicant);
+    console.log(`Preparing to post applicant to SAP: ${JSON.stringify(sanitizedApplicant)}`);
 
     const employeeId = await sap.postApplicant(applicant, util.generateResumeNumber());
 
-    if (employeeId != null) { // TODO more detailed return from postApplicant.
-      secureApplicant.employeeId = employeeId;
-      successfulApplicants.push(secureApplicant);
+    if (employeeId != null) { // TODO more detailed return from postApplicant?
+      sanitizedApplicant.employeeId = employeeId;
+      return { applicant: sanitizedApplicant, status: 'Succeeded' };
     }
+    return { applicant: sanitizedApplicant, status: 'Failed' };
   }));
-  console.log(`Processed applicants: ${JSON.stringify(successfulApplicants)}`);
+  console.log(`Processed applicants: ${JSON.stringify(processedApplicants)}`);
 
-  return { successfulApplicants };
+  return { processedApplicants };
 };
 
 module.exports = {

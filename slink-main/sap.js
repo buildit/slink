@@ -52,7 +52,7 @@ const buildPostBody = (applicant, resumeNumber, offerDate = new Date()) => (
         salary: [
           {
             compCode: 'BASIC',
-            compValue: `${applicant.primaryAssignment.job.annualSalary / 12}`
+            compValue: `${Math.floor(applicant.primaryAssignment.job.annualSalary / 12)}`
           },
           {
             compCode: 'HRA',
@@ -128,6 +128,7 @@ const buildPostBody = (applicant, resumeNumber, offerDate = new Date()) => (
 /**
  * Receives an applicant object and uses it to POST to SAP, resulting in an employee.
  * @param applicant The object to submit to SAP.
+ * @param resumeNumber The 'resume number' to use with SAP.  Does not come from SR data.
  * @returns {Promise<String>} Employee ID.
  */
 const postApplicant = async (applicant, resumeNumber) => {
@@ -148,9 +149,11 @@ const postApplicant = async (applicant, resumeNumber) => {
 
     const { output } = sapResponse.data;
     if (output && output.ReturnFlag === 'F') {
-      console.log(`SAP post failed.  Applicant:  ${JSON.stringify(util.secureApplicant(applicant))}, Response: ${JSON.stringify(output)}`);
+      console.log(`SAP post failed.  Applicant:  ${JSON.stringify(util.sanitizeApplicant(applicant))}, Resume number: ${resumeNumber}, Response: ${JSON.stringify(output)}`);
       return null;
     }
+
+    console.log(`SAP post succeeded.  Applicant:  ${JSON.stringify(util.sanitizeApplicant(applicant))}, Resume number: ${resumeNumber}, Response: ${JSON.stringify(output)}`);
     return output.EmployeeId;
   } catch (err) {
     console.log(`Exception posting applicant to SAP: ${err.message}`);

@@ -15,7 +15,7 @@ describe('When handler invoked', () => {
   });
 
   it('runs introduction process and gives successful response', async () => {
-    introduction.process.mockResolvedValue({ successfulApplicants: [{ id: 'abc-123' }] });
+    introduction.process.mockResolvedValue({ processedApplicants: [{ id: 'abc-123' }] });
 
     await index.handler(event, context, (err, result) => {
       expect(result.statusCode).toEqual(200);

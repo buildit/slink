@@ -1,6 +1,6 @@
 'use strict';
 
-const secureApplicant = applicant => ({
+const sanitizeApplicant = applicant => ({
   id: applicant.id,
   lastName: applicant.lastName,
   firstName: applicant.firstName
@@ -13,12 +13,13 @@ const secureApplicant = applicant => ({
  * @returns {number}
  */
 function generateResumeNumber() {
-  const max = 99999999;
-  const min = 3450000;
+  const max = 999999999;
+  // Below set by choosing a number significantly higher than that used for manual Postman tests.
+  const min = 350000;
   return Math.floor((Math.random() * (max - min)) + min);
 }
 
 module.exports = {
-  secureApplicant,
+  sanitizeApplicant,
   generateResumeNumber
 };

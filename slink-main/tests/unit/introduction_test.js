@@ -39,11 +39,23 @@ describe('Applicant introduction process', () => {
 
     expect(sap.postApplicant).toBeCalledWith(applicant1, 1111);
     expect(sap.postApplicant).toBeCalledWith(applicant2, 2222);
+    expect(sap.postApplicant).toBeCalledWith(applicant3, 3333);
 
-    expect(results.successfulApplicants.length).toBe(applicants.length - 1);
-    const result1 = Object.assign(util.secureApplicant(applicant1), { employeeId: 1010101 });
-    const result2 = Object.assign(util.secureApplicant(applicant2), { employeeId: 2020202 });
-    expect(results.successfulApplicants).toEqual([result1, result2]);
+    expect(results.processedApplicants.length).toBe(applicants.length);
+
+    const result1 = {
+      applicant: Object.assign(util.sanitizeApplicant(applicant1), { employeeId: 1010101 }),
+      status: "Succeeded"
+    };
+    const result2 = {
+      applicant: Object.assign(util.sanitizeApplicant(applicant2), { employeeId: 2020202 }),
+      status: "Succeeded"
+    };
+    const result3 = {
+      applicant: util.sanitizeApplicant(applicant3),
+      status: "Failed"
+    };
+    expect(results.processedApplicants).toEqual([result1, result2, result3]);
   });
 });
 
