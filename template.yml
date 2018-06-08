@@ -80,6 +80,7 @@ Resources:
             Fn::GetAtt:
               - "SlinkMainFunction"
               - "Arn"
+          Id: "SlinkMainV1"
   PermissionForEventsToInvokeLambda:
     Type: "AWS::Lambda::Permission"
     Properties:
