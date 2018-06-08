@@ -68,4 +68,29 @@ Resources:
             Method: get
             Path: /slink
 
+  SlinkIntroductionRule:
+    Type: "AWS::Events::Rule"
+    Properties:
+      Description: "Invoke Slink Introduction Process"
+      ScheduleExpression: "rate(60 minutes)"
+      State: "ENABLED"
+      Targets:
+        -
+          Arn:
+            Fn::GetAtt:
+              - "SlinkMainFunction"
+              - "Arn"
+  PermissionForEventsToInvokeLambda:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      FunctionName:
+        Ref: "SlinkMainFunction"
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn:
+        Fn::GetAtt:
+          - "SlinkIntroductionRule"
+          - "Arn"
+
+
 Transform: AWS::Serverless-2016-10-31
