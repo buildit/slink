@@ -170,7 +170,7 @@ function formatPhoneNumber(phoneNumber) {
     const phoneNoSpaces = phoneNumber.replace(/ */g, '');
     return phoneNoSpaces.substr(phoneNoSpaces.length - 10);
   }
-  return '';
+  return MISSING_STRING;
 }
 
 function formatSapDate(date) {
