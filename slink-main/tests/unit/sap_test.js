@@ -92,14 +92,16 @@ describe('Build an SAP post body', () => {
     const hackedApplicant = Object.assign({}, testmodels.applicant);
     hackedApplicant.phoneNumber = '123 456 7890';
     hackedApplicant.primaryAssignment.job.zipCode = 'ABC 123';
+    hackedApplicant.location = {}; // Case from actual data
     const asOfDate = new Date(2018, 0, 5);
 
     const body = sap.buildPostBody(hackedApplicant, 1234, asOfDate);
 
     // eslint-disable-next-line camelcase
-    const { Contact_Number, Pin_Code } = body.input.applicantId;
-    expect(Contact_Number).toEqual(hackedApplicant.phoneNumber);
+    const { Contact_Number, Pin_Code, CITY } = body.input.applicantId;
+    expect(Contact_Number).toEqual('1234567890');
     expect(Pin_Code).toEqual(sap.MISSING_STRING);
+    expect(CITY).toEqual('NA');
   });
 });
 

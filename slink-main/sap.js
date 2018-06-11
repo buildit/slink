@@ -4,6 +4,7 @@ const axios = require('axios');
 const util = require('./util');
 
 const MISSING_STRING = '';
+const DEFAULT_STRING = 'NA';
 
 /**
  * Builds an SAP POST body for introducing an applicant to SAP.<br/>
@@ -31,11 +32,11 @@ const buildPostBody = (applicant, resumeNumber, offerDate = new Date()) => (
         Nationality: 'US',
         Language: 'EN',
         Street: MISSING_STRING,
-        CITY: applicant.location.city || MISSING_STRING,
+        CITY: applicant.location.city || DEFAULT_STRING,
         District: MISSING_STRING,
         Pin_Code: formatPinZip(applicant),
         Country: applicant.location.country || MISSING_STRING, // TODO:  mapping needed?
-        Contact_Number: applicant.phoneNumber ? applicant.phoneNumber.replace(/ *g/, '') : '',
+        Contact_Number: applicant.phoneNumber ? applicant.phoneNumber.replace(/ */g, '') : '',
         Source: '00001197',
         Recruiter_Id: '10068175',
         Employer_City: applicant.experience.location || MISSING_STRING,
@@ -144,7 +145,7 @@ const postApplicant = async (applicant, resumeNumber) => {
     };
 
     const postBody = buildPostBody(applicant, resumeNumber);
-    // console.log(`'postBody', ${JSON.stringify(postBody)}`);
+    console.log(`'postBody', ${JSON.stringify(postBody)}`);
     const sapResponse = await axios.post(apiEndpoint, postBody, options);
 
     const { output } = sapResponse.data;
@@ -182,5 +183,6 @@ function currentDateIfNull(date) {
 module.exports = {
   postApplicant,
   buildPostBody,
-  MISSING_STRING
+  MISSING_STRING,
+  DEFAULT_STRING
 };
