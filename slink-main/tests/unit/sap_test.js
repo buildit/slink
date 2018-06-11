@@ -59,7 +59,7 @@ describe('Post Employee Data', () => {
 });
 
 
-describe('Build an SAP post body', () => {
+describe('When building an SAP post body', () => {
   it('normal applicant results in a POSTable object', () => {
     const applicantWithProperties = testmodels.applicant;
     const asOfDate = new Date(2018, 0, 5);
@@ -110,6 +110,18 @@ describe('Build an SAP post body', () => {
     const qplc = body.input.contractOffer.salary.find(it => it.compCode === 'QPLC').compValue;
     expect(qplc).toEqual('0');
     expect(body.input.contractOffer.offeredCurrency).toEqual('USD');
+  });
+
+  it('applicant with international number results in a POSTable object', () => {
+    const hackedApplicant = Object.assign({}, testmodels.applicant);
+    hackedApplicant.phoneNumber = '+919591875888';
+    const asOfDate = new Date(2018, 0, 5);
+
+    const body = sap.buildPostBody(hackedApplicant, 1234, asOfDate);
+
+    // eslint-disable-next-line camelcase
+    const { Contact_Number } = body.input.applicantId;
+    expect(Contact_Number).toEqual('9591875888');
   });
 });
 

@@ -6,6 +6,14 @@ const util = require('./util');
 const MISSING_STRING = '';
 const DEFAULT_STRING = 'NA';
 
+function formatPhoneNumber(applicant) {
+  if (applicant.phoneNumber) {
+    const phoneNoSpaces = applicant.phoneNumber.replace(/ */g, '');
+    return phoneNoSpaces.substr(phoneNoSpaces.length - 10);
+  }
+  return '';
+}
+
 /**
  * Builds an SAP POST body for introducing an applicant to SAP.<br/>
  * Note:  If a field has a literal, then that value was provided in
@@ -36,7 +44,7 @@ const buildPostBody = (applicant, resumeNumber, offerDate = new Date()) => (
         District: MISSING_STRING,
         Pin_Code: formatPinZip(applicant),
         Country: applicant.location.country || MISSING_STRING, // TODO:  mapping needed?
-        Contact_Number: applicant.phoneNumber ? applicant.phoneNumber.replace(/ */g, '') : '',
+        Contact_Number: formatPhoneNumber(applicant),
         Source: '00001197',
         Recruiter_Id: '10068175',
         Employer_City: formatCity(applicant.experience.location),
@@ -164,7 +172,8 @@ const postApplicant = async (applicant, resumeNumber) => {
 
 
 function formatSapDate(date) {
-  const pieces = date.toDateString().split(' ');
+  const pieces = date.toDateString()
+    .split(' ');
   return `${pieces[2]}-${pieces[1]}-${pieces[3]}`;
 }
 
