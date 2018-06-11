@@ -35,7 +35,7 @@ const buildPostBody = (applicant, resumeNumber, offerDate = new Date()) => (
         District: MISSING_STRING,
         Pin_Code: applicant.primaryAssignment.job.zipCode || MISSING_STRING,
         Country: applicant.location.country || MISSING_STRING, // TODO:  mapping needed?
-        Contact_Number: applicant.phoneNumber,
+        Contact_Number: applicant.phoneNumber ? applicant.phoneNumber.replace(/ *g/, '') : '',
         Source: '00001197',
         Recruiter_Id: '10068175',
         Employer_City: applicant.experience.location || MISSING_STRING,
