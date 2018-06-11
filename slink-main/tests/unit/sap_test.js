@@ -105,7 +105,7 @@ describe('When building an SAP post body', () => {
       Contact_Number, Pin_Code, Employer_City
     } = body.input.applicantId;
     expect(Contact_Number).toEqual('1234567890');
-    expect(Pin_Code).toEqual(sap.MISSING_STRING);
+    expect(Pin_Code).toEqual(sap.DEFAULT_ZIP_CODE);
     expect(Employer_City).toEqual(sap.MISSING_STRING);
     const qplc = body.input.contractOffer.salary.find(it => it.compCode === 'QPLC').compValue;
     expect(qplc).toEqual('0');

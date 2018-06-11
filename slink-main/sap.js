@@ -5,6 +5,7 @@ const util = require('./util');
 
 const MISSING_STRING = '';
 const DEFAULT_STRING = 'NA';
+const DEFAULT_ZIP_CODE = '40391'; // Unlikely marker zip code because SAP appears to require one.
 
 function formatPhoneNumber(applicant) {
   if (applicant.phoneNumber) {
@@ -182,7 +183,7 @@ function formatPinZip(applicant) {
   if (zipCode && zipCode.match(/^\d{5}(?:[-\s]\d{4})?$/)) {
     return zipCode;
   }
-  return MISSING_STRING;
+  return DEFAULT_ZIP_CODE;
 }
 
 function formatCity(city) {
@@ -200,5 +201,6 @@ module.exports = {
   postApplicant,
   buildPostBody,
   MISSING_STRING,
-  DEFAULT_STRING
+  DEFAULT_STRING,
+  DEFAULT_ZIP_CODE
 };
