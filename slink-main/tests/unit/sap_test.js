@@ -79,10 +79,10 @@ describe('Build an SAP post body', () => {
     const contractOffer = body.input.contractOffer;
     expect(contractOffer.offeredCurrency).toEqual(applicantWithProperties.primaryAssignment.job.offeredCurrency);
     console.log('salary', `${applicantWithProperties.primaryAssignment.job.monthlySalary}`);
-    expect(contractOffer.salary[0].compValue).toEqual('6250');
+    expect(contractOffer.salary[0].compValue).toEqual('8333');
     expect(contractOffer.salary[2].compValue).toEqual(`${applicantWithProperties.primaryAssignment.job.annualBonus}`);
     expect(contractOffer.Offer_Date).toEqual('05-Jan-2018');
-    expect(contractOffer.Joining_Date).toEqual('25-Jun-2018');
+    expect(contractOffer.Joining_Date).toEqual('22-Jun-2018');
   });
 });
 
