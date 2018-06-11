@@ -61,7 +61,7 @@ const buildPostBody = (applicant, resumeNumber, offerDate = new Date()) => (
           },
           {
             compCode: 'QPLC',
-            compValue: `${applicant.primaryAssignment.job.annualBonus}` || '0'
+            compValue: applicant.primaryAssignment.job.annualBonus ? `${applicant.primaryAssignment.job.annualBonus}` : '0'
           },
           {
             compCode: 'PF',
