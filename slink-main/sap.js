@@ -8,6 +8,43 @@ const DEFAULT_STRING = 'NA';
 const DEFAULT_ZIP_CODE = '40391'; // Unlikely marker zip code because SAP appears to require one.
 
 /**
+ * Receives an applicant object and uses it to POST to SAP, resulting in an employee.
+ * @param applicant The object to submit to SAP.
+ * @param resumeNumber The 'resume number' to use with SAP.  Does not come from SR data.
+ * @returns {Promise<String>} Employee ID.
+ */
+const postApplicant = async (applicant, resumeNumber) => {
+  try {
+    const apiEndpoint = process.env.SAP_ADD_EMPLOYEE_URL;
+    const options = {
+      method: 'POST',
+      headers: {
+        Username: process.env.SAP_USERNAME,
+        Password: process.env.SAP_PASSWORD,
+        'Content-Type': 'application/json'
+      }
+    };
+
+    const postBody = buildPostBody(applicant, resumeNumber);
+    console.log(`'postBody', ${JSON.stringify(postBody)}`);
+    const sapResponse = await axios.post(apiEndpoint, postBody, options);
+
+    const { output } = sapResponse.data;
+    if (output && output.ReturnFlag === 'F') {
+      console.log(`SAP post failed.  Applicant:  ${JSON.stringify(util.sanitizeApplicant(applicant))}, Resume number: ${resumeNumber}, Response: ${JSON.stringify(output)}`);
+      return null;
+    }
+
+    console.log(`SAP post succeeded.  Applicant:  ${JSON.stringify(util.sanitizeApplicant(applicant))}, Resume number: ${resumeNumber}, Response: ${JSON.stringify(output)}`);
+    return output.EmployeeId;
+  } catch (err) {
+    console.log(`Exception posting applicant to SAP: ${err.message}`);
+    throw err;
+  }
+};
+
+
+/**
  * Builds an SAP POST body for introducing an applicant to SAP.<br/>
  * Note:  If a field has a literal, then that value was provided in
  *        the "SR-SAP Integration Spec Overview" document that can
@@ -17,8 +54,8 @@ const DEFAULT_ZIP_CODE = '40391'; // Unlikely marker zip code because SAP appear
  * @param offerDate Date used as a source for date fields sent to SAP.  This is a punt, for now.
  * @returns fully filled-out body that can be posted to SAP
  */
-const buildPostBody = (applicant, resumeNumber, offerDate = new Date()) => (
-  {
+function buildPostBody(applicant, resumeNumber, offerDate = new Date()) {
+  return {
     input: {
       applicantId: {
         First_Name: applicant.firstName,
@@ -125,44 +162,8 @@ const buildPostBody = (applicant, resumeNumber, offerDate = new Date()) => (
       }
     },
     output: null
-  });
-
-/**
- * Receives an applicant object and uses it to POST to SAP, resulting in an employee.
- * @param applicant The object to submit to SAP.
- * @param resumeNumber The 'resume number' to use with SAP.  Does not come from SR data.
- * @returns {Promise<String>} Employee ID.
- */
-const postApplicant = async (applicant, resumeNumber) => {
-  try {
-    const apiEndpoint = process.env.SAP_ADD_EMPLOYEE_URL;
-    const options = {
-      method: 'POST',
-      headers: {
-        Username: process.env.SAP_USERNAME,
-        Password: process.env.SAP_PASSWORD,
-        'Content-Type': 'application/json'
-      }
-    };
-
-    const postBody = buildPostBody(applicant, resumeNumber);
-    console.log(`'postBody', ${JSON.stringify(postBody)}`);
-    const sapResponse = await axios.post(apiEndpoint, postBody, options);
-
-    const { output } = sapResponse.data;
-    if (output && output.ReturnFlag === 'F') {
-      console.log(`SAP post failed.  Applicant:  ${JSON.stringify(util.sanitizeApplicant(applicant))}, Resume number: ${resumeNumber}, Response: ${JSON.stringify(output)}`);
-      return null;
-    }
-
-    console.log(`SAP post succeeded.  Applicant:  ${JSON.stringify(util.sanitizeApplicant(applicant))}, Resume number: ${resumeNumber}, Response: ${JSON.stringify(output)}`);
-    return output.EmployeeId;
-  } catch (err) {
-    console.log(`Exception posting applicant to SAP: ${err.message}`);
-    throw err;
-  }
-};
-
+  };
+}
 
 function formatPhoneNumber(phoneNumber) {
   if (phoneNumber) {
