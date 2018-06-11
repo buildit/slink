@@ -39,7 +39,7 @@ const buildPostBody = (applicant, resumeNumber, offerDate = new Date()) => (
         Contact_Number: applicant.phoneNumber ? applicant.phoneNumber.replace(/ */g, '') : '',
         Source: '00001197',
         Recruiter_Id: '10068175',
-        Employer_City: applicant.experience.location || MISSING_STRING,
+        Employer_City: formatCity(applicant.experience.location),
         External_AppId: 'SR',
         proactive_flag: 'Y'
       },
@@ -172,6 +172,13 @@ function formatPinZip(applicant) {
   const { zipCode } = applicant.primaryAssignment.job;
   if (zipCode && zipCode.match(/^\d{5}(?:[-\s]\d{4})?$/)) {
     return zipCode;
+  }
+  return MISSING_STRING;
+}
+
+function formatCity(city) {
+  if (city && city.match(/[A-Za-z]+/)) {
+    return city;
   }
   return MISSING_STRING;
 }

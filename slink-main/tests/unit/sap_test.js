@@ -93,15 +93,18 @@ describe('Build an SAP post body', () => {
     hackedApplicant.phoneNumber = '123 456 7890';
     hackedApplicant.primaryAssignment.job.zipCode = 'ABC 123';
     hackedApplicant.location = {}; // Case from actual data
+    hackedApplicant.experience.location = ', , '; // Case from actual data
     const asOfDate = new Date(2018, 0, 5);
 
     const body = sap.buildPostBody(hackedApplicant, 1234, asOfDate);
 
-    // eslint-disable-next-line camelcase
-    const { Contact_Number, Pin_Code, CITY } = body.input.applicantId;
+    const {
+      // eslint-disable-next-line camelcase
+      Contact_Number, Pin_Code, CITY, Employer_City
+    } = body.input.applicantId;
     expect(Contact_Number).toEqual('1234567890');
     expect(Pin_Code).toEqual(sap.MISSING_STRING);
-    expect(CITY).toEqual('NA');
+    expect(Employer_City).toEqual(sap.MISSING_STRING);
   });
 });
 
