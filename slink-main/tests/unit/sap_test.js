@@ -91,13 +91,15 @@ describe('Build an SAP post body', () => {
   it('crappy applicant results in a POSTable object', () => {
     const hackedApplicant = Object.assign({}, testmodels.applicant);
     hackedApplicant.phoneNumber = '123 456 7890';
+    hackedApplicant.primaryAssignment.job.zipCode = 'ABC 123';
     const asOfDate = new Date(2018, 0, 5);
 
     const body = sap.buildPostBody(hackedApplicant, 1234, asOfDate);
 
     // eslint-disable-next-line camelcase
-    const { Contact_Number } = body.input.applicantId;
+    const { Contact_Number, Pin_Code } = body.input.applicantId;
     expect(Contact_Number).toEqual(hackedApplicant.phoneNumber);
+    expect(Pin_Code).toEqual(sap.MISSING_STRING);
   });
 });
 

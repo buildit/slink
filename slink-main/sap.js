@@ -33,7 +33,7 @@ const buildPostBody = (applicant, resumeNumber, offerDate = new Date()) => (
         Street: MISSING_STRING,
         CITY: applicant.location.city || MISSING_STRING,
         District: MISSING_STRING,
-        Pin_Code: applicant.primaryAssignment.job.zipCode || MISSING_STRING,
+        Pin_Code: formatPinZip(applicant),
         Country: applicant.location.country || MISSING_STRING, // TODO:  mapping needed?
         Contact_Number: applicant.phoneNumber ? applicant.phoneNumber.replace(/ *g/, '') : '',
         Source: '00001197',
@@ -167,11 +167,20 @@ function formatSapDate(date) {
   return `${pieces[2]}-${pieces[1]}-${pieces[3]}`;
 }
 
+function formatPinZip(applicant) {
+  const { zipCode } = applicant.primaryAssignment.job;
+  if (zipCode && zipCode.match(/^\d{5}(?:[-\s]\d{4})?$/)) {
+    return zipCode;
+  }
+  return MISSING_STRING;
+}
+
 function currentDateIfNull(date) {
   return new Date(date || new Date().getTime());
 }
 
 module.exports = {
   postApplicant,
-  buildPostBody
+  buildPostBody,
+  MISSING_STRING
 };
