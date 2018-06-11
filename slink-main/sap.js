@@ -45,7 +45,7 @@ const buildPostBody = (applicant, resumeNumber, offerDate = new Date()) => (
       },
       contractOffer: {
         careerband: 'B2',
-        offeredCurrency: applicant.primaryAssignment.job.offeredCurrency,
+        offeredCurrency: applicant.primaryAssignment.job.offeredCurrency || 'USD',
         reportingManager: '117543',
         jobcode: '0',
         educationType: '03',

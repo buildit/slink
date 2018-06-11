@@ -95,6 +95,7 @@ describe('Build an SAP post body', () => {
     hackedApplicant.location = {}; // Case from actual data
     hackedApplicant.experience.location = ', , '; // Case from actual data
     hackedApplicant.primaryAssignment.job.annualBonus = null; // Can happen with contractors
+    hackedApplicant.primaryAssignment.job.offeredCurrency = null; // Can happen with contractors
     const asOfDate = new Date(2018, 0, 5);
 
     const body = sap.buildPostBody(hackedApplicant, 1234, asOfDate);
@@ -108,6 +109,7 @@ describe('Build an SAP post body', () => {
     expect(Employer_City).toEqual(sap.MISSING_STRING);
     const qplc = body.input.contractOffer.salary.find(it => it.compCode === 'QPLC').compValue;
     expect(qplc).toEqual('0');
+    expect(body.input.contractOffer.offeredCurrency).toEqual('USD');
   });
 });
 
