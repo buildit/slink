@@ -26,7 +26,7 @@ const postApplicant = async (applicant, resumeNumber) => {
     };
 
     const postBody = buildPostBody(applicant, resumeNumber);
-    console.log(`'postBody', ${JSON.stringify(postBody)}`);
+    // console.log(`'postBody', ${JSON.stringify(postBody)}`);
     const sapResponse = await axios.post(apiEndpoint, postBody, options);
 
     const { output } = sapResponse.data;
