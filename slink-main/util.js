@@ -14,7 +14,7 @@ const sanitizeApplicant = applicant => ({
  */
 function generateResumeNumber() {
   const min = 350000; // determined by choosing a number significantly higher than that used for manual Postman tests.
-  const max = 999999999; // should give us enough integer space to mostly avoid duplicates.
+  const max = 9999999999; // Max allowed by API, and should give us enough integer space to mostly avoid duplicates.
   return Math.floor((Math.random() * (max - min)) + min);
 }
 
