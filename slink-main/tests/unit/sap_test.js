@@ -5,7 +5,6 @@ const sap = require('../../sap');
 const testmodels = require('./models');
 
 jest.mock('axios');
-
 // Not sure about ReturnFlag value for a good response.  Below is just a guess for now.
 const mockResponseGood = {
   data: {
@@ -60,10 +59,11 @@ describe('Post Employee Data', () => {
 });
 
 
-describe('Build an SAP post body', () => {
-  it('results in a POSTable object', () => {
+describe('When building an SAP post body', () => {
+  it('normal applicant results in a POSTable object', () => {
     const applicantWithProperties = testmodels.applicant;
     const asOfDate = new Date(2018, 0, 5);
+
     const body = sap.buildPostBody(applicantWithProperties, 1234, asOfDate);
 
     const applicantId = body.input.applicantId;
@@ -76,13 +76,52 @@ describe('Build an SAP post body', () => {
     expect(applicantId.Contact_Number).toEqual(applicantWithProperties.phoneNumber);
     expect(applicantId.Employer_City).toEqual(applicantWithProperties.experience.location);
 
-    const contractOffer = body.input.contractOffer;
-    expect(contractOffer.offeredCurrency).toEqual(applicantWithProperties.primaryAssignment.job.offeredCurrency);
+    const {
+      // eslint-disable-next-line camelcase
+      offeredCurrency, salary, Offer_Date, Joining_Date
+    } = body.input.contractOffer;
+    expect(offeredCurrency).toEqual(applicantWithProperties.primaryAssignment.job.offeredCurrency);
     console.log('salary', `${applicantWithProperties.primaryAssignment.job.monthlySalary}`);
-    expect(contractOffer.salary[0].compValue).toEqual('8333');
-    expect(contractOffer.salary[2].compValue).toEqual(`${applicantWithProperties.primaryAssignment.job.annualBonus}`);
-    expect(contractOffer.Offer_Date).toEqual('05-Jan-2018');
-    expect(contractOffer.Joining_Date).toEqual('22-Jun-2018');
+    expect(salary[0].compValue).toEqual('8333');
+    expect(salary[2].compValue).toEqual(`${applicantWithProperties.primaryAssignment.job.annualBonus}`);
+    expect(Offer_Date).toEqual('05-Jan-2018');
+    expect(Joining_Date).toEqual('22-Jun-2018');
+  });
+
+  it('crappy applicant results in a POSTable object', () => {
+    const hackedApplicant = Object.assign({}, testmodels.applicant);
+    hackedApplicant.phoneNumber = '123 456 7890';
+    hackedApplicant.primaryAssignment.job.zipCode = 'ABC 123';
+    hackedApplicant.location = {}; // Case from actual data
+    hackedApplicant.experience.location = ', , '; // Case from actual data
+    hackedApplicant.primaryAssignment.job.annualBonus = null; // Can happen with contractors
+    hackedApplicant.primaryAssignment.job.offeredCurrency = null; // Can happen with contractors
+    const asOfDate = new Date(2018, 0, 5);
+
+    const body = sap.buildPostBody(hackedApplicant, 1234, asOfDate);
+
+    const {
+      // eslint-disable-next-line camelcase
+      Contact_Number, Pin_Code, Employer_City
+    } = body.input.applicantId;
+    expect(Contact_Number).toEqual('1234567890');
+    expect(Pin_Code).toEqual(sap.DEFAULT_ZIP_CODE);
+    expect(Employer_City).toEqual(sap.MISSING_STRING);
+    const qplc = body.input.contractOffer.salary.find(it => it.compCode === 'QPLC').compValue;
+    expect(qplc).toEqual('0');
+    expect(body.input.contractOffer.offeredCurrency).toEqual('USD');
+  });
+
+  it('applicant with international number results in a POSTable object', () => {
+    const hackedApplicant = Object.assign({}, testmodels.applicant);
+    hackedApplicant.phoneNumber = '+919591875888';
+    const asOfDate = new Date(2018, 0, 5);
+
+    const body = sap.buildPostBody(hackedApplicant, 1234, asOfDate);
+
+    // eslint-disable-next-line camelcase
+    const { Contact_Number } = body.input.applicantId;
+    expect(Contact_Number).toEqual('9591875888');
   });
 });
 

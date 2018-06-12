@@ -4,6 +4,45 @@ const axios = require('axios');
 const util = require('./util');
 
 const MISSING_STRING = '';
+const DEFAULT_STRING = 'NA';
+const DEFAULT_ZIP_CODE = '40391'; // Unlikely marker zip code because SAP appears to require one.
+
+/**
+ * Receives an applicant object and uses it to POST to SAP, resulting in an employee.
+ * @param applicant The object to submit to SAP.
+ * @param resumeNumber The 'resume number' to use with SAP.  Does not come from SR data.
+ * @returns {Promise<String>} Employee ID.
+ */
+const postApplicant = async (applicant, resumeNumber) => {
+  try {
+    const apiEndpoint = process.env.SAP_ADD_EMPLOYEE_URL;
+    const options = {
+      method: 'POST',
+      headers: {
+        Username: process.env.SAP_USERNAME,
+        Password: process.env.SAP_PASSWORD,
+        'Content-Type': 'application/json'
+      }
+    };
+
+    const postBody = buildPostBody(applicant, resumeNumber);
+    // console.log(`'postBody', ${JSON.stringify(postBody)}`);
+    const sapResponse = await axios.post(apiEndpoint, postBody, options);
+
+    const { output } = sapResponse.data;
+    if (output && output.ReturnFlag === 'F') {
+      console.log(`SAP post failed.  Applicant:  ${JSON.stringify(util.sanitizeApplicant(applicant))}, Resume number: ${resumeNumber}, Response: ${JSON.stringify(output)}`);
+      return null;
+    }
+
+    console.log(`SAP post succeeded.  Applicant:  ${JSON.stringify(util.sanitizeApplicant(applicant))}, Resume number: ${resumeNumber}, Response: ${JSON.stringify(output)}`);
+    return output.EmployeeId;
+  } catch (err) {
+    console.log(`Exception posting applicant to SAP: ${err.message}`);
+    throw err;
+  }
+};
+
 
 /**
  * Builds an SAP POST body for introducing an applicant to SAP.<br/>
@@ -15,8 +54,8 @@ const MISSING_STRING = '';
  * @param offerDate Date used as a source for date fields sent to SAP.  This is a punt, for now.
  * @returns fully filled-out body that can be posted to SAP
  */
-const buildPostBody = (applicant, resumeNumber, offerDate = new Date()) => (
-  {
+function buildPostBody(applicant, resumeNumber, offerDate = new Date()) {
+  return {
     input: {
       applicantId: {
         First_Name: applicant.firstName,
@@ -31,20 +70,20 @@ const buildPostBody = (applicant, resumeNumber, offerDate = new Date()) => (
         Nationality: 'US',
         Language: 'EN',
         Street: MISSING_STRING,
-        CITY: applicant.location.city || MISSING_STRING,
+        CITY: applicant.location.city || DEFAULT_STRING,
         District: MISSING_STRING,
-        Pin_Code: applicant.primaryAssignment.job.zipCode || MISSING_STRING,
+        Pin_Code: formatPinZip(applicant.primaryAssignment.job.zipCode),
         Country: applicant.location.country || MISSING_STRING, // TODO:  mapping needed?
-        Contact_Number: applicant.phoneNumber,
+        Contact_Number: formatPhoneNumber(applicant.phoneNumber),
         Source: '00001197',
         Recruiter_Id: '10068175',
-        Employer_City: applicant.experience.location || MISSING_STRING,
+        Employer_City: formatCity(applicant.experience.location),
         External_AppId: 'SR',
         proactive_flag: 'Y'
       },
       contractOffer: {
         careerband: 'B2',
-        offeredCurrency: applicant.primaryAssignment.job.offeredCurrency,
+        offeredCurrency: applicant.primaryAssignment.job.offeredCurrency || 'USD',
         reportingManager: '117543',
         jobcode: '0',
         educationType: '03',
@@ -60,7 +99,7 @@ const buildPostBody = (applicant, resumeNumber, offerDate = new Date()) => (
           },
           {
             compCode: 'QPLC',
-            compValue: `${applicant.primaryAssignment.job.annualBonus}` || '0'
+            compValue: applicant.primaryAssignment.job.annualBonus ? `${applicant.primaryAssignment.job.annualBonus}` : '0'
           },
           {
             compCode: 'PF',
@@ -123,48 +162,35 @@ const buildPostBody = (applicant, resumeNumber, offerDate = new Date()) => (
       }
     },
     output: null
-  });
+  };
+}
 
-/**
- * Receives an applicant object and uses it to POST to SAP, resulting in an employee.
- * @param applicant The object to submit to SAP.
- * @param resumeNumber The 'resume number' to use with SAP.  Does not come from SR data.
- * @returns {Promise<String>} Employee ID.
- */
-const postApplicant = async (applicant, resumeNumber) => {
-  try {
-    const apiEndpoint = process.env.SAP_ADD_EMPLOYEE_URL;
-    const options = {
-      method: 'POST',
-      headers: {
-        Username: process.env.SAP_USERNAME,
-        Password: process.env.SAP_PASSWORD,
-        'Content-Type': 'application/json'
-      }
-    };
-
-    const postBody = buildPostBody(applicant, resumeNumber);
-    // console.log(`'postBody', ${JSON.stringify(postBody)}`);
-    const sapResponse = await axios.post(apiEndpoint, postBody, options);
-
-    const { output } = sapResponse.data;
-    if (output && output.ReturnFlag === 'F') {
-      console.log(`SAP post failed.  Applicant:  ${JSON.stringify(util.sanitizeApplicant(applicant))}, Resume number: ${resumeNumber}, Response: ${JSON.stringify(output)}`);
-      return null;
-    }
-
-    console.log(`SAP post succeeded.  Applicant:  ${JSON.stringify(util.sanitizeApplicant(applicant))}, Resume number: ${resumeNumber}, Response: ${JSON.stringify(output)}`);
-    return output.EmployeeId;
-  } catch (err) {
-    console.log(`Exception posting applicant to SAP: ${err.message}`);
-    throw err;
+function formatPhoneNumber(phoneNumber) {
+  if (phoneNumber) {
+    const phoneNoSpaces = phoneNumber.replace(/ */g, '');
+    return phoneNoSpaces.substr(phoneNoSpaces.length - 10);
   }
-};
-
+  return MISSING_STRING;
+}
 
 function formatSapDate(date) {
-  const pieces = date.toDateString().split(' ');
+  const pieces = date.toDateString()
+    .split(' ');
   return `${pieces[2]}-${pieces[1]}-${pieces[3]}`;
+}
+
+function formatPinZip(zipCode) {
+  if (zipCode && zipCode.match(/^\d{5}(?:[-\s]\d{4})?$/)) {
+    return zipCode;
+  }
+  return DEFAULT_ZIP_CODE;
+}
+
+function formatCity(city) {
+  if (city && city.match(/[A-Za-z]+/)) {
+    return city;
+  }
+  return MISSING_STRING;
 }
 
 function currentDateIfNull(date) {
@@ -173,5 +199,8 @@ function currentDateIfNull(date) {
 
 module.exports = {
   postApplicant,
-  buildPostBody
+  buildPostBody,
+  MISSING_STRING,
+  DEFAULT_STRING,
+  DEFAULT_ZIP_CODE
 };

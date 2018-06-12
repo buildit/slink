@@ -6,7 +6,7 @@ module.exports.handler = async (event, context, callback) => {
   try {
     const result = await introduction.process();
 
-    console.log(`Process complete.  Applicants in this run: ${result.processedApplicants}`);
+    console.log(`Process complete.  Applicants in this run: ${JSON.stringify(result.processedApplicants)}`);
     result.processedApplicants.forEach((applicant) => {
       console.log(`${JSON.stringify(applicant)}`);
     });
