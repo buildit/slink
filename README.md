@@ -48,7 +48,7 @@ REPORT RequestId: 52325f23-d66b-1713-6604-05d453ab9d80    Duration: 725.14 ms   
 
 ### Example command for `slink-main` function, passing in Lambda environment variable:
 
-`SR_API_TOKEN=<api token> sam local invoke SlinkMainFunction -e event.json`
+`SR_API_TOKEN=<value> SAP_USERNAME=<value> SAP_PASSWORD=<value> sam local invoke SlinkMainFunction -e event.json`
 
 
 ## AWS Deployment ##
