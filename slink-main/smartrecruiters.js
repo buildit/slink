@@ -56,7 +56,6 @@ const getApplicants = async () => {
 
   const applicants = Promise.all(summaries.content.map(async (summary) => {
     const candidateDetail = await srGet(summary.actions.details.url);
-    // eslint-disable-next-line
     const jobDetail = await srGet(candidateDetail.primaryAssignment.job.actions.details.url);
     const jobProps = await getJobProperties(summary.id, summary.primaryAssignment.job.id);
     const salaryPropertyValue = findPropertyValue(jobProps.content, 'Annual Salary');
@@ -72,6 +71,7 @@ const getApplicants = async () => {
         country: summary.location.country || null,
         city: summary.location.city || null
       },
+      fullTime: (jobDetail.typeOfEmployment && jobDetail.typeOfEmployment.id === 'permanent') || false,
       primaryAssignment: {
         job: {
           id: summary.primaryAssignment.job.id,
@@ -92,7 +92,7 @@ const getApplicants = async () => {
         location: (candidateDetail.experience && candidateDetail.experience[0].location) || null
       };
     }
-
+    console.log(`'applicant', ${JSON.stringify(applicant)}`);
     return applicant;
   }));
 

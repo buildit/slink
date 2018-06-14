@@ -19,7 +19,7 @@ describe('Get candidate summary', () => {
 
   it('should build applicant if required data is present', async () => {
     const mockSummaryResponse = testmodels.sr.rawCandidateSummaries;
-    const get = axios.get;
+    const { get } = axios;
 
     get.mockResolvedValueOnce(mockSummaryResponse);
 

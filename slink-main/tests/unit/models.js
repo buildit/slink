@@ -12,6 +12,7 @@ const applicant = {
     country: 'United States',
     city: 'Atlanta',
   },
+  fullTime: true,
   primaryAssignment: {
     job: {
       id: 'ccfc86f3-c309-48e2-a2ae-175ae0d0ec3c',
