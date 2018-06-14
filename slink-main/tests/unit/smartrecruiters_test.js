@@ -10,6 +10,7 @@ describe('Get candidate summary', () => {
   beforeAll(() => {
     process.env.SR_API_TOKEN = 'SR_API_TOKEN';
     process.env.SR_CANDIDATE_SUMMARY_URL = 'http://mockurl/';
+    process.env.SR_JOB_PROPS_URL = 'https://api.smartrecruiters.com/candidates/{candidateId}/jobs/{jobId}/properties';
   });
 
   beforeEach(() => {
@@ -17,21 +18,34 @@ describe('Get candidate summary', () => {
   });
 
   it('should build applicant if required data is present', async () => {
-    const mockSummaryResponse = { data: { content: [testmodels.sr.rawCandidateSummaries] } };
-    axios.get.mockResolvedValueOnce(mockSummaryResponse);
+    const mockSummaryResponse = testmodels.sr.rawCandidateSummaries;
+    const get = axios.get;
 
-    const mockDetailResponse = { data: testmodels.sr.candidateDetail };
-    axios.get.mockResolvedValueOnce(mockDetailResponse);
+    get.mockResolvedValueOnce(mockSummaryResponse);
 
-    const mockJobPropsResponse = { data: testmodels.sr.jobProperties };
-    axios.get.mockResolvedValueOnce(mockJobPropsResponse);
+    const mockDetailResponse = testmodels.sr.candidateDetail;
+    get.mockResolvedValueOnce(mockDetailResponse);
+
+    const mockJobDetailResponse = testmodels.sr.jobDetail;
+    get.mockResolvedValueOnce(mockJobDetailResponse);
+
+    const mockJobPropsResponse = testmodels.sr.jobProperties;
+    get.mockResolvedValueOnce(mockJobPropsResponse);
 
     const response = await smartrecruiters.getApplicants();
+
+    expect(get.mock.calls[0][0]).toBe(process.env.SR_CANDIDATE_SUMMARY_URL);
+    expect(get.mock.calls[1][0]).toBe(testmodels.sr.rawCandidateSummaries.data.content[0].actions.details.url);
+    expect(get.mock.calls[2][0]).toBe(testmodels.sr.candidateDetail.data.primaryAssignment.job.actions.details.url);
+    expect(get.mock.calls[3][0]).toBe('https://api.smartrecruiters.com/candidates/cc285818-963d-497a-a2a8-e2227af0876e/jobs/ccfc86f3-c309-48e2-a2ae-175ae0d0ec3c/properties');
+
     expect(response[0]).toEqual(testmodels.applicant);
   });
 
   it.skip('should return an error on failure', async () => {
     // Don't set up mocks, which results `undefined` values, which causes error.
-    expect(() => { smartrecruiters.getApplicants() }).toThrow();
+    expect(() => {
+      smartrecruiters.getApplicants();
+    }).toThrow();
   });
 });
