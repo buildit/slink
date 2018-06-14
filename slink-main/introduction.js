@@ -11,18 +11,27 @@ const util = require('./util');
 const process = async () => {
   const applicants = await sr.getApplicants();
 
-  const processedApplicants = await Promise.all(applicants.map(async (applicant) => {
-    const sanitizedApplicant = util.sanitizeApplicant(applicant);
-    console.log(`Preparing to post applicant to SAP: ${JSON.stringify(sanitizedApplicant)}`);
+  const processedApplicants =
+    await Promise.all(applicants
+      .filter(applicant => applicant.fullTime)
+      .map(async (applicant) => {
+        const sanitizedApplicant = util.sanitizeApplicant(applicant);
+        console.log(`Preparing to post applicant to SAP: ${JSON.stringify(sanitizedApplicant)}`);
 
-    const employeeId = await sap.postApplicant(applicant, util.generateResumeNumber());
+        const employeeId = await sap.postApplicant(applicant, util.generateResumeNumber());
 
-    if (employeeId != null) { // TODO more detailed return from postApplicant?
-      sanitizedApplicant.employeeId = employeeId;
-      return { applicant: sanitizedApplicant, status: 'Succeeded' };
-    }
-    return { applicant: sanitizedApplicant, status: 'Failed' };
-  }));
+        if (employeeId != null) { // TODO more detailed return from postApplicant?
+          sanitizedApplicant.employeeId = employeeId;
+          return {
+            applicant: sanitizedApplicant,
+            status: 'Succeeded'
+          };
+        }
+        return {
+          applicant: sanitizedApplicant,
+          status: 'Failed'
+        };
+      }));
   console.log(`Processed applicants: ${JSON.stringify(processedApplicants)}`);
 
   return { processedApplicants };
