@@ -2,7 +2,7 @@
 
 const axios = require('axios');
 
-const getCandidateSummaries = async () => {
+const srGet = async (url) => {
   try {
     const apiToken = process.env.SR_API_TOKEN;
     const options = {
@@ -10,29 +10,8 @@ const getCandidateSummaries = async () => {
       headers: { 'X-SmartToken': apiToken }
     };
 
-    const reply = await axios.get(process.env.SR_CANDIDATE_SUMMARY_URL, options);
+    const reply = await axios.get(url, options);
 
-    return reply.data.content;
-  } catch (err) {
-    console.log(err);
-    throw err;
-  }
-};
-
-const getCandidateDetail = async (candidateId) => {
-  let reply;
-  try {
-    const apiToken = process.env.SR_API_TOKEN;
-    let apiEndpoint = process.env.SR_CANDIDATE_DETAIL_URL;
-    if (apiEndpoint != null) {
-      apiEndpoint = apiEndpoint.replace('{candidateId}', candidateId);
-    }
-    const options = {
-      method: 'GET',
-      headers: { 'X-SmartToken': apiToken }
-    };
-
-    reply = await axios.get(apiEndpoint, options);
     return reply.data;
   } catch (err) {
     console.log(err);
@@ -41,7 +20,6 @@ const getCandidateDetail = async (candidateId) => {
 };
 
 const getJobProperties = async (candidateId, jobId) => {
-  let reply;
   try {
     const apiToken = process.env.SR_API_TOKEN;
     let apiEndpoint = process.env.SR_JOB_PROPS_URL;
@@ -55,7 +33,7 @@ const getJobProperties = async (candidateId, jobId) => {
       headers: { 'X-SmartToken': apiToken }
     };
 
-    reply = await axios.get(apiEndpoint, options);
+    const reply = await axios.get(apiEndpoint, options);
     return reply.data;
   } catch (err) {
     console.log(err);
@@ -64,6 +42,8 @@ const getJobProperties = async (candidateId, jobId) => {
 };
 
 const findPropertyValue = (props, propertyLabel) => {
+  if (!props) return null;
+
   const foundProperty = props.find(property => property.label === propertyLabel);
   return (foundProperty === undefined ? null : foundProperty.value);
 };
@@ -72,10 +52,11 @@ const getValue = property => (property != null ? property.value : null);
 const getCode = property => (property != null ? property.code : null);
 
 const getApplicants = async () => {
-  const summaries = await getCandidateSummaries();
+  const summaries = await srGet(process.env.SR_CANDIDATE_SUMMARY_URL);
 
-  const applicants = Promise.all(summaries.map(async (summary) => {
-    const detail = await getCandidateDetail(summary.id);
+  const applicants = Promise.all(summaries.content.map(async (summary) => {
+    const candidateDetail = await srGet(summary.actions.details.url);
+    const jobDetail = await srGet(candidateDetail.primaryAssignment.job.actions.details.url);
     const jobProps = await getJobProperties(summary.id, summary.primaryAssignment.job.id);
     const salaryPropertyValue = findPropertyValue(jobProps.content, 'Annual Salary');
     const annualBonusValue = findPropertyValue(jobProps.content, 'Annual Bonus');
@@ -90,6 +71,7 @@ const getApplicants = async () => {
         country: summary.location.country || null,
         city: summary.location.city || null
       },
+      fullTime: (jobDetail.typeOfEmployment && jobDetail.typeOfEmployment.id === 'permanent') || false,
       primaryAssignment: {
         job: {
           id: summary.primaryAssignment.job.id,
@@ -104,13 +86,13 @@ const getApplicants = async () => {
       }
     };
 
-    if (detail) {
-      applicant.phoneNumber = detail.phoneNumber || null;
+    if (candidateDetail) {
+      applicant.phoneNumber = candidateDetail.phoneNumber || null;
       applicant.experience = {
-        location: (detail.experience && detail.experience[0].location) || null
+        location: (candidateDetail.experience && candidateDetail.experience[0].location) || null
       };
     }
-
+    console.log(`'applicant', ${JSON.stringify(applicant)}`);
     return applicant;
   }));
 
