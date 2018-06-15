@@ -81,7 +81,6 @@ describe('Building an SAP post body', () => {
       offeredCurrency, salary, Offer_Date, Joining_Date
     } = body.input.contractOffer;
     expect(offeredCurrency).toEqual(applicantWithProperties.primaryAssignment.job.offeredCurrency);
-    console.log('salary', `${applicantWithProperties.primaryAssignment.job.monthlySalary}`);
     expect(salary[0].compValue).toEqual('8333');
     expect(salary[2].compValue).toEqual(`${applicantWithProperties.primaryAssignment.job.annualBonus}`);
     expect(Offer_Date).toEqual('05-Jan-2018');

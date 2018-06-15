@@ -88,7 +88,6 @@ const getApplicants = async () => {
         location: (candidateDetail.experience && candidateDetail.experience[0].location) || null
       };
     }
-    console.log(`'applicant', ${JSON.stringify(applicant)}`);
     return applicant;
   }));
 
