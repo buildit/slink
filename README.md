@@ -11,7 +11,7 @@ _Slink_ is a SmartRecruiters to SAP integration service.  It is implemented usin
 - Clone this repository
 - `nvm use`
 - `npm install`
-- `npm test`
+- `npm test -- --silent` (silent causes `console.log()` messages not to print, giving cleaner output)
 
 _Note_:  The solution is modular.  That is, there are several "module" subdirectories within the source tree.  Each
 module represents a Lambda function and has its own `package.json`.  We are striving to keep the commands the same

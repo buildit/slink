@@ -9,7 +9,7 @@ jest.mock('axios');
 let event;
 let context;
 
-describe('handler method', () => {
+describe('Ping handler method', () => {
   beforeEach(() => {
     axios.mockClear();
   });

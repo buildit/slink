@@ -17,7 +17,7 @@ describe('Applicant introduction process', () => {
     sap.postApplicant.mockClear();
   });
 
-  it('calls SAP for each fteApplicant from SmartRecruiters', async () => {
+  it('calls SAP for each FTE Applicant from SmartRecruiters, and registers Employee ID in SmartRecruiters', async () => {
     const fteApplicant1 = {
       id: 'guid1',
       employeeId: null,
