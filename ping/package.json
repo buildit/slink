@@ -15,7 +15,7 @@
     },
     "jest": {
         "testMatch": [
-            "**/tests/**/*.js?(x)"
+            "**/tests/**/*_test.js?(x)"
         ],
         "testEnvironment": "node"
     }
