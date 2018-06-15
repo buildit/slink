@@ -64,10 +64,10 @@ describe('Get candidate summary', () => {
     expect(response[0]).toEqual(expectedApplicant);
   });
 
-  it.skip('should return an error on failure', async () => {
-    // Don't set up mocks, which results `undefined` values, which causes error.
-    expect(() => {
-      smartrecruiters.getApplicants();
-    }).toThrow();
+
+  it('throws an exception on failure', () => {
+    const error = new Error('Error from unit test');
+    get.mockRejectedValue(error);
+    return expect(smartrecruiters.getApplicants()).rejects.toBe(error);
   });
 });
