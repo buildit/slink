@@ -23,21 +23,36 @@ describe('Applicant introduction process', () => {
       lastName: 'One',
       firstName: 'Applicant',
       other: 'Other',
-      fullTime: true
+      fullTime: true,
+      primaryAssignment: {
+        job: {
+          id: 'job1'
+        }
+      }
     };
     const fteApplicant2 = {
       id: 'guid2',
       lastName: 'Two',
       firstName: 'Applicant',
       other: 'Other',
-      fullTime: true
+      fullTime: true,
+      primaryAssignment: {
+        job: {
+          id: 'job2'
+        }
+      }
     };
     const fteApplicant3 = {
       id: 'guid3',
       lastName: 'Three',
       firstName: 'Applicant',
       other: 'Other',
-      fullTime: true
+      fullTime: true,
+      primaryAssignment: {
+        job: {
+          id: 'job3'
+        }
+      }
     };
     const contractorApplicant = {
       id: 'guid4',
@@ -52,13 +67,16 @@ describe('Applicant introduction process', () => {
 
     util.generateResumeNumber.mockReturnValueOnce(1111);
     sap.postApplicant.mockReturnValueOnce(1010101);
+    smartrecruiters.addEmployeeId.mockReturnValueOnce(true);
 
     util.generateResumeNumber.mockReturnValueOnce(2222);
     sap.postApplicant.mockReturnValueOnce(2020202);
+    smartrecruiters.addEmployeeId.mockReturnValueOnce(true);
 
     // Error case.  Need to handle in a more detailed way.
     util.generateResumeNumber.mockReturnValueOnce(3333);
     sap.postApplicant.mockReturnValueOnce(null);
+    smartrecruiters.addEmployeeId.mockReturnValueOnce(false);
 
     const results = await introduction.process();
 

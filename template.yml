@@ -54,6 +54,8 @@ Resources:
           SR_API_TOKEN: override_me
           SR_CANDIDATE_SUMMARY_URL: https://api.smartrecruiters.com/candidates?updatedAfter=2018-02-01T10%3A15%3A00.500%2B00%3A00&status=OFFERED&subStatus=Offer Accepted
           SR_JOB_PROPS_URL: https://api.smartrecruiters.com/candidates/{candidateId}/jobs/{jobId}/properties
+          SR_EMPLOYEE_PROP_ID: 05f1b2eb-65f2-46c7-ad73-c7b8bd688c33
+          SR_ADD_PROPERTY_URL: https://api.smartrecruiters.com/candidates/{candidateId}/jobs/{jobId}/properties/{propertyId}
           SAP_ADD_EMPLOYEE_URL: https://appstore.wipro.com/synergy/AltRecruitService?opr=empIdGen
           SAP_USERNAME: override_me
           SAP_PASSWORD: override_me
