@@ -88,6 +88,49 @@ const getApplicants = async () => {
   return applicants;
 };
 
+/**
+ * Adds the SAP employee ID to Smart Recruiters applicant as a property value.
+ * @param applicantId The id of the application from SR.
+ * @param jobId The id of the Job which applicant is primarily assigned to (from SR).
+ * @param sapId The SAP ID to be assigned to this applicant.
+ * @returns true if the call to Smart Recruiter succeeds, otherwise false.
+ */
+const addEmployeeId = async (applicantId, jobId, sapId) => {
+  try {
+    const apiToken = process.env.SR_API_TOKEN;
+    let apiEndpoint = process.env.SR_ADD_PROPERTY_URL;
+    apiEndpoint = apiEndpoint.replace('{candidateId}', applicantId);
+    apiEndpoint = apiEndpoint.replace('{jobId}', jobId);
+    apiEndpoint = apiEndpoint.replace('{propertyId}', process.env.SR_EMPLOYEE_PROP_ID);
+
+    const options = {
+      method: 'PUT',
+      headers: {
+        'X-SmartToken': apiToken,
+        'Content-Type': 'application/json'
+      },
+    };
+
+    const putBody = {
+      value: `${sapId}`
+    };
+
+    const SRresponse = await axios.put(apiEndpoint, putBody, options);
+    if (SRresponse && SRresponse.status === 204) {
+      console.log(`Smart Recruiters post succeeded.  Applicant:  ${applicantId}, SAP employee id: ${sapId}`);
+      return true;
+    }
+
+    console.log(`Smart Recruiters post failed.  ApplicantId:  ${applicantId}, employee id: ${sapId}, Response: ${JSON.stringify(SRresponse)}`);
+    return false;
+  } catch (err) {
+    console.log(`Exception posting applicant employee id to Smart Recruiters: ${err.message}`);
+    throw err;
+  }
+};
+
+
 module.exports = {
-  getApplicants
+  getApplicants,
+  addEmployeeId
 };

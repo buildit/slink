@@ -23,9 +23,17 @@ const process = async () => {
 
         if (employeeId != null) { // TODO more detailed return from postApplicant?
           sanitizedApplicant.employeeId = employeeId;
+
+          console.log(`Preparing to add SAP employee id to Smart Recruiters: ${JSON.stringify(sanitizedApplicant)}`);
+          const srStatusFlag = await sr.addEmployeeId(
+            applicant.id,
+            applicant.primaryAssignment.job.id,
+            employeeId
+          );
+
           return {
             applicant: sanitizedApplicant,
-            status: 'Succeeded'
+            status: (srStatusFlag ? 'Succeeded' : 'Failed')
           };
         }
         return {

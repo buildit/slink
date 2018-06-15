@@ -71,3 +71,58 @@ describe('Get candidate summary', () => {
     return expect(smartrecruiters.getApplicants()).rejects.toBe(error);
   });
 });
+
+const mockPutResponseGood = {
+  status: 204
+};
+
+const mockPutResponseBad = {
+  status: 404,
+  data: {
+    message: 'some return message',
+    errors: [{
+      code: 'some code',
+      message: 'some return message'
+    }]
+  }
+};
+
+describe('Add Employee Id property to SR', () => {
+  beforeAll(() => {
+    process.env.SR_ADD_PROPERTY_URL = 'http://mockurl/';
+  });
+
+  beforeEach(() => {
+    axios.mockClear();
+  });
+
+  it('returns null if a good response', async () => {
+    axios.put.mockResolvedValue(mockPutResponseGood);
+
+    const result = await smartrecruiters.addEmployeeId(
+      testmodels.applicant.id,
+      testmodels.applicant.primaryAssignment.job.id,
+      '123123g3-3434'
+    );
+    expect(result).toBe(true);
+  });
+
+
+  it('returns mockPutResponseBad if a bad response', async () => {
+    axios.put.mockResolvedValue(mockPutResponseBad);
+    const result = await smartrecruiters.addEmployeeId(
+      testmodels.applicant.id,
+      testmodels.applicant.primaryAssignment.job.id
+    );
+    expect(result).toBe(false);
+  });
+
+  it('throws an exception on failure', () => {
+    const error = new Error('Error from unit test');
+    axios.put.mockRejectedValue(error);
+    return expect(smartrecruiters.addEmployeeId(
+      testmodels.applicant.id,
+      testmodels.applicant.primaryAssignment.job.id
+    )).rejects.toBe(error);
+  });
+});
