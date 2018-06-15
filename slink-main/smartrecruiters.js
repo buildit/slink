@@ -20,25 +20,12 @@ const srGet = async (url) => {
 };
 
 const getJobProperties = async (candidateId, jobId) => {
-  try {
-    const apiToken = process.env.SR_API_TOKEN;
-    let apiEndpoint = process.env.SR_JOB_PROPS_URL;
-    if (apiEndpoint != null) {
-      apiEndpoint = apiEndpoint.replace('{candidateId}', candidateId);
-      apiEndpoint = apiEndpoint.replace('{jobId}', jobId);
-    }
-
-    const options = {
-      method: 'GET',
-      headers: { 'X-SmartToken': apiToken }
-    };
-
-    const reply = await axios.get(apiEndpoint, options);
-    return reply.data;
-  } catch (err) {
-    console.log(err);
-    throw err;
+  let apiEndpoint = process.env.SR_JOB_PROPS_URL;
+  if (apiEndpoint != null) {
+    apiEndpoint = apiEndpoint.replace('{candidateId}', candidateId);
+    apiEndpoint = apiEndpoint.replace('{jobId}', jobId);
   }
+  return srGet(apiEndpoint);
 };
 
 const findPropertyValue = (props, propertyLabel) => {
