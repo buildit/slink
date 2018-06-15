@@ -48,9 +48,11 @@ const getApplicants = async () => {
     const salaryPropertyValue = findPropertyValue(jobProps.content, 'Annual Salary');
     const annualBonusValue = findPropertyValue(jobProps.content, 'Annual Bonus');
     const signingBonusValue = findPropertyValue(jobProps.content, 'Signing Bonus');
+    const employeeId = findPropertyValue(jobProps.content, 'Employee ID');
 
     const applicant = {
       id: summary.id,
+      employeeId,
       firstName: summary.firstName,
       lastName: summary.lastName,
       email: summary.email,

@@ -5,6 +5,7 @@
 //
 const applicant = {
   id: 'cc285818-963d-497a-a2a8-e2227af0876e',
+  employeeId: null, // case if applicant is un-introduced
   firstName: 'Ricky',
   lastName: 'Bobby',
   email: 'shakenbake@gmail.com',
