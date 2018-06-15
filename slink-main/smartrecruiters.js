@@ -28,10 +28,17 @@ const getJobProperties = async (candidateId, jobId) => {
   return srGet(apiEndpoint);
 };
 
-const findPropertyValue = (props, propertyLabel) => {
+const findPropertyValueByLabel = (props, propertyLabel) => {
   if (!props) return null;
 
   const foundProperty = props.find(property => property.label === propertyLabel);
+  return (foundProperty === undefined ? null : foundProperty.value);
+};
+
+const findPropertyValueById = (props, id) => {
+  if (!props) return null;
+
+  const foundProperty = props.find(property => property.id === id);
   return (foundProperty === undefined ? null : foundProperty.value);
 };
 
@@ -45,12 +52,14 @@ const getApplicants = async () => {
     const candidateDetail = await srGet(summary.actions.details.url);
     const jobDetail = await srGet(candidateDetail.primaryAssignment.job.actions.details.url);
     const jobProps = await getJobProperties(summary.id, summary.primaryAssignment.job.id);
-    const salaryPropertyValue = findPropertyValue(jobProps.content, 'Annual Salary');
-    const annualBonusValue = findPropertyValue(jobProps.content, 'Annual Bonus');
-    const signingBonusValue = findPropertyValue(jobProps.content, 'Signing Bonus');
+    const salaryPropertyValue = findPropertyValueByLabel(jobProps.content, 'Annual Salary');
+    const annualBonusValue = findPropertyValueByLabel(jobProps.content, 'Annual Bonus');
+    const signingBonusValue = findPropertyValueByLabel(jobProps.content, 'Signing Bonus');
+    const employeeId = findPropertyValueById(jobProps.content, process.env.SR_EMPLOYEE_PROP_ID);
 
     const applicant = {
       id: summary.id,
+      employeeId,
       firstName: summary.firstName,
       lastName: summary.lastName,
       email: summary.email,
@@ -62,9 +71,9 @@ const getApplicants = async () => {
       primaryAssignment: {
         job: {
           id: summary.primaryAssignment.job.id,
-          startDate: findPropertyValue(jobProps.content, 'Start Date'),
-          zipCode: findPropertyValue(jobProps.content, 'Zip Code'),
-          country: findPropertyValue(jobProps.content, 'Country'),
+          startDate: findPropertyValueByLabel(jobProps.content, 'Start Date'),
+          zipCode: findPropertyValueByLabel(jobProps.content, 'Zip Code'),
+          country: findPropertyValueByLabel(jobProps.content, 'Country'),
           annualSalary: getValue(salaryPropertyValue),
           offeredCurrency: getCode(salaryPropertyValue), // Assume currency is salary currency.
           annualBonus: getValue(annualBonusValue),

@@ -8,7 +8,7 @@ jest.mock('../../introduction');
 let event;
 let context;
 
-describe('When handler invoked', () => {
+describe('Handler invocation', () => {
   beforeEach(() => {
     // Clear all instances and calls to constructor and all methods
     introduction.process.mockClear();

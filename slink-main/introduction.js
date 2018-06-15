@@ -14,6 +14,7 @@ const process = async () => {
   const processedApplicants =
     await Promise.all(applicants
       .filter(applicant => applicant.fullTime)
+      .filter(applicant => applicant.employeeId === null)
       .map(async (applicant) => {
         const sanitizedApplicant = util.sanitizeApplicant(applicant);
         console.log(`Preparing to post applicant to SAP: ${JSON.stringify(sanitizedApplicant)}`);

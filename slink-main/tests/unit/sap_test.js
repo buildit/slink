@@ -27,7 +27,7 @@ const mockResponseBad = {
 };
 
 
-describe('Post Employee Data', () => {
+describe('POSTing Employee Data', () => {
   beforeAll(() => {
     process.env.SAP_USERNAME = 'username';
     process.env.SAP_PASSWORD = 'password';
@@ -59,8 +59,8 @@ describe('Post Employee Data', () => {
 });
 
 
-describe('When building an SAP post body', () => {
-  it('normal applicant results in a POSTable object', () => {
+describe('Building an SAP post body', () => {
+  it('with normal applicant results in a POSTable object', () => {
     const applicantWithProperties = testmodels.applicant;
     const asOfDate = new Date(2018, 0, 5);
 
@@ -88,7 +88,7 @@ describe('When building an SAP post body', () => {
     expect(Joining_Date).toEqual('22-Jun-2018');
   });
 
-  it('crappy applicant results in a POSTable object', () => {
+  it('with crappy applicant results in a POSTable object', () => {
     const hackedApplicant = Object.assign({}, testmodels.applicant);
     hackedApplicant.phoneNumber = '123 456 7890';
     hackedApplicant.primaryAssignment.job.zipCode = 'ABC 123';
@@ -112,7 +112,7 @@ describe('When building an SAP post body', () => {
     expect(body.input.contractOffer.offeredCurrency).toEqual('USD');
   });
 
-  it('applicant with international number results in a POSTable object', () => {
+  it('with applicant with international number results in a POSTable object', () => {
     const hackedApplicant = Object.assign({}, testmodels.applicant);
     hackedApplicant.phoneNumber = '+919591875888';
     const asOfDate = new Date(2018, 0, 5);
