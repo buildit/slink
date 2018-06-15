@@ -20,6 +20,7 @@ describe('Applicant introduction process', () => {
   it('calls SAP for each fteApplicant from SmartRecruiters', async () => {
     const fteApplicant1 = {
       id: 'guid1',
+      employeeId: null,
       lastName: 'One',
       firstName: 'Applicant',
       other: 'Other',
@@ -27,6 +28,7 @@ describe('Applicant introduction process', () => {
     };
     const fteApplicant2 = {
       id: 'guid2',
+      employeeId: null,
       lastName: 'Two',
       firstName: 'Applicant',
       other: 'Other',
@@ -34,6 +36,7 @@ describe('Applicant introduction process', () => {
     };
     const fteApplicant3 = {
       id: 'guid3',
+      employeeId: null,
       lastName: 'Three',
       firstName: 'Applicant',
       other: 'Other',
@@ -41,12 +44,21 @@ describe('Applicant introduction process', () => {
     };
     const contractorApplicant = {
       id: 'guid4',
+      employeeId: null,
       lastName: 'Four',
       firstName: 'Contractor Applicant',
       other: 'Other',
       fullTime: false
     };
-    const applicants = [fteApplicant1, contractorApplicant, fteApplicant2, fteApplicant3];
+    const alreadyIntroducedApplicant = {
+      id: 'guid5',
+      employeeId: 12345,
+      lastName: 'Five',
+      firstName: 'Already Introduced',
+      other: 'Other',
+      fullTime: true
+    };
+    const applicants = [fteApplicant1, contractorApplicant, fteApplicant2, alreadyIntroducedApplicant, fteApplicant3];
 
     smartrecruiters.getApplicants.mockResolvedValueOnce(applicants);
 
@@ -62,14 +74,16 @@ describe('Applicant introduction process', () => {
 
     const results = await introduction.process();
 
-    expect(util.generateResumeNumber).toHaveBeenCalledTimes(3);
+    expect(util.generateResumeNumber)
+      .toHaveBeenCalledTimes(3);
 
     expect(sap.postApplicant).toHaveBeenCalledWith(fteApplicant1, 1111);
     expect(sap.postApplicant).toHaveBeenCalledWith(fteApplicant2, 2222);
     expect(sap.postApplicant).toHaveBeenCalledWith(fteApplicant3, 3333);
     expect(sap.postApplicant).toHaveBeenCalledTimes(3);
 
-    expect(results.processedApplicants.length).toBe(3); // A contractor is not processed
+    expect(results.processedApplicants.length)
+      .toBe(applicants.length - 2); // Contractors and already-introduced applicants are not processed
 
     const result1 = {
       applicant: Object.assign(util.sanitizeApplicant(fteApplicant1), { employeeId: 1010101 }),
