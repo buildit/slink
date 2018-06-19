@@ -32,6 +32,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: ./slink-main/
+      AutoPublishAlias: STAGE
       Environment:
         Variables:
           SR_API_TOKEN: override_me
@@ -51,12 +52,6 @@ Resources:
           Properties:
             Method: get
             Path: /slink
-
-  SlinkMainFunctionVersion:
-    Type: AWS::Lambda::Version
-    Properties:
-      Description: Version for function
-      FunctionName: !Ref SlinkMainFunction
 
   SlinkIntroductionRule:
     Type: "AWS::Events::Rule"
