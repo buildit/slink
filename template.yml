@@ -55,7 +55,7 @@ Resources:
   SlinkMainFunctionVersion:
     Type: AWS::Lambda::Version
     Properties:
-      Description: Version for introduction function
+      Description: Version for function
       FunctionName: !Ref SlinkMainFunction
 
   SlinkIntroductionRule:
