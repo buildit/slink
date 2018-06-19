@@ -28,24 +28,6 @@ Follow these steps:
 - Take special note of the requirement to add your project root directory to Docker's File Sharing preferences
 - Run the appropriate `sam local invoke` command.  See https://github.com/awslabs/aws-sam-cli#invoke-functions-locally
 
-### Example terminal session for `ping` function:
-```bash
-1 ❯ sam local invoke "PingFunction"
-2018-05-21 16:48:58 Reading invoke payload from stdin (you can also pass it from file with --event)
-{}
-<ctl-D>
-2018-05-21 16:49:03 Invoking index.handler (nodejs8.10)
-2018-05-21 16:49:03 Credentials found in config file: ~/.aws/config
-
-Fetching lambci/lambda:nodejs8.10 Docker container image......
-2018-05-21 16:49:05 Mounting /Users/mthomas/Code/slink/ping as /var/task:ro inside runtime container
-START RequestId: 52325f23-d66b-1713-6604-05d453ab9d80 Version: $LATEST
-END RequestId: 52325f23-d66b-1713-6604-05d453ab9d80
-REPORT RequestId: 52325f23-d66b-1713-6604-05d453ab9d80    Duration: 725.14 ms    Billed Duration: 800 ms    Memory Size: 128 MB    Max Memory Used: 35 MB
-
-{"statusCode":200,"body":"{\"message\":\"hello world\",\"location\":\"208.184.53.154\"}"}
-```
-
 ### Example command for `slink-main` function, passing in Lambda environment variable:
 
 `SR_API_TOKEN=<value> SAP_USERNAME=<value> SAP_PASSWORD=<value> sam local invoke SlinkMainFunction -e event.json`
