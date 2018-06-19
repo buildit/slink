@@ -14,7 +14,13 @@ const srGet = async (url) => {
 
     return reply.data;
   } catch (err) {
-    console.log(err);
+    if (err.response) {
+      console.log(`Error response from SmartRecruiters API. Status: ${err.response.status}, URL: ${url}, Headers: ${err.response.headers}, Error: ${err}`);
+    } else if (err.request) {
+      console.log(`Error calling SmartRecruiters API. Status: ${err.request}, Error: ${err}`);
+    } else {
+      console.log('Unexpected error interacting with SmartRecruiters', err.message);
+    }
     throw err;
   }
 };
@@ -51,6 +57,7 @@ const getApplicants = async () => {
   const applicants = Promise.all(summaries.content.map(async (summary) => {
     const candidateDetail = await srGet(summary.actions.details.url);
     const jobDetail = await srGet(candidateDetail.primaryAssignment.job.actions.details.url);
+
     const jobProps = await getJobProperties(summary.id, summary.primaryAssignment.job.id);
     const salaryPropertyValue = findPropertyValueByLabel(jobProps.content, 'Annual Salary');
     const annualBonusValue = findPropertyValueByLabel(jobProps.content, 'Annual Bonus');
