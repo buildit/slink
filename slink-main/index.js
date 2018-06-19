@@ -4,7 +4,7 @@ const introduction = require('./introduction');
 
 module.exports.handler = async (event, context, callback) => {
   try {
-    console.log(`#### ARN:  ${context.invokedFunctionArn}`);
+    console.log(`#### Function ARN:  ${context.invokedFunctionArn}`);
 
     const result = await introduction.process();
 
