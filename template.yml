@@ -83,10 +83,10 @@ Resources:
       State: "ENABLED"
       Targets:
         -
-          Arn:
-            Fn::GetAtt:
-              - "SlinkMainFunction"
-              - "Arn"
+          Arn: !Join
+            - ':'
+            - - !GetAtt SlinkMainFunction.Arn
+              - PROD
           Id: "SlinkMainV1"
 
   PermissionForEventsToInvokeLambda:
@@ -96,10 +96,10 @@ Resources:
         Ref: "SlinkMainFunction"
       Action: "lambda:InvokeFunction"
       Principal: "events.amazonaws.com"
-      SourceArn: !Join
-         - ':'
-         - - !GetAtt SlinkIntroductionRule.Arn
-           - PROD
+      SourceArn:
+        Fn::GetAtt:
+          - "SlinkIntroductionRule"
+          - "Arn"
 
 
 Transform: AWS::Serverless-2016-10-31
