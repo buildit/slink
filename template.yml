@@ -69,6 +69,12 @@ Resources:
             Method: get
             Path: /slink
 
+  SlinkMainFunctionVersion:
+    Type: AWS::Lambda::Version
+    Properties:
+      Description: Version for introduction function
+      FunctionName: !Ref SlinkMainFunction
+
   SlinkIntroductionRule:
     Type: "AWS::Events::Rule"
     Properties:
@@ -82,6 +88,7 @@ Resources:
               - "SlinkMainFunction"
               - "Arn"
           Id: "SlinkMainV1"
+
   PermissionForEventsToInvokeLambda:
     Type: "AWS::Lambda::Permission"
     Properties:
@@ -89,10 +96,10 @@ Resources:
         Ref: "SlinkMainFunction"
       Action: "lambda:InvokeFunction"
       Principal: "events.amazonaws.com"
-      SourceArn:
-        Fn::GetAtt:
-          - "SlinkIntroductionRule"
-          - "Arn"
+      SourceArn: !Join
+         - ':'
+         - - !GetAtt SlinkIntroductionRule.Arn
+           - PROD
 
 
 Transform: AWS::Serverless-2016-10-31
