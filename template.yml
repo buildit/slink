@@ -28,23 +28,6 @@ Globals:
     Handler: index.handler
 
 Resources:
-  PingFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: ./ping/
-      Environment:
-        Variables:
-          PARAM1: VALUE
-      Role:
-        Fn::ImportValue:
-          !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
-      Events:
-        GetApiEndpoint:
-          Type: Api
-          Properties:
-            Method: get
-            Path: /ping
-
   SlinkMainFunction:
     Type: AWS::Serverless::Function
     Properties:
