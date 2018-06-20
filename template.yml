@@ -7,6 +7,10 @@ Parameters:
   ProjectId:
     Type: String
     Description: AWS CodeStar projectID used to associate new resources to team members
+  ScheduledFunctionAlias:
+    Type: String
+    Description: Function Alias that is executed by the CW Event rule for scheduled runs.
+    Default: PROD
 
 # Enable blue/green deployments using this Globals section. For instructions, see the AWS CodeStar User Guide:
 # https://docs.aws.amazon.com/codestar/latest/userguide/how-to-modify-serverless-project.html?icmpid=docs_acs_rm_tr
@@ -64,7 +68,7 @@ Resources:
           Arn: !Join
             - ':'
             - - !GetAtt SlinkMainFunction.Arn
-              - PROD
+              - !Ref ScheduledFunctionAlias
           Id: "SlinkMainV1"
 
   PermissionForEventsToInvokeLambda:
@@ -73,7 +77,7 @@ Resources:
       FunctionName: !Join
         - ':'
         - - !GetAtt SlinkMainFunction.Arn
-          - PROD
+          - !Ref ScheduledFunctionAlias
 
       Action: "lambda:InvokeFunction"
       Principal: "events.amazonaws.com"
