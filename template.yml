@@ -61,7 +61,7 @@ Resources:
     Type: "AWS::Events::Rule"
     Properties:
       Description: "Invoke Slink Introduction Process"
-      ScheduleExpression: "rate(60 minutes)"
+      ScheduleExpression: "rate(15 minutes)"
       State: "ENABLED"
       Targets:
         -
