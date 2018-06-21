@@ -3,6 +3,7 @@
 const axios = require('axios');
 const smartrecruiters = require('../../smartrecruiters');
 const testmodels = require('./models');
+const config = require('../../config');
 
 jest.mock('axios');
 
@@ -12,10 +13,9 @@ describe('Get candidate summary', () => {
   const { get } = axios;
 
   beforeAll(() => {
-    process.env.SR_API_TOKEN = 'SR_API_TOKEN';
-    process.env.SR_CANDIDATE_SUMMARY_URL = 'http://mockurl/';
-    process.env.SR_JOB_PROPS_URL = 'https://api.smartrecruiters.com/candidates/{candidateId}/jobs/{jobId}/properties';
-    process.env.SR_EMPLOYEE_PROP_ID = 'abc-123';
+    config.configParams.SR_SUMMARY_URL = 'http://mockurl/';
+    config.configParams.SR_JOB_PROPS_URL = 'https://api.smartrecruiters.com/candidates/{candidateId}/jobs/{jobId}/properties';
+    config.configParams.SR_EMPLOYEE_PROP_ID = 'abc-123';
   });
 
   beforeEach(() => {
@@ -40,7 +40,7 @@ describe('Get candidate summary', () => {
   it('builds applicant employee ID if property is present', async () => {
     const jobPropertiesWithEmployeeId = Object.assign({}, testmodels.sr.jobProperties);
     jobPropertiesWithEmployeeId.data.content.push({
-      id: process.env.SR_EMPLOYEE_PROP_ID,
+      id: config.configParams.SR_EMPLOYEE_PROP_ID,
       value: 12345
     });
     get.mockResolvedValueOnce(jobPropertiesWithEmployeeId);
@@ -63,7 +63,7 @@ describe('Get candidate summary', () => {
 
   function expectSmartRecruitersCalls(get) {
     expect(get.mock.calls[0][0])
-      .toBe(process.env.SR_CANDIDATE_SUMMARY_URL);
+      .toBe(config.configParams.SR_SUMMARY_URL);
     expect(get.mock.calls[1][0])
       .toBe(testmodels.sr.rawCandidateSummaries.data.content[0].actions.details.url);
     expect(get.mock.calls[2][0])
@@ -91,7 +91,7 @@ describe('Add Employee Id property to SR', () => {
   };
 
   beforeAll(() => {
-    process.env.SR_ADD_PROPERTY_URL = 'http://mockurl/';
+    config.configParams.SR_ADD_PROP_URL = 'http://mockurl/';
   });
 
   beforeEach(() => {

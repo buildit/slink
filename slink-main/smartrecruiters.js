@@ -1,10 +1,11 @@
 'use strict';
 
 const axios = require('axios');
+const config = require('./config');
 
 const srGet = async (url) => {
   try {
-    const apiToken = process.env.SR_API_TOKEN;
+    const apiToken = config.configParams.SR_TOKEN;
     const options = {
       method: 'GET',
       headers: { 'X-SmartToken': apiToken }
@@ -26,7 +27,7 @@ const srGet = async (url) => {
 };
 
 const getJobProperties = async (candidateId, jobId) => {
-  let apiEndpoint = process.env.SR_JOB_PROPS_URL;
+  let apiEndpoint = config.configParams.SR_JOB_PROPS_URL;
   if (apiEndpoint != null) {
     apiEndpoint = apiEndpoint.replace('{candidateId}', candidateId);
     apiEndpoint = apiEndpoint.replace('{jobId}', jobId);
@@ -52,7 +53,7 @@ const getValue = property => (property != null ? property.value : null);
 const getCode = property => (property != null ? property.code : null);
 
 const getApplicants = async () => {
-  const summaries = await srGet(process.env.SR_CANDIDATE_SUMMARY_URL);
+  const summaries = await srGet(config.configParams.SR_SUMMARY_URL);
 
   const applicants = Promise.all(summaries.content.map(async (summary) => {
     const candidateDetail = await srGet(summary.actions.details.url);
@@ -62,7 +63,7 @@ const getApplicants = async () => {
     const salaryPropertyValue = findPropertyValueByLabel(jobProps.content, 'Annual Salary');
     const annualBonusValue = findPropertyValueByLabel(jobProps.content, 'Annual Bonus');
     const signingBonusValue = findPropertyValueByLabel(jobProps.content, 'Signing Bonus');
-    const employeeId = findPropertyValueById(jobProps.content, process.env.SR_EMPLOYEE_PROP_ID);
+    const employeeId = findPropertyValueById(jobProps.content, config.configParams.SR_EMPLOYEE_PROP_ID);
 
     const applicant = {
       id: summary.id,
@@ -110,11 +111,11 @@ const getApplicants = async () => {
  */
 const addEmployeeId = async (applicantId, jobId, sapId) => {
   try {
-    const apiToken = process.env.SR_API_TOKEN;
-    let apiEndpoint = process.env.SR_ADD_PROPERTY_URL;
+    const apiToken = config.configParams.SR_TOKEN;
+    let apiEndpoint = config.configParams.SR_ADD_PROP_URL;
     apiEndpoint = apiEndpoint.replace('{candidateId}', applicantId);
     apiEndpoint = apiEndpoint.replace('{jobId}', jobId);
-    apiEndpoint = apiEndpoint.replace('{propertyId}', process.env.SR_EMPLOYEE_PROP_ID);
+    apiEndpoint = apiEndpoint.replace('{propertyId}', config.configParams.SR_EMPLOYEE_PROP_ID);
 
     const options = {
       method: 'PUT',

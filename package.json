@@ -15,7 +15,9 @@
     "eslint-plugin-react": "^7.8.2",
     "jest": "^22.4.4",
     "jest-get-type": "^22.4.3",
-    "pre-commit": "^1.2.2"
+    "pre-commit": "^1.2.2",
+    "aws-sdk": "^2.259.1",
+    "aws-param-store": "^2.0.0"
   },
   "engines": {
     "node": ">=8.0.0"
@@ -30,5 +32,6 @@
   "precommit": [
     "eslint",
     "test"
-  ]
+  ],
+  "dependencies": {}
 }
