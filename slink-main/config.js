@@ -79,7 +79,11 @@ const loadConfigParams = async (context) => {
   // the ARN doesn't include an alias token, therefore we must be executing $LATEST
   if (alias === functionName) {
     alias = 'LATEST';
+  } else if (alias === 'test') {
+    // If running locally, AWS automatically sets alias to 'test' so we will change it to STAGE for testing purposes
+    alias = 'STAGE';
   }
+
   const paramPath = `/slink/${alias}`;
 
   const parameters = await lib.getAWSParams(paramPath);
@@ -94,7 +98,7 @@ const loadConfigParams = async (context) => {
       configParam.value = paramFound[0].Value;
     } else {
       // We didn't find something here so its best to throw an exception and stop
-      throw new Error(`Configuration value not found in SSM Parameter Store for: ${configParam.name}`);
+      throw new Error(`Configuration value not found in SSM Parameter Store for: ${paramPath}/${configParam.name}`);
     }
   });
 
