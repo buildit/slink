@@ -9,8 +9,8 @@ const employeeId = 'test-ccfc86f3-c309';
 
 describe('Add & then delete/null out Employee Id property in SR', () => {
   beforeAll(() => {
-    config.params.SR_EMPLOYEE_PROP_ID = '05f1b2eb-65f2-46c7-ad73-c7b8bd688c33';
-    config.params.SR_JOB_PROPS_URL = 'https://api.smartrecruiters.com/candidates/{candidateId}/jobs/{jobId}/properties/{propertyId}';
+    config.params.SR_EMPLOYEE_PROP_ID.value = '05f1b2eb-65f2-46c7-ad73-c7b8bd688c33';
+    config.params.SR_JOB_PROPS_URL.value = 'https://api.smartrecruiters.com/candidates/{candidateId}/jobs/{jobId}/properties/{propertyId}';
   });
 
   beforeEach(() => {

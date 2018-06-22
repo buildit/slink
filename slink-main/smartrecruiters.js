@@ -6,7 +6,7 @@ const config = require('./config');
 
 const srGet = async (url) => {
   try {
-    const apiToken = config.params.SR_TOKEN;
+    const apiToken = config.params.SR_TOKEN.value;
     const options = {
       method: 'GET',
       headers: { 'X-SmartToken': apiToken }
@@ -28,7 +28,7 @@ const srGet = async (url) => {
 };
 
 const getJobProperties = async (candidateId, jobId) => {
-  let apiEndpoint = config.params.SR_JOB_PROPS_URL;
+  let apiEndpoint = config.params.SR_JOB_PROPS_URL.value;
   if (apiEndpoint != null) {
     apiEndpoint = apiEndpoint.replace('{candidateId}', candidateId);
     apiEndpoint = apiEndpoint.replace('{jobId}', jobId);
@@ -55,7 +55,7 @@ const getCode = property => (property != null ? property.code : null);
 
 
 const getApplicants = async () => {
-  const candidateSummaries = await srGet(config.params.SR_SUMMARY_URL);
+  const candidateSummaries = await srGet(config.params.SR_SUMMARY_URL.value);
   const candidateBatches = R.splitEvery(3, candidateSummaries.content);
 
   const batchedApplicants =
@@ -116,7 +116,7 @@ async function toApplicant(summary) {
   const salaryPropertyValue = findPropertyValueByLabel(jobProps.content, 'Annual Salary');
   const annualBonusValue = findPropertyValueByLabel(jobProps.content, 'Annual Bonus');
   const signingBonusValue = findPropertyValueByLabel(jobProps.content, 'Signing Bonus');
-  const employeeId = findPropertyValueById(jobProps.content, config.params.SR_EMPLOYEE_PROP_ID);
+  const employeeId = findPropertyValueById(jobProps.content, config.params.SR_EMPLOYEE_PROP_ID.value);
 
   const applicant = {
     id: summary.id,
@@ -143,14 +143,50 @@ async function toApplicant(summary) {
     }
   };
 
-  if (candidateDetail) {
-    applicant.phoneNumber = candidateDetail.phoneNumber || null;
-    applicant.experience = {
-      location: (candidateDetail.experience && candidateDetail.experience[0].location) || null
+    if (candidateDetail) {
+      applicant.phoneNumber = candidateDetail.phoneNumber || null;
+      applicant.experience = {
+        location: (candidateDetail.experience && candidateDetail.experience[0].location) || null
+      };
+    }
+    return applicant;
+  }));
+
+  return applicants;
+};
+
+/**
+ * Adds the SAP employee ID to Smart Recruiters applicant as a property value.
+ * @param applicantId The id of the application from SR.
+ * @param jobId The id of the Job which applicant is primarily assigned to (from SR).
+ * @param sapId The SAP ID to be assigned to this applicant.
+ * @returns true if the call to Smart Recruiter succeeds, otherwise false.
+ */
+const addEmployeeId = async (applicantId, jobId, sapId) => {
+  try {
+    const apiToken = config.params.SR_TOKEN.value;
+    let apiEndpoint = config.params.SR_ADD_PROP_URL.value;
+    apiEndpoint = apiEndpoint.replace('{candidateId}', applicantId);
+    apiEndpoint = apiEndpoint.replace('{jobId}', jobId);
+    apiEndpoint = apiEndpoint.replace('{propertyId}', config.params.SR_EMPLOYEE_PROP_ID.value);
+
+    const options = {
+      method: 'PUT',
+      headers: {
+        'X-SmartToken': apiToken,
+        'Content-Type': 'application/json'
+      },
     };
-  }
-  return applicant;
-}
+
+    const putBody = {
+      value: `${sapId}`
+    };
+
+    const SRresponse = await axios.put(apiEndpoint, putBody, options);
+    if (SRresponse && SRresponse.status === 204) {
+      console.log(`Smart Recruiters post succeeded.  Applicant:  ${applicantId}, SAP employee id: ${sapId}`);
+      return true;
+    }
 
 function promiseTimer(ms) {
   return new Promise((resolve) => {
