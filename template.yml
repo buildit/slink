@@ -89,6 +89,7 @@ Resources:
                   - 'lambda.amazonaws.com'
               Action:
                 - 'sts:AssumeRole'
+                - 'iam:CreateRole'
         ManagedPolicyArns:
           - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
         Policies:
