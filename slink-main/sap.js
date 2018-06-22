@@ -16,12 +16,12 @@ const DEFAULT_ZIP_CODE = '40391'; // Unlikely marker zip code because SAP appear
  */
 const postApplicant = async (applicant, resumeNumber) => {
   try {
-    const apiEndpoint = config.params.SAP_ADD_EMPLOYEE_URL;
+    const apiEndpoint = config.params.SAP_ADD_EMPLOYEE_URL.value;
     const options = {
       method: 'POST',
       headers: {
-        Username: config.params.SAP_USERNAME,
-        Password: config.params.SAP_PASSWORD,
+        Username: config.params.SAP_USERNAME.value,
+        Password: config.params.SAP_PASSWORD.value,
         'Content-Type': 'application/json'
       }
     };
