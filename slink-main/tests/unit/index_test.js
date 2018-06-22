@@ -17,12 +17,12 @@ describe('Handler invocation', () => {
   });
 
   it('runs introduction process and gives successful response', async () => {
-    introduction.process.mockResolvedValue({ processedApplicants: [{ id: 'abc-123' }] });
+    introduction.process.mockResolvedValue({ applicantsIntroducedToSap: [{ id: 'abc-123' }] });
 
     await index.handler({}, context, (err, result) => {
       expect(result.statusCode).toEqual(200);
       expect(getType(result.body)).toEqual('string');
-      expect(result.body).toEqual(JSON.stringify({ message: 'Processed 1 candidate(s)' }));
+      expect(result.body).toEqual(JSON.stringify({ message: 'Sent 1 candidate(s) to SAP' }));
     });
   });
 

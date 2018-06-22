@@ -11,7 +11,7 @@ const util = require('./util');
 const process = async () => {
   const applicants = await sr.getApplicants();
 
-  const processedApplicants =
+  const applicantsRequiringIntroduction =
     await Promise.all(applicants
       .filter(applicant => applicant.fullTime)
       .filter(applicant => applicant.employeeId === null)
@@ -41,9 +41,9 @@ const process = async () => {
           status: 'Failed'
         };
       }));
-  console.log(`Processed applicants: ${JSON.stringify(processedApplicants)}`);
+  console.log(`Applicants sent to SAP: ${JSON.stringify(applicantsRequiringIntroduction)}`);
 
-  return { processedApplicants };
+  return { applicantsIntroducedToSap: applicantsRequiringIntroduction };
 };
 
 module.exports = {
