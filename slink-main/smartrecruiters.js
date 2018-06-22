@@ -67,46 +67,6 @@ const getApplicants = async () => {
   return R.flatten(await batchedApplicants);
 };
 
-/**
- * Adds the SAP employee ID to Smart Recruiters applicant as a property value.
- * @param applicantId The id of the application from SR.
- * @param jobId The id of the Job which applicant is primarily assigned to (from SR).
- * @param sapId The SAP ID to be assigned to this applicant.
- * @returns true if the call to Smart Recruiter succeeds, otherwise false.
- */
-const addEmployeeId = async (applicantId, jobId, sapId) => {
-  try {
-    const apiToken = config.params.SR_TOKEN;
-    let apiEndpoint = config.params.SR_ADD_PROP_URL;
-    apiEndpoint = apiEndpoint.replace('{candidateId}', applicantId);
-    apiEndpoint = apiEndpoint.replace('{jobId}', jobId);
-    apiEndpoint = apiEndpoint.replace('{propertyId}', config.params.SR_EMPLOYEE_PROP_ID);
-
-    const options = {
-      method: 'PUT',
-      headers: {
-        'X-SmartToken': apiToken,
-        'Content-Type': 'application/json'
-      },
-    };
-
-    const putBody = {
-      value: `${sapId}`
-    };
-
-    const SRresponse = await axios.put(apiEndpoint, putBody, options);
-    if (SRresponse && SRresponse.status === 204) {
-      console.log(`Smart Recruiters post succeeded.  Applicant:  ${applicantId}, SAP employee id: ${sapId}`);
-      return true;
-    }
-
-    console.log(`Smart Recruiters post failed.  ApplicantId:  ${applicantId}, employee id: ${sapId}, Response: ${JSON.stringify(SRresponse)}`);
-    return false;
-  } catch (err) {
-    console.log(`Exception posting applicant employee id to Smart Recruiters: ${err.message}`);
-    throw err;
-  }
-};
 
 async function toApplicant(summary) {
   const candidateDetail = await srGet(summary.actions.details.url);
@@ -143,17 +103,15 @@ async function toApplicant(summary) {
     }
   };
 
-    if (candidateDetail) {
-      applicant.phoneNumber = candidateDetail.phoneNumber || null;
-      applicant.experience = {
-        location: (candidateDetail.experience && candidateDetail.experience[0].location) || null
-      };
-    }
-    return applicant;
-  }));
+  if (candidateDetail) {
+    applicant.phoneNumber = candidateDetail.phoneNumber || null;
+    applicant.experience = {
+      location: (candidateDetail.experience && candidateDetail.experience[0].location) || null
+    };
+  }
+  return applicant;
+}
 
-  return applicants;
-};
 
 /**
  * Adds the SAP employee ID to Smart Recruiters applicant as a property value.
@@ -187,6 +145,15 @@ const addEmployeeId = async (applicantId, jobId, sapId) => {
       console.log(`Smart Recruiters post succeeded.  Applicant:  ${applicantId}, SAP employee id: ${sapId}`);
       return true;
     }
+
+    console.log(`Smart Recruiters post failed.  ApplicantId:  ${applicantId}, employee id: ${sapId}, Response: ${JSON.stringify(SRresponse)}`);
+    return false;
+  } catch (err) {
+    console.log(`Exception posting applicant employee id to Smart Recruiters: ${err.message}`);
+    throw err;
+  }
+};
+
 
 function promiseTimer(ms) {
   return new Promise((resolve) => {
