@@ -1,10 +1,13 @@
 'use strict';
 
 const config = require('../../config.js');
+const aws = require('../../aws.js');
+
+jest.mock('../../aws.js');
 
 describe('Handler invocation', () => {
   beforeEach(() => {
-    config.lib.getAWSParams.mockClear();
+    aws.getAWSParams.mockClear();
   });
 
   const context = {
@@ -84,19 +87,9 @@ describe('Handler invocation', () => {
     }
   };
 
-  const mockedBadAWSParamResult = {
-    data: [
-      {
-        Name: '/slink/STAGE/sap/ADD_EMPLOYEE_URL',
-        Value: 'https://appstore.wipro.com/synergy/AltRecruitService?opr=empIdGen'
-      }
-    ]
-  };
-
-  config.lib.getAWSParams = jest.fn(() => {return mockedAWSParamResult.data;});
-
-  it('checks if all parameters are defined in AWS paramater store', async () => {
+  it('checks if all parameters are defined in AWS parameter store', async () => {
     try {
+      aws.getAWSParams.mockResolvedValue(mockedAWSParamResult.data);
       const configParams = await config.loadConfigParams(context);
       expect(JSON.stringify(configParams) === JSON.stringify(mockedExpectedResult)).toBe(true);
     } catch (e) {
@@ -105,10 +98,8 @@ describe('Handler invocation', () => {
   });
 
   it('throws an exception on failure', async () => {
-    config.lib.getAWSParams = jest.fn(() => {
-      return mockedBadAWSParamResult.data;
-    });
-
-    await expect(config.loadConfigParams(context)).rejects.toBeDefined();
+    const error = new Error('Error from unit test');
+    aws.getAWSParams.mockRejectedValue(error);
+    return (config.loadConfigParams(context)).rejects;
   });
 });

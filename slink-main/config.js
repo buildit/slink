@@ -1,8 +1,8 @@
 'use strict';
 
-const awsParamStore = require('aws-param-store');
+const aws = require('./aws');
 
-const configParams = {
+const params = {
   SAP_ADD_EMPLOYEE_URL: {
     name: 'sap/ADD_EMPLOYEE_URL',
     value: undefined
@@ -38,31 +38,6 @@ const configParams = {
 };
 
 /**
- * Helper function to call AWS API to retrieve parameter values
- * Extracting this call in its own function also helps in mocking tests
- * @param paramPath
- * @returns Parameter keys/values raw JSON
- */
-const getAWSParams = async (paramPath) => {
-  // Get the AWS region from the environment variable which gets created automatically by AWS
-  let awsRegion = process.env.AWS_DEFAULT_REGION;
-
-  // the environment doesn't know which AWS region we are running in so default it to us-east-1
-  if (awsRegion === undefined) {
-    awsRegion = 'us-east-1';
-  }
-
-  const parameters = await awsParamStore.getParametersByPath(paramPath, { region: awsRegion });
-  return parameters;
-};
-
-// This is an awful work around to mocking a single function using jest!!
-// Apparently mocking a single function in a module doesn't work!
-const lib = {
-  getAWSParams,
-};
-
-/**
  * Loads the configuration paramaters from AWS Parameter Store.<br/>
  * It uses the Lambda ALIAS to determine which paramaters to load (STAGE or PROD).<br/>
  * In order for this work correctly, we must ensure that the Lambda functions have aliases assigned
@@ -86,13 +61,22 @@ const loadConfigParams = async (context) => {
 
   const paramPath = `/slink/${alias}`;
 
-  const parameters = await lib.getAWSParams(paramPath);
+  // Get the AWS region from the environment variable which gets created automatically by AWS
+  let awsRegion = process.env.AWS_DEFAULT_REGION;
+
+  // the environment doesn't know which AWS region we are running in so default it to us-east-1
+  if (awsRegion === undefined) {
+    awsRegion = 'us-east-1';
+    console.log(`#### Defaulting to ${awsRegion} region for AWS API calls`);
+  }
+
+  const parameters = await aws.getAWSParams(paramPath);
   // console.log(`SSM Params: ${JSON.stringify(parameters)}`);
 
   // Load all param values in our configParams list
-  const keys = Object.keys(configParams);
+  const keys = Object.keys(params);
   keys.forEach((configParamKey) => {
-    const configParam = configParams[configParamKey];
+    const configParam = params[configParamKey];
     const paramFound = parameters.filter(p => p.Name.includes(configParam.name));
     if (paramFound !== undefined && paramFound.length === 1) {
       configParam.value = paramFound[0].Value;
@@ -102,11 +86,10 @@ const loadConfigParams = async (context) => {
     }
   });
 
-  return configParams;
+  return params;
 };
 
 module.exports = {
   loadConfigParams,
-  lib,
-  configParams
+  params
 };

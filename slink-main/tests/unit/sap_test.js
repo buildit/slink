@@ -30,9 +30,9 @@ const mockResponseBad = {
 
 describe('POSTing Employee Data', () => {
   beforeAll(() => {
-    config.configParams.SAP_USERNAME = 'username';
-    config.configParams.SAP_PASSWORD = 'password';
-    config.configParams.SR_SUMMARY_URL = 'http://mockurl/';
+    config.params.SAP_USERNAME = 'username';
+    config.params.SAP_PASSWORD = 'password';
+    config.params.SR_SUMMARY_URL = 'http://mockurl/';
   });
 
   beforeEach(() => {
