@@ -7,7 +7,7 @@ jest.mock('../../aws.js');
 
 describe('Handler invocation', () => {
   beforeEach(() => {
-    aws.getAWSParams.mockClear();
+    aws.getParams.mockClear();
   });
 
   const context = {
@@ -89,7 +89,7 @@ describe('Handler invocation', () => {
 
   it('checks if all parameters are defined in AWS parameter store', async () => {
     try {
-      aws.getAWSParams.mockResolvedValue(mockedAWSParamResult.data);
+      aws.getParams.mockResolvedValue(mockedAWSParamResult.data);
       const configParams = await config.loadConfigParams(context);
       expect(JSON.stringify(configParams) === JSON.stringify(mockedExpectedResult)).toBe(true);
     } catch (e) {
@@ -99,7 +99,7 @@ describe('Handler invocation', () => {
 
   it('throws an exception on failure', async () => {
     const error = new Error('Error from unit test');
-    aws.getAWSParams.mockRejectedValue(error);
+    aws.getParams.mockRejectedValue(error);
     return (config.loadConfigParams(context)).rejects;
   });
 });

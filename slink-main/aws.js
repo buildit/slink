@@ -8,11 +8,11 @@ const awsParamStore = require('aws-param-store');
  * @param paramPath
  * @returns Parameter keys/values raw JSON
  */
-const getAWSParams = async (paramPath, awsRegion) => {
+const getParams = async (paramPath, awsRegion) => {
   const parameters = await awsParamStore.getParametersByPath(paramPath, { region: awsRegion });
   return parameters;
 };
 
 module.exports = {
-  getAWSParams
+  getParams
 };

@@ -70,7 +70,7 @@ const loadConfigParams = async (context) => {
     console.log(`#### Defaulting to ${awsRegion} region for AWS API calls`);
   }
 
-  const parameters = await aws.getAWSParams(paramPath);
+  const parameters = await aws.getParams(paramPath);
   // console.log(`SSM Params: ${JSON.stringify(parameters)}`);
 
   // Load all param values in our configParams list
