@@ -55,13 +55,16 @@ const getCode = property => (property != null ? property.code : null);
 
 
 const getApplicants = async () => {
+  const CANDIDATE_BATCH_SIZE = 3;
+  const SLEEP_TIME_PER_BATCH = 250;
+
   const candidateSummaries = await srGet(config.params.SR_SUMMARY_URL.value);
-  const candidateBatches = R.splitEvery(3, candidateSummaries.content);
+  const candidateBatches = R.splitEvery(CANDIDATE_BATCH_SIZE, candidateSummaries.content);
 
   const batchedApplicants =
     Promise.all(candidateBatches.map(async (candidateBatch) => {
       const batchOfApplicants = await Promise.all(candidateBatch.map(async candidate => toApplicant(candidate)));
-      await promiseTimer(250);
+      await promiseTimer(SLEEP_TIME_PER_BATCH);
       return batchOfApplicants;
     }));
   return R.flatten(await batchedApplicants);
