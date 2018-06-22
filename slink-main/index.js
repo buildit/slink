@@ -1,11 +1,15 @@
 'use strict';
 
 const introduction = require('./introduction');
+const config = require('./config');
 
 module.exports.handler = async (event, context, callback) => {
   try {
     console.log(`#### All the context stuff:  ${JSON.stringify(context)}`);
     console.log(`#### Function ARN:  ${context.invokedFunctionArn}`);
+
+    // Load all configuration parameters from AWS SSM
+    await config.loadConfigParams(context);
 
     const result = await introduction.process();
 

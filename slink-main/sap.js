@@ -2,6 +2,7 @@
 
 const axios = require('axios');
 const util = require('./util');
+const config = require('./config');
 
 const MISSING_STRING = '';
 const DEFAULT_STRING = 'NA';
@@ -15,12 +16,12 @@ const DEFAULT_ZIP_CODE = '40391'; // Unlikely marker zip code because SAP appear
  */
 const postApplicant = async (applicant, resumeNumber) => {
   try {
-    const apiEndpoint = process.env.SAP_ADD_EMPLOYEE_URL;
+    const apiEndpoint = config.params.SAP_ADD_EMPLOYEE_URL;
     const options = {
       method: 'POST',
       headers: {
-        Username: process.env.SAP_USERNAME,
-        Password: process.env.SAP_PASSWORD,
+        Username: config.params.SAP_USERNAME,
+        Password: config.params.SAP_PASSWORD,
         'Content-Type': 'application/json'
       }
     };

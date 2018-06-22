@@ -3,6 +3,8 @@
     "version": "0.0.1",
     "private": true,
     "dependencies": {
+        "aws-sdk": "^2.259.1",
+        "aws-param-store": "^2.0.0",
         "axios": "0.18.0"
     },
     "devDependencies": {

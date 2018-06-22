@@ -30,7 +30,11 @@ Follow these steps:
 
 ### Example command for `slink-main` function, passing in Lambda environment variable:
 
-`SR_API_TOKEN=<value> SAP_USERNAME=<value> SAP_PASSWORD=<value> sam local invoke SlinkMainFunction -e event.json`
+sam local invoke SlinkMainFunction -e event.json`
+
+_**Note**_: Runtime configuration settings are managed in AWS Parameter Store. There are two sets of configuration settings 
+for STAGE and PROD environments. When running locally via SAM local, we use the STAGE configuration. The parameters are 
+managed under /slink path in AWS Parameter Store.
 
 
 ## AWS Deployment ##

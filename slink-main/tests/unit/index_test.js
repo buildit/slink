@@ -3,8 +3,10 @@
 const getType = require('jest-get-type');
 const index = require('../../index.js');
 const introduction = require('../../introduction');
+const config = require('../../config');
 
 jest.mock('../../introduction');
+jest.mock('../../config');
 
 const context = { invokedFunctionArn: 'unit-test' };
 
@@ -25,8 +27,10 @@ describe('Handler invocation', () => {
   });
 
   it('runs introduction process and gives unsuccessful response if issues', async () => {
+    config.loadConfigParams.mockResolvedValue({ SAP_ADD_EMPLOYEE_URL: '' });
     introduction.process.mockRejectedValue(new Error('Some random error occurred'));
     await index.handler({}, context, (err, result) => {
+      console.log(`error: ${err}`);
       expect(result.statusCode).toEqual(500);
       expect(getType(result.body)).toEqual('object');
       expect(result.body).toEqual({ message: 'Error: Some random error occurred' });

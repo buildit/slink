@@ -2,6 +2,7 @@
 
 const axios = require('axios');
 const sap = require('../../sap');
+const config = require('../../config');
 const testmodels = require('./models');
 
 jest.mock('axios');
@@ -29,9 +30,9 @@ const mockResponseBad = {
 
 describe('POSTing Employee Data', () => {
   beforeAll(() => {
-    process.env.SAP_USERNAME = 'username';
-    process.env.SAP_PASSWORD = 'password';
-    process.env.SR_CANDIDATE_SUMMARY_URL = 'http://mockurl/';
+    config.params.SAP_USERNAME = 'username';
+    config.params.SAP_PASSWORD = 'password';
+    config.params.SR_SUMMARY_URL = 'http://mockurl/';
   });
 
   beforeEach(() => {
