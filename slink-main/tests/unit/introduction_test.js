@@ -79,16 +79,16 @@ describe('Applicant introduction process', () => {
 
     util.generateResumeNumber.mockReturnValueOnce(1111);
     sap.postApplicant.mockReturnValueOnce(1010101);
-    smartrecruiters.addEmployeeId.mockReturnValueOnce(true);
+    smartrecruiters.storeEmployeeId.mockReturnValueOnce(true);
 
     util.generateResumeNumber.mockReturnValueOnce(2222);
     sap.postApplicant.mockReturnValueOnce(2020202);
-    smartrecruiters.addEmployeeId.mockReturnValueOnce(true);
+    smartrecruiters.storeEmployeeId.mockReturnValueOnce(true);
 
     // Error case.  Need to handle in a more detailed way.
     util.generateResumeNumber.mockReturnValueOnce(3333);
     sap.postApplicant.mockReturnValueOnce(null);
-    smartrecruiters.addEmployeeId.mockReturnValueOnce(false);
+    smartrecruiters.storeEmployeeId.mockReturnValueOnce(false);
 
     const results = await introduction.process();
 

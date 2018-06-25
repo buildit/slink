@@ -17,7 +17,7 @@ describe('Add & then delete/null out Employee Id property in SR', () => {
   });
 
   it.skip('returns true when reset employee id is set\'', async () => {
-    const result = await smartrecruiters.addEmployeeId(
+    const result = await smartrecruiters.storeEmployeeId(
       applicantId,
       jobId,
       employeeId
@@ -26,7 +26,7 @@ describe('Add & then delete/null out Employee Id property in SR', () => {
   });
 
   it.skip('returns true when reset employee id to null', async () => {
-    const result = await smartrecruiters.addEmployeeId(
+    const result = await smartrecruiters.storeEmployeeId(
       applicantId,
       jobId,
       ''

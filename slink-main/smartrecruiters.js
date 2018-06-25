@@ -4,55 +4,6 @@ const axios = require('axios');
 const R = require('ramda');
 const config = require('./config');
 
-const srGet = async (url) => {
-  try {
-    const apiToken = config.params.SR_TOKEN.value;
-    const options = {
-      method: 'GET',
-      headers: { 'X-SmartToken': apiToken }
-    };
-
-    const reply = await axios.get(url, options);
-
-    return reply.data;
-  } catch (err) {
-    if (err.response) {
-      console.log(`Error response from SmartRecruiters API. Status: ${err.response.status}, URL: ${url}, Headers: ${err.response.headers}, Error: ${err}`);
-    } else if (err.request) {
-      console.log(`Error calling SmartRecruiters API. Status: ${err.request}, Error: ${err}`);
-    } else {
-      console.log('Unexpected error interacting with SmartRecruiters', err.message);
-    }
-    throw err;
-  }
-};
-
-const getJobProperties = async (candidateId, jobId) => {
-  let apiEndpoint = config.params.SR_JOB_PROPS_URL.value;
-  if (apiEndpoint != null) {
-    apiEndpoint = apiEndpoint.replace('{candidateId}', candidateId);
-    apiEndpoint = apiEndpoint.replace('{jobId}', jobId);
-  }
-  return srGet(apiEndpoint);
-};
-
-const findPropertyValueByLabel = (props, propertyLabel) => {
-  if (!props) return null;
-
-  const foundProperty = props.find(property => property.label === propertyLabel);
-  return (foundProperty === undefined ? null : foundProperty.value);
-};
-
-const findPropertyValueById = (props, id) => {
-  if (!props) return null;
-
-  const foundProperty = props.find(property => property.id === id);
-  return (foundProperty === undefined ? null : foundProperty.value);
-};
-
-const getValue = property => (property != null ? property.value : null);
-const getCode = property => (property != null ? property.code : null);
-
 
 const getApplicants = async () => {
   const CANDIDATE_BATCH_SIZE = 3;
@@ -123,7 +74,7 @@ async function toApplicant(summary) {
  * @param sapId The SAP ID to be assigned to this applicant.
  * @returns true if the call to Smart Recruiter succeeds, otherwise false.
  */
-const addEmployeeId = async (applicantId, jobId, sapId) => {
+const storeEmployeeId = async (applicantId, jobId, sapId) => {
   try {
     const apiToken = config.params.SR_TOKEN.value;
     let apiEndpoint = config.params.SR_ADD_PROP_URL.value;
@@ -157,6 +108,60 @@ const addEmployeeId = async (applicantId, jobId, sapId) => {
   }
 };
 
+async function srGet(url) {
+  try {
+    const apiToken = config.params.SR_TOKEN.value;
+    const options = {
+      method: 'GET',
+      headers: { 'X-SmartToken': apiToken }
+    };
+
+    const reply = await axios.get(url, options);
+
+    return reply.data;
+  } catch (err) {
+    if (err.response) {
+      console.log(`Error response from SmartRecruiters API. Status: ${err.response.status}, URL: ${url}, Headers: ${err.response.headers}, Error: ${err}`);
+    } else if (err.request) {
+      console.log(`Error calling SmartRecruiters API. Status: ${err.request}, Error: ${err}`);
+    } else {
+      console.log('Unexpected error interacting with SmartRecruiters', err.message);
+    }
+    throw err;
+  }
+}
+
+async function getJobProperties(candidateId, jobId) {
+  let apiEndpoint = config.params.SR_JOB_PROPS_URL.value;
+  if (apiEndpoint != null) {
+    apiEndpoint = apiEndpoint.replace('{candidateId}', candidateId);
+    apiEndpoint = apiEndpoint.replace('{jobId}', jobId);
+  }
+  return srGet(apiEndpoint);
+}
+
+function findPropertyValueByLabel(props, propertyLabel) {
+  if (!props) return null;
+
+  const foundProperty = props.find(property => property.label === propertyLabel);
+  return (foundProperty === undefined ? null : foundProperty.value);
+}
+
+function findPropertyValueById(props, id) {
+  if (!props) return null;
+
+  const foundProperty = props.find(property => property.id === id);
+  return (foundProperty === undefined ? null : foundProperty.value);
+}
+
+function getValue(property) {
+  return property != null ? property.value : null;
+}
+
+function getCode(property) {
+  return property != null ? property.code : null;
+}
+
 
 function promiseTimer(ms) {
   return new Promise((resolve) => {
@@ -166,5 +171,5 @@ function promiseTimer(ms) {
 
 module.exports = {
   getApplicants,
-  addEmployeeId
+  storeEmployeeId
 };

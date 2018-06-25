@@ -25,7 +25,7 @@ const process = async () => {
           sanitizedApplicant.employeeId = employeeId;
 
           console.log(`Preparing to add SAP employee id to Smart Recruiters: ${JSON.stringify(sanitizedApplicant)}`);
-          const srStatusFlag = await sr.addEmployeeId(
+          const srStatusFlag = await sr.storeEmployeeId(
             applicant.id,
             applicant.primaryAssignment.job.id,
             employeeId

@@ -101,7 +101,7 @@ describe('Add Employee Id property to SR', () => {
   it('returns null if a good response', async () => {
     axios.put.mockResolvedValue(mockPutResponseGood);
 
-    const result = await smartrecruiters.addEmployeeId(
+    const result = await smartrecruiters.storeEmployeeId(
       testmodels.applicant.id,
       testmodels.applicant.primaryAssignment.job.id,
       '123123g3-3434'
@@ -112,7 +112,7 @@ describe('Add Employee Id property to SR', () => {
 
   it('returns 404 response and body if a bad response', async () => {
     axios.put.mockResolvedValue(mockPutResponseBad);
-    const result = await smartrecruiters.addEmployeeId(
+    const result = await smartrecruiters.storeEmployeeId(
       testmodels.applicant.id,
       testmodels.applicant.primaryAssignment.job.id
     );
@@ -122,7 +122,7 @@ describe('Add Employee Id property to SR', () => {
   it('throws an exception on failure', () => {
     const error = new Error('Error from unit test');
     axios.put.mockRejectedValue(error);
-    return expect(smartrecruiters.addEmployeeId(
+    return expect(smartrecruiters.storeEmployeeId(
       testmodels.applicant.id,
       testmodels.applicant.primaryAssignment.job.id
     )).rejects.toBe(error);
