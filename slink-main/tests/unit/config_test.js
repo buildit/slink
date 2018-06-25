@@ -98,7 +98,7 @@ describe('Handler invocation', () => {
   });
 
   it('throws an exception on failure', async () => {
-    const error = new Error('Error from unit test');
+    const error = new Error('Error from unit test (config_test)');
     aws.getParams.mockRejectedValue(error);
     return (config.loadConfigParams(context)).rejects;
   });

@@ -70,23 +70,28 @@ const loadConfigParams = async (context) => {
     console.log(`#### Defaulting to ${awsRegion} region for AWS API calls`);
   }
 
-  const parameters = await aws.getParams(paramPath);
-  // console.log(`SSM Params: ${JSON.stringify(parameters)}`);
+  try {
+    const parameters = await aws.getParams(paramPath);
+    // console.log(`SSM Params: ${JSON.stringify(parameters)}`);
 
-  // Load all param values in our configParams list
-  const keys = Object.keys(params);
-  keys.forEach((configParamKey) => {
-    const configParam = params[configParamKey];
-    const paramFound = parameters.filter(p => p.Name.includes(configParam.name));
-    if (paramFound !== undefined && paramFound.length === 1) {
-      configParam.value = paramFound[0].Value;
-    } else {
-      // We didn't find something here so its best to throw an exception and stop
-      throw new Error(`Configuration value not found in SSM Parameter Store for: ${paramPath}/${configParam.name}`);
-    }
-  });
+    // Load all param values in our configParams list
+    const keys = Object.keys(params);
+    keys.forEach((configParamKey) => {
+      const configParam = params[configParamKey];
+      const paramFound = parameters.filter(p => p.Name.includes(configParam.name));
+      if (paramFound !== undefined && paramFound.length === 1) {
+        configParam.value = paramFound[0].Value;
+      } else {
+        // We didn't find something here so its best to throw an exception and stop
+        throw new Error(`Configuration value not found in SSM Parameter Store for: ${paramPath}/${configParam.name}`);
+      }
+    });
 
-  return params;
+    return params;
+  } catch (e) {
+    console.log(`Problem accessing SSM parameters for ${paramPath}`, e);
+    return null;
+  }
 };
 
 module.exports = {

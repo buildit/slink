@@ -53,7 +53,7 @@ describe('POSTing Employee Data', () => {
   });
 
   it('throws an exception on failure', () => {
-    const error = new Error('Error from unit test');
+    const error = new Error('Error from unit test (sap_test)');
     axios.post.mockRejectedValue(error);
     return expect(sap.postApplicant(testmodels.applicant, 111)).rejects.toBe(error);
   });

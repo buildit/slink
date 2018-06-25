@@ -55,7 +55,7 @@ describe('Get candidate summary', () => {
 
 
   it('throws an exception on failure', () => {
-    const error = new Error('Error from unit test');
+    const error = new Error('Error from unit test (smartrecruiters_test 1)');
     get.mockRejectedValue(error);
     return expect(smartrecruiters.getApplicants()).rejects.toBe(error);
   });
@@ -120,7 +120,7 @@ describe('Add Employee Id property to SR', () => {
   });
 
   it('throws an exception on failure', () => {
-    const error = new Error('Error from unit test');
+    const error = new Error('Error from unit test (smartrecruiters_test 2)');
     axios.put.mockRejectedValue(error);
     return expect(smartrecruiters.storeEmployeeId(
       testmodels.applicant.id,
