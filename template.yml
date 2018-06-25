@@ -40,9 +40,9 @@ Resources:
       Role:
         Fn::ImportValue:
           !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
-        Fn::GetAtt:
-          - "ParameterStoreRole"
-          - "Arn"
+#        Fn::GetAtt:
+#          - "ParameterStoreRole"
+#          - "Arn"
       Events:
         GetApiEndpoint:
           Type: Api
@@ -79,31 +79,31 @@ Resources:
           - "SlinkIntroductionRule"
           - "Arn"
 
-  ParameterStoreRole:
-      Type: AWS::IAM::Role
-      Properties:
-        AssumeRolePolicyDocument:
-          Version: '2012-10-17'
-          Statement:
-            -
-              Effect: Allow
-              Principal:
-                Service:
-                  - 'lambda.amazonaws.com'
-              Action:
-                - 'sts:AssumeRole'
-        ManagedPolicyArns:
-          - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
-        Policies:
-          -
-            PolicyName: 'ParameterStoreSlinkAccess'
-            PolicyDocument:
-              Version: '2012-10-17'
-              Statement:
-                -
-                  Effect: Allow
-                  Action:
-                    - 'ssm:GetParameter*'
-                  Resource: !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/slink*'
+#  ParameterStoreRole:
+#      Type: AWS::IAM::Role
+#      Properties:
+#        AssumeRolePolicyDocument:
+#          Version: '2012-10-17'
+#          Statement:
+#            -
+#              Effect: Allow
+#              Principal:
+#                Service:
+#                  - 'lambda.amazonaws.com'
+#              Action:
+#                - 'sts:AssumeRole'
+#        ManagedPolicyArns:
+#          - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+#        Policies:
+#          -
+#            PolicyName: 'ParameterStoreSlinkAccess'
+#            PolicyDocument:
+#              Version: '2012-10-17'
+#              Statement:
+#                -
+#                  Effect: Allow
+#                  Action:
+#                    - 'ssm:GetParameter*'
+#                  Resource: !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/slink*'
 
 Transform: AWS::Serverless-2016-10-31
