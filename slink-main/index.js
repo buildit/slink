@@ -13,14 +13,14 @@ module.exports.handler = async (event, context, callback) => {
 
     const result = await introduction.process();
 
-    console.log(`Process complete.  Applicants in this run: ${JSON.stringify(result.processedApplicants)}`);
-    result.processedApplicants.forEach((applicant) => {
+    console.log(`Process complete.  Applicants sent to SAP $in this run: ${JSON.stringify(result.applicantsIntroducedToSap)}`);
+    result.applicantsIntroducedToSap.forEach((applicant) => {
       console.log(`${JSON.stringify(applicant)}`);
     });
 
     const response = {
       statusCode: 200,
-      body: JSON.stringify({ message: `Processed ${result.processedApplicants.length} candidate(s)` })
+      body: JSON.stringify({ message: `Sent ${result.applicantsIntroducedToSap.length} candidate(s) to SAP` })
     };
     callback(null, response);
   } catch (e) {

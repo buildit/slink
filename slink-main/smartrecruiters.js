@@ -1,6 +1,7 @@
 'use strict';
 
 const axios = require('axios');
+const R = require('ramda');
 const config = require('./config');
 
 const srGet = async (url) => {
@@ -52,55 +53,68 @@ const findPropertyValueById = (props, id) => {
 const getValue = property => (property != null ? property.value : null);
 const getCode = property => (property != null ? property.code : null);
 
+
 const getApplicants = async () => {
-  const summaries = await srGet(config.params.SR_SUMMARY_URL.value);
+  const CANDIDATE_BATCH_SIZE = 3;
+  const SLEEP_TIME_PER_BATCH = 250;
 
-  const applicants = Promise.all(summaries.content.map(async (summary) => {
-    const candidateDetail = await srGet(summary.actions.details.url);
-    const jobDetail = await srGet(candidateDetail.primaryAssignment.job.actions.details.url);
+  const candidateSummaries = await srGet(config.params.SR_SUMMARY_URL.value);
+  const candidateBatches = R.splitEvery(CANDIDATE_BATCH_SIZE, candidateSummaries.content);
 
-    const jobProps = await getJobProperties(summary.id, summary.primaryAssignment.job.id);
-    const salaryPropertyValue = findPropertyValueByLabel(jobProps.content, 'Annual Salary');
-    const annualBonusValue = findPropertyValueByLabel(jobProps.content, 'Annual Bonus');
-    const signingBonusValue = findPropertyValueByLabel(jobProps.content, 'Signing Bonus');
-    const employeeId = findPropertyValueById(jobProps.content, config.params.SR_EMPLOYEE_PROP_ID.value);
-
-    const applicant = {
-      id: summary.id,
-      employeeId,
-      firstName: summary.firstName,
-      lastName: summary.lastName,
-      email: summary.email,
-      location: {
-        country: summary.location.country || null,
-        city: summary.location.city || null
-      },
-      fullTime: (jobDetail.typeOfEmployment && jobDetail.typeOfEmployment.id === 'permanent') || false,
-      primaryAssignment: {
-        job: {
-          id: summary.primaryAssignment.job.id,
-          startDate: findPropertyValueByLabel(jobProps.content, 'Start Date'),
-          zipCode: findPropertyValueByLabel(jobProps.content, 'Zip Code'),
-          country: findPropertyValueByLabel(jobProps.content, 'Country'),
-          annualSalary: getValue(salaryPropertyValue),
-          offeredCurrency: getCode(salaryPropertyValue), // Assume currency is salary currency.
-          annualBonus: getValue(annualBonusValue),
-          signingBonus: getValue(signingBonusValue)
-        }
-      }
-    };
-
-    if (candidateDetail) {
-      applicant.phoneNumber = candidateDetail.phoneNumber || null;
-      applicant.experience = {
-        location: (candidateDetail.experience && candidateDetail.experience[0].location) || null
-      };
-    }
-    return applicant;
-  }));
-
-  return applicants;
+  const batchedApplicants =
+    Promise.all(candidateBatches.map(async (candidateBatch) => {
+      const batchOfApplicants = await Promise.all(candidateBatch.map(async candidate => toApplicant(candidate)));
+      await promiseTimer(SLEEP_TIME_PER_BATCH);
+      return batchOfApplicants;
+    }));
+  return R.flatten(await batchedApplicants);
 };
+
+
+async function toApplicant(summary) {
+  const candidateDetail = await srGet(summary.actions.details.url);
+  const jobDetail = await srGet(candidateDetail.primaryAssignment.job.actions.details.url);
+
+  const jobProps = await getJobProperties(summary.id, summary.primaryAssignment.job.id);
+  const salaryPropertyValue = findPropertyValueByLabel(jobProps.content, 'Annual Salary');
+  const annualBonusValue = findPropertyValueByLabel(jobProps.content, 'Annual Bonus');
+  const signingBonusValue = findPropertyValueByLabel(jobProps.content, 'Signing Bonus');
+  const employeeId = findPropertyValueById(jobProps.content, config.params.SR_EMPLOYEE_PROP_ID.value);
+
+  const applicant = {
+    id: summary.id,
+    employeeId,
+    firstName: summary.firstName,
+    lastName: summary.lastName,
+    email: summary.email,
+    location: {
+      country: summary.location.country || null,
+      city: summary.location.city || null
+    },
+    fullTime: (jobDetail.typeOfEmployment && jobDetail.typeOfEmployment.id === 'permanent') || false,
+    primaryAssignment: {
+      job: {
+        id: summary.primaryAssignment.job.id,
+        startDate: findPropertyValueByLabel(jobProps.content, 'Start Date'),
+        zipCode: findPropertyValueByLabel(jobProps.content, 'Zip Code'),
+        country: findPropertyValueByLabel(jobProps.content, 'Country'),
+        annualSalary: getValue(salaryPropertyValue),
+        offeredCurrency: getCode(salaryPropertyValue), // Assume currency is salary currency.
+        annualBonus: getValue(annualBonusValue),
+        signingBonus: getValue(signingBonusValue)
+      }
+    }
+  };
+
+  if (candidateDetail) {
+    applicant.phoneNumber = candidateDetail.phoneNumber || null;
+    applicant.experience = {
+      location: (candidateDetail.experience && candidateDetail.experience[0].location) || null
+    };
+  }
+  return applicant;
+}
+
 
 /**
  * Adds the SAP employee ID to Smart Recruiters applicant as a property value.
@@ -143,6 +157,12 @@ const addEmployeeId = async (applicantId, jobId, sapId) => {
   }
 };
 
+
+function promiseTimer(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
 
 module.exports = {
   getApplicants,

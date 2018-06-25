@@ -100,7 +100,7 @@ describe('Applicant introduction process', () => {
     expect(sap.postApplicant).toHaveBeenCalledWith(fteApplicant3, 3333);
     expect(sap.postApplicant).toHaveBeenCalledTimes(3);
 
-    expect(results.processedApplicants.length)
+    expect(results.applicantsIntroducedToSap.length)
       .toBe(applicants.length - 2); // Contractors and already-introduced applicants are not processed
 
     const result1 = {
@@ -115,7 +115,7 @@ describe('Applicant introduction process', () => {
       applicant: util.sanitizeApplicant(fteApplicant3),
       status: 'Failed'
     };
-    expect(results.processedApplicants)
+    expect(results.applicantsIntroducedToSap)
       .toEqual([result1, result2, result3]);
   });
 });
