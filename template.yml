@@ -41,8 +41,8 @@ Resources:
         Fn::ImportValue:
           !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
         Fn::GetAtt:
-                - ParameterStoreRole
-                - Arn
+          - "ParameterStoreRole"
+          - "Arn"
       Events:
         GetApiEndpoint:
           Type: Api
