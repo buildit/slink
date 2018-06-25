@@ -40,6 +40,9 @@ Resources:
       Role:
         Fn::ImportValue:
           !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
+        Fn::GetAtt:
+                - ParameterStoreRole
+                - Arn
       Events:
         GetApiEndpoint:
           Type: Api
@@ -89,7 +92,6 @@ Resources:
                   - 'lambda.amazonaws.com'
               Action:
                 - 'sts:AssumeRole'
-                - 'iam:CreateRole'
         ManagedPolicyArns:
           - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
         Policies:
