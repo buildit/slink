@@ -6,8 +6,8 @@ const config = require('./config');
 
 
 const getApplicants = async () => {
-  const CANDIDATE_BATCH_SIZE = 3;
-  const SLEEP_TIME_PER_BATCH = 250;
+  const CANDIDATE_BATCH_SIZE = 2;
+  const SLEEP_TIME_PER_BATCH = 500;
 
   const candidateSummaries = await srGet(config.params.SR_SUMMARY_URL.value);
   const candidateBatches = R.splitEvery(CANDIDATE_BATCH_SIZE, candidateSummaries.content);
