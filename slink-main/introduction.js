@@ -10,6 +10,7 @@ const util = require('./util');
  */
 const process = async () => {
   const applicants = await sr.getApplicants();
+  console.log(`Collected ${applicants.length} applicants from SmartRecruiters`);
 
   const applicantsIntroducedToSap =
     await Promise.all(applicants
@@ -41,7 +42,6 @@ const process = async () => {
           reason: 'SAP post failure'
         };
       }));
-  console.log(`Applicants sent to SAP: ${JSON.stringify(applicantsIntroducedToSap)}`);
 
   return { applicantsIntroducedToSap };
 };
