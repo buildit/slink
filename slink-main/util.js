@@ -1,10 +1,9 @@
 'use strict';
 
-const sanitizeApplicant = applicant => ({
-  id: applicant.id,
-  lastName: applicant.lastName,
-  firstName: applicant.firstName
-});
+const R = require('ramda');
+
+
+const sanitizeApplicant = applicant => R.pick(['id', 'lastName', 'firstName'], applicant);
 
 
 /**
