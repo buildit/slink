@@ -4,16 +4,6 @@ const sr = require('./smartrecruiters');
 const sap = require('./sap');
 const util = require('./util');
 
-async function postEmployeeIdToSmartRecruiters(employeeId, applicant) {
-  console.log(`Preparing to add SAP employee id to Smart Recruiters: ${employeeId}`);
-  const srStatusFlag = await sr.storeEmployeeId(
-    applicant.id,
-    applicant.primaryAssignment.job.id,
-    employeeId
-  );
-  return srStatusFlag;
-}
-
 /*
  * Obtains applicants by calling the SmartRecruiters facade and calls SAP with each applicant.
  * @returns {Promise<{successfulApplicants: Array}>}
@@ -33,23 +23,37 @@ const process = async () => {
 
         if (employeeId != null) { // TODO more detailed return from postApplicant?
           sanitizedApplicant.employeeId = employeeId;
-          const srStatusFlag = await postEmployeeIdToSmartRecruiters(employeeId, applicant);
+          const srSuccess = await postEmployeeIdToSmartRecruiters(employeeId, applicant);
 
-          return {
+          const results = {
             applicant: sanitizedApplicant,
-            status: (srStatusFlag ? 'Succeeded' : 'Failed')
+            status: (srSuccess ? 'Succeeded' : 'Failed')
           };
+          if (!srSuccess) {
+            results.reason = 'SR post failure';
+          }
+          return results;
         }
 
         return {
           applicant: sanitizedApplicant,
-          status: 'Failed'
+          status: 'Failed',
+          reason: 'SAP post failure'
         };
       }));
   console.log(`Applicants sent to SAP: ${JSON.stringify(applicantsIntroducedToSap)}`);
 
   return { applicantsIntroducedToSap };
 };
+
+async function postEmployeeIdToSmartRecruiters(employeeId, applicant) {
+  console.log(`Preparing to add SAP employee id to Smart Recruiters: ${employeeId}`);
+  return sr.storeEmployeeId(
+    applicant.id,
+    applicant.primaryAssignment.job.id,
+    employeeId
+  );
+}
 
 module.exports = {
   process

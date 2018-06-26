@@ -18,7 +18,7 @@ describe('Applicant introduction process', () => {
   });
 
   it('calls SAP for each FTE Applicant from SmartRecruiters, and registers Employee ID in SmartRecruiters', async () => {
-    const fteApplicant1 = {
+    const successApplicant1 = {
       id: 'guid1',
       employeeId: null,
       lastName: 'One',
@@ -31,7 +31,7 @@ describe('Applicant introduction process', () => {
         }
       }
     };
-    const fteApplicant2 = {
+    const successApplicant2 = {
       id: 'guid2',
       employeeId: null,
       lastName: 'Two',
@@ -44,11 +44,11 @@ describe('Applicant introduction process', () => {
         }
       }
     };
-    const fteApplicant3 = {
+    const sapFailApplicant = {
       id: 'guid3',
       employeeId: null,
       lastName: 'Three',
-      firstName: 'Applicant',
+      firstName: 'SAP Employee ID Failure',
       other: 'Other',
       fullTime: true,
       primaryAssignment: {
@@ -62,7 +62,6 @@ describe('Applicant introduction process', () => {
       employeeId: null,
       lastName: 'Four',
       firstName: 'Contractor Applicant',
-      other: 'Other',
       fullTime: false
     };
     const alreadyIntroducedApplicant = {
@@ -70,16 +69,40 @@ describe('Applicant introduction process', () => {
       employeeId: 12345,
       lastName: 'Five',
       firstName: 'Already Introduced',
-      other: 'Other',
       fullTime: true
     };
-    const applicants = [fteApplicant1, contractorApplicant, fteApplicant2, alreadyIntroducedApplicant, fteApplicant3];
+    const srFailApplicant = {
+      id: 'guid6',
+      employeeId: null,
+      lastName: 'Six',
+      firstName: 'SR Store Employee ID Fail',
+      other: 'Other',
+      fullTime: true,
+      primaryAssignment: {
+        job: {
+          id: 'job6'
+        }
+      }
+    };
+
+    const applicants = [
+      successApplicant1,
+      contractorApplicant,
+      srFailApplicant,
+      successApplicant2,
+      alreadyIntroducedApplicant,
+      sapFailApplicant
+    ];
 
     smartrecruiters.getApplicants.mockResolvedValueOnce(applicants);
 
     util.generateResumeNumber.mockReturnValueOnce(1111);
     sap.postApplicant.mockReturnValueOnce(1010101);
     smartrecruiters.storeEmployeeId.mockReturnValueOnce(true);
+
+    util.generateResumeNumber.mockReturnValueOnce(6666);
+    sap.postApplicant.mockReturnValueOnce(6060606);
+    smartrecruiters.storeEmployeeId.mockReturnValueOnce(false);
 
     util.generateResumeNumber.mockReturnValueOnce(2222);
     sap.postApplicant.mockReturnValueOnce(2020202);
@@ -88,35 +111,42 @@ describe('Applicant introduction process', () => {
     // Error case.  Need to handle in a more detailed way.
     util.generateResumeNumber.mockReturnValueOnce(3333);
     sap.postApplicant.mockReturnValueOnce(null);
-    smartrecruiters.storeEmployeeId.mockReturnValueOnce(false);
 
     const results = await introduction.process();
 
-    expect(util.generateResumeNumber)
-      .toHaveBeenCalledTimes(3);
+    expect(util.generateResumeNumber).toHaveBeenCalledTimes(4);
 
-    expect(sap.postApplicant).toHaveBeenCalledWith(fteApplicant1, 1111);
-    expect(sap.postApplicant).toHaveBeenCalledWith(fteApplicant2, 2222);
-    expect(sap.postApplicant).toHaveBeenCalledWith(fteApplicant3, 3333);
-    expect(sap.postApplicant).toHaveBeenCalledTimes(3);
+    expect(sap.postApplicant).toHaveBeenCalledWith(successApplicant1, 1111);
+    expect(sap.postApplicant).toHaveBeenCalledWith(srFailApplicant, 6666);
+    expect(sap.postApplicant).toHaveBeenCalledWith(successApplicant2, 2222);
+    expect(sap.postApplicant).toHaveBeenCalledWith(sapFailApplicant, 3333);
+    expect(sap.postApplicant).toHaveBeenCalledTimes(4);
+
+    expect(smartrecruiters.storeEmployeeId).not.toHaveBeenCalledWith(3333, 'job3', null);
 
     expect(results.applicantsIntroducedToSap.length)
       .toBe(applicants.length - 2); // Contractors and already-introduced applicants are not processed
 
     const result1 = {
-      applicant: Object.assign(util.sanitizeApplicant(fteApplicant1), { employeeId: 1010101 }),
+      applicant: Object.assign(util.sanitizeApplicant(successApplicant1), { employeeId: 1010101 }),
       status: 'Succeeded'
     };
     const result2 = {
-      applicant: Object.assign(util.sanitizeApplicant(fteApplicant2), { employeeId: 2020202 }),
+      applicant: Object.assign(util.sanitizeApplicant(successApplicant2), { employeeId: 2020202 }),
       status: 'Succeeded'
     };
     const result3 = {
-      applicant: util.sanitizeApplicant(fteApplicant3),
-      status: 'Failed'
+      applicant: util.sanitizeApplicant(sapFailApplicant),
+      status: 'Failed',
+      reason: 'SAP post failure'
+    };
+    const result4 = {
+      applicant: Object.assign(util.sanitizeApplicant(srFailApplicant), { employeeId: 6060606 }),
+      status: 'Failed',
+      reason: 'SR post failure'
     };
     expect(results.applicantsIntroducedToSap)
-      .toEqual([result1, result2, result3]);
+      .toEqual([result1, result4, result2, result3]);
   });
 });
 
