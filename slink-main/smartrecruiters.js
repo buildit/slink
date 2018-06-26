@@ -27,10 +27,10 @@ async function toApplicant(summary) {
   const jobDetail = await srGet(candidateDetail.primaryAssignment.job.actions.details.url);
 
   const jobProps = await getJobProperties(summary.id, summary.primaryAssignment.job.id);
-  const salaryPropertyValue = findPropertyValueByLabel(jobProps.content, 'Annual Salary');
-  const annualBonusValue = findPropertyValueByLabel(jobProps.content, 'Annual Bonus');
-  const signingBonusValue = findPropertyValueByLabel(jobProps.content, 'Signing Bonus');
-  const employeeId = findPropertyValueById(jobProps.content, config.params.SR_EMPLOYEE_PROP_ID.value);
+  const salaryPropertyValue = findPropertyValueBy(jobProps.content, 'label', 'Annual Salary');
+  const annualBonusValue = findPropertyValueBy(jobProps.content, 'label', 'Annual Bonus');
+  const signingBonusValue = findPropertyValueBy(jobProps.content, 'label', 'Signing Bonus');
+  const employeeId = findPropertyValueBy(jobProps.content, 'id', config.params.SR_EMPLOYEE_PROP_ID.value);
 
   const applicant = {
     id: summary.id,
@@ -46,9 +46,9 @@ async function toApplicant(summary) {
     primaryAssignment: {
       job: {
         id: summary.primaryAssignment.job.id,
-        startDate: findPropertyValueByLabel(jobProps.content, 'Start Date'),
-        zipCode: findPropertyValueByLabel(jobProps.content, 'Zip Code'),
-        country: findPropertyValueByLabel(jobProps.content, 'Country'),
+        startDate: findPropertyValueBy(jobProps.content, 'label', 'Start Date'),
+        zipCode: findPropertyValueBy(jobProps.content, 'label', 'Zip Code'),
+        country: findPropertyValueBy(jobProps.content, 'label', 'Country'),
         annualSalary: getValue(salaryPropertyValue),
         offeredCurrency: getCode(salaryPropertyValue), // Assume currency is salary currency.
         annualBonus: getValue(annualBonusValue),
@@ -94,13 +94,13 @@ const storeEmployeeId = async (applicantId, jobId, sapId) => {
       value: `${sapId}`
     };
 
-    const SRresponse = await axios.put(apiEndpoint, putBody, options);
-    if (SRresponse && SRresponse.status === 204) {
+    const srResponse = await axios.put(apiEndpoint, putBody, options);
+    if (srResponse && srResponse.status === 204) {
       console.log(`Smart Recruiters post succeeded.  Applicant:  ${applicantId}, SAP employee id: ${sapId}`);
       return true;
     }
 
-    console.log(`Smart Recruiters post failed.  ApplicantId:  ${applicantId}, employee id: ${sapId}, Response: ${JSON.stringify(SRresponse)}`);
+    console.log(`Smart Recruiters post failed.  ApplicantId:  ${applicantId}, employee id: ${sapId}, Response: ${JSON.stringify(srResponse)}`);
     return false;
   } catch (err) {
     console.log(`Exception posting applicant employee id to Smart Recruiters: ${err.message}`);
@@ -140,18 +140,9 @@ async function getJobProperties(candidateId, jobId) {
   return srGet(apiEndpoint);
 }
 
-function findPropertyValueByLabel(props, propertyLabel) {
-  if (!props) return null;
-
-  const foundProperty = props.find(property => property.label === propertyLabel);
-  return (foundProperty === undefined ? null : foundProperty.value);
-}
-
-function findPropertyValueById(props, id) {
-  if (!props) return null;
-
-  const foundProperty = props.find(property => property.id === id);
-  return (foundProperty === undefined ? null : foundProperty.value);
+function findPropertyValueBy(props, discriminator, discriminatorValue) {
+  const foundObject = R.find(R.propEq(discriminator, discriminatorValue), props);
+  return R.propOr(null, 'value', foundObject);
 }
 
 function getValue(property) {
@@ -161,7 +152,6 @@ function getValue(property) {
 function getCode(property) {
   return property != null ? property.code : null;
 }
-
 
 function promiseTimer(ms) {
   return new Promise((resolve) => {
