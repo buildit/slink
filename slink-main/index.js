@@ -12,7 +12,7 @@ module.exports.handler = async (event, context, callback) => {
 
     const result = await introduction.process();
 
-    console.log(`Process complete.  Applicants sent to SAP $in this run: ${JSON.stringify(result.applicantsIntroducedToSap)}`);
+    console.log(`Process complete.  Applicants sent to SAP in this run: ${JSON.stringify(result.applicantsIntroducedToSap)}`);
     result.applicantsIntroducedToSap.forEach((applicant) => {
       console.log(`${JSON.stringify(applicant)}`);
     });
