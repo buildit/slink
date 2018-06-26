@@ -127,26 +127,26 @@ describe('Applicant introduction process', () => {
     expect(results.applicantsIntroducedToSap.length)
       .toBe(applicants.length - 2); // Contractors and already-introduced applicants are not processed
 
-    const result1 = {
+    const successResult1 = {
       applicant: Object.assign(util.sanitizeApplicant(successApplicant1), { employeeId: 1010101 }),
       status: 'Succeeded'
     };
-    const result2 = {
+    const successResult2 = {
       applicant: Object.assign(util.sanitizeApplicant(successApplicant2), { employeeId: 2020202 }),
       status: 'Succeeded'
     };
-    const result3 = {
+    const sapFailResult = {
       applicant: util.sanitizeApplicant(sapFailApplicant),
       status: 'Failed',
       reason: 'SAP post failure'
     };
-    const result4 = {
+    const srFailResult = {
       applicant: Object.assign(util.sanitizeApplicant(srFailApplicant), { employeeId: 6060606 }),
       status: 'Failed',
       reason: 'SR post failure'
     };
     expect(results.applicantsIntroducedToSap)
-      .toEqual([result1, result4, result2, result3]);
+      .toEqual([successResult1, srFailResult, successResult2, sapFailResult]);
   });
 });
 
