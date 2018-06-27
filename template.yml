@@ -89,7 +89,7 @@ Resources:
   Slink429MetricFilter:
     Type: "AWS::Logs::MetricFilter"
     Properties:
-      LogGroupName: !Ref SlinkMainFunction
+      LogGroupName: "/aws/lambda/awscodestar-buildit-slink-lambda-SlinkMainFunction-ABBXZIYEV8GR"
       FilterPattern: "Request failed with status code 429"
       MetricTransformations: 
       - 
