@@ -1,5 +1,7 @@
 'use strict';
 
+const R = require('ramda');
+
 const sr = require('./smartrecruiters');
 const sap = require('./sap');
 const util = require('./util');
@@ -12,10 +14,13 @@ const process = async () => {
   const applicants = await sr.getApplicants();
   console.log(`Collected ${applicants.length} applicants from SmartRecruiters`);
 
+  const ftes = split(applicant => applicant.fullTime === true, applicants);
+  console.log(`Non-FTE applicants skipped: ${ftes.nonMatches.length}`);
+  const ftesNeedingIntroduction = split(applicant => applicant.employeeId === null, ftes.matches);
+  console.log(`Already-introduced applicants skipped: ${ftesNeedingIntroduction.nonMatches.length}`);
+
   const applicantsIntroducedToSap =
-    await Promise.all(applicants
-      .filter(applicant => applicant.fullTime)
-      .filter(applicant => applicant.employeeId === null)
+    await Promise.all(ftesNeedingIntroduction.matches
       .map(async (applicant) => {
         const sanitizedApplicant = util.sanitizeApplicant(applicant);
 
@@ -45,6 +50,21 @@ const process = async () => {
 
   return { applicantsIntroducedToSap };
 };
+
+/**
+ * Splits the given array based on the given predicate, and returns an object holding a pair of properties holding
+ * the matching and non-matching results.
+ * @param predicate
+ * @param ary
+ * @returns {{matches: *, nonMatches: *}}
+ */
+function split(predicate, ary) {
+  const tuple = R.partition(predicate, ary);
+  return {
+    matches: R.head(tuple),
+    nonMatches: R.last(tuple)
+  };
+}
 
 async function postEmployeeIdToSmartRecruiters(employeeId, applicant) {
   console.log(`Preparing to add SAP employee id to Smart Recruiters: ${employeeId}`);
