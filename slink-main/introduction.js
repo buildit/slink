@@ -14,41 +14,57 @@ const process = async () => {
   const applicants = await sr.getApplicants();
   console.log(`Collected ${applicants.length} applicants from SmartRecruiters`);
 
-  const fullTimeTuple = R.partition(applicant => applicant.fullTime === true, applicants);
-  const introductionTuple = R.partition(applicant => applicant.employeeId === null, R.head(fullTimeTuple));
-  console.log(`Non-FTE applicants skipped: ${R.last(fullTimeTuple).length}`);
-  console.log(`Already-introduced applicants skipped: ${R.last(introductionTuple).length}`);
+  const ftes = split(applicant => applicant.fullTime === true, applicants);
+  console.log(`Non-FTE applicants skipped: ${ftes.nonMatches.length}`);
+  const needsIntroduction = split(applicant => applicant.employeeId === null, ftes.matches);
+  console.log(`Already-introduced applicants skipped: ${needsIntroduction.nonMatches.length}`);
 
   const applicantsIntroducedToSap =
-    await Promise.all(R.head(introductionTuple).map(async (applicant) => {
-      const sanitizedApplicant = util.sanitizeApplicant(applicant);
+    await Promise.all(needsIntroduction.matches
+      .map(async (applicant) => {
+        const sanitizedApplicant = util.sanitizeApplicant(applicant);
 
-      console.log(`Preparing to post applicant to SAP: ${JSON.stringify(sanitizedApplicant)}`);
-      const employeeId = await sap.postApplicant(applicant, util.generateResumeNumber());
+        console.log(`Preparing to post applicant to SAP: ${JSON.stringify(sanitizedApplicant)}`);
+        const employeeId = await sap.postApplicant(applicant, util.generateResumeNumber());
 
-      if (employeeId != null) { // TODO more detailed return from postApplicant?
-        sanitizedApplicant.employeeId = employeeId;
-        const srSuccess = await postEmployeeIdToSmartRecruiters(employeeId, applicant);
+        if (employeeId != null) { // TODO more detailed return from postApplicant?
+          sanitizedApplicant.employeeId = employeeId;
+          const srSuccess = await postEmployeeIdToSmartRecruiters(employeeId, applicant);
 
-        const results = {
-          applicant: sanitizedApplicant,
-          status: (srSuccess ? 'Succeeded' : 'Failed')
-        };
-        if (!srSuccess) {
-          results.reason = 'SR post failure';
+          const results = {
+            applicant: sanitizedApplicant,
+            status: (srSuccess ? 'Succeeded' : 'Failed')
+          };
+          if (!srSuccess) {
+            results.reason = 'SR post failure';
+          }
+          return results;
         }
-        return results;
-      }
 
-      return {
-        applicant: sanitizedApplicant,
-        status: 'Failed',
-        reason: 'SAP post failure'
-      };
-    }));
+        return {
+          applicant: sanitizedApplicant,
+          status: 'Failed',
+          reason: 'SAP post failure'
+        };
+      }));
 
   return { applicantsIntroducedToSap };
 };
+
+/**
+ * Splits the given array based on the given predicate, and returns an object holding a pair of properties holding
+ * the matching and non-matching results.
+ * @param predicate
+ * @param ary
+ * @returns {{matches: *, nonMatches: *}}
+ */
+function split(predicate, ary) {
+  const tuple = R.partition(predicate, ary);
+  return {
+    matches: R.head(tuple),
+    nonMatches: R.last(tuple)
+  };
+}
 
 async function postEmployeeIdToSmartRecruiters(employeeId, applicant) {
   console.log(`Preparing to add SAP employee id to Smart Recruiters: ${employeeId}`);
