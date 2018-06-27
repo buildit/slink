@@ -14,10 +14,13 @@ const process = async () => {
   const applicants = await sr.getApplicants();
   console.log(`Collected ${applicants.length} applicants from SmartRecruiters`);
 
-  const ftes = split(applicant => applicant.fullTime === true, applicants);
-  console.log(`Non-FTE applicants skipped: ${ftes.nonMatches.length}`);
-  const ftesNeedingIntroduction = split(applicant => applicant.employeeId === null, ftes.matches);
-  console.log(`Already-introduced applicants skipped: ${ftesNeedingIntroduction.nonMatches.length}`);
+  const splitByFte = split(applicant => applicant.fullTime === true);
+  const splitByNeedsIntroduction = split(applicant => applicant.employeeId === null);
+
+  const ftes = splitByFte(applicants);
+  console.log(`Non-FTE applicants skipped: ${ftes.rejects.length}`);
+  const ftesNeedingIntroduction = splitByNeedsIntroduction(ftes.matches);
+  console.log(`Already-introduced applicants skipped: ${ftesNeedingIntroduction.rejects.length}`);
 
   const applicantsIntroducedToSap =
     await Promise.all(ftesNeedingIntroduction.matches
@@ -52,18 +55,12 @@ const process = async () => {
 };
 
 /**
- * Splits the given array based on the given predicate, and returns an object holding a pair of properties holding
- * the matching and non-matching results.
+ * Returns a function that splits an Array into an object containing matches and non-matches.
  * @param predicate
- * @param ary
- * @returns {{matches: *, nonMatches: *}}
+ * @returns {{matches: *, rejects: *}}
  */
-function split(predicate, ary) {
-  const tuple = R.partition(predicate, ary);
-  return {
-    matches: R.head(tuple),
-    nonMatches: R.last(tuple)
-  };
+function split(predicate) {
+  return R.pipe(R.partition(predicate), R.zipObj(['matches', 'rejects']));
 }
 
 async function postEmployeeIdToSmartRecruiters(employeeId, applicant) {
