@@ -16,11 +16,11 @@ const process = async () => {
 
   const ftes = split(applicant => applicant.fullTime === true, applicants);
   console.log(`Non-FTE applicants skipped: ${ftes.nonMatches.length}`);
-  const needsIntroduction = split(applicant => applicant.employeeId === null, ftes.matches);
-  console.log(`Already-introduced applicants skipped: ${needsIntroduction.nonMatches.length}`);
+  const ftesNeedingIntroduction = split(applicant => applicant.employeeId === null, ftes.matches);
+  console.log(`Already-introduced applicants skipped: ${ftesNeedingIntroduction.nonMatches.length}`);
 
   const applicantsIntroducedToSap =
-    await Promise.all(needsIntroduction.matches
+    await Promise.all(ftesNeedingIntroduction.matches
       .map(async (applicant) => {
         const sanitizedApplicant = util.sanitizeApplicant(applicant);
 
