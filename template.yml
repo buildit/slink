@@ -79,6 +79,9 @@ Resources:
           - "SlinkIntroductionRule"
           - "Arn"
 
+  SlinkLogGroup:
+    Type: "AWS::Logs::LogGroup"
+
   SlinkSNSTopic:
     Type: "AWS::SNS::Topic"
     Properties:
@@ -89,7 +92,8 @@ Resources:
   Slink429MetricFilter:
     Type: "AWS::Logs::MetricFilter"
     Properties:
-      LogGroupName: "/aws/lambda/awscodestar-buildit-slink-lambda-SlinkMainFunction-ABBXZIYEV8GR"
+      LogGroupName: 
+      - !Ref SlinkLogGroup
       FilterPattern: "Request failed with status code 429"
       MetricTransformations: 
       - 
