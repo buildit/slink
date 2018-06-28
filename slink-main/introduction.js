@@ -1,5 +1,7 @@
 'use strict';
 
+const R = require('ramda');
+
 const sr = require('./smartrecruiters');
 const sap = require('./sap');
 const util = require('./util');
@@ -12,10 +14,16 @@ const process = async () => {
   const applicants = await sr.getApplicants();
   console.log(`Collected ${applicants.length} applicants from SmartRecruiters`);
 
+  const splitByFte = split(applicant => applicant.fullTime === true);
+  const splitByNeedsIntroduction = split(applicant => applicant.employeeId === null);
+
+  const ftes = splitByFte(applicants);
+  console.log(`Non-FTE applicants skipped: ${ftes.rejects.length}`);
+  const ftesNeedingIntroduction = splitByNeedsIntroduction(ftes.matches);
+  console.log(`Already-introduced applicants skipped: ${ftesNeedingIntroduction.rejects.length}`);
+
   const applicantsIntroducedToSap =
-    await Promise.all(applicants
-      .filter(applicant => applicant.fullTime)
-      .filter(applicant => applicant.employeeId === null)
+    await Promise.all(ftesNeedingIntroduction.matches
       .map(async (applicant) => {
         const sanitizedApplicant = util.sanitizeApplicant(applicant);
 
@@ -45,6 +53,15 @@ const process = async () => {
 
   return { applicantsIntroducedToSap };
 };
+
+/**
+ * Returns a function that splits an Array into an object containing matches and non-matches.
+ * @param predicate
+ * @returns {{matches: *, rejects: *}}
+ */
+function split(predicate) {
+  return R.pipe(R.partition(predicate), R.zipObj(['matches', 'rejects']));
+}
 
 async function postEmployeeIdToSmartRecruiters(employeeId, applicant) {
   console.log(`Preparing to add SAP employee id to Smart Recruiters: ${employeeId}`);
