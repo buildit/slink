@@ -97,9 +97,20 @@ Resources:
       MetricTransformations: 
       - 
         MetricValue: "1"
-        MetricNamespace: "SlinkErrors"
+        MetricNamespace: "SlinkMetrics"
         MetricName: "429Errors"
   
+  Slink200CandidatesSentMetricFilter:
+    Type: "AWS::Logs::MetricFilter"
+    Properties:
+      LogGroupName: !Ref SlinkLogGroup
+      FilterPattern: "Sent candidate(s) to SAP"
+      MetricTransformations: 
+      - 
+        MetricValue: "1"
+        MetricNamespace: "SlinkMetrics"
+        MetricName: "200CandidatesSent"
+
   Slink429Alarm:
     Type: "AWS::CloudWatch::Alarm"
     Properties: 
@@ -115,6 +126,20 @@ Resources:
       Statistic: Maximum
       Threshold: '1'
       
+  Slink200Alarm:
+    Type: "AWS::CloudWatch::Alarm"
+    Properties: 
+      AlarmName: "Slink 200 Notiication"
+      AlarmDescription: "Notification for 200 candidates sent"
+      AlarmActions: 
+      - !Ref SlinkSNSTopic
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      EvaluationPeriods: "15"
+      Namespace: Slink/Alarms
+      MetricName: Slink429MetricFilter
+      Period: '60'
+      Statistic: Maximum
+      Threshold: '1'
 #  ParameterStoreRole:
 #      Type: AWS::IAM::Role
 #      Properties:
