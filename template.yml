@@ -89,7 +89,7 @@ Resources:
         - Endpoint: "a5u9g5c9t4m3v0z5@wiprodigital.slack.com"
           Protocol: "email"
 
-  Slink429MetricFilter:
+  Slink429Metric:
     Type: "AWS::Logs::MetricFilter"
     Properties:
       LogGroupName: !Ref SlinkLogGroup
@@ -100,11 +100,11 @@ Resources:
         MetricNamespace: "SlinkMetrics"
         MetricName: "429Errors"
   
-  SlinkCandidatesSentSuccessMetricFilter:
+  SlinkCandidatesSentSuccessMetric:
     Type: "AWS::Logs::MetricFilter"
     Properties:
       LogGroupName: !Ref SlinkLogGroup
-      FilterPattern: "Sent candidate(s) to SAP"
+      FilterPattern: "Sent candidate to SAP"
       MetricTransformations: 
       - 
         MetricValue: "1"
@@ -121,7 +121,7 @@ Resources:
       ComparisonOperator: GreaterThanOrEqualToThreshold
       EvaluationPeriods: "15"
       Namespace: Slink/Alarms
-      MetricName: Slink429MetricFilter
+      MetricName: Slink429Metric
       Period: '60'
       Statistic: Maximum
       Threshold: '1'
@@ -136,7 +136,7 @@ Resources:
       ComparisonOperator: GreaterThanOrEqualToThreshold
       EvaluationPeriods: "15"
       Namespace: Slink/Alarms
-      MetricName: SlinkCandidatesSentSuccessMetricFilter
+      MetricName: SlinkCandidatesSentSuccessMetric
       Period: '60'
       Statistic: Maximum
       Threshold: '1'
