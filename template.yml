@@ -79,18 +79,6 @@ Resources:
           - "SlinkIntroductionRule"
           - "Arn"
 
-
-  SlinkIntroductionExecution:
-     Type: AWS::Serverless::SimpleTable
-     Properties:
-       PrimaryKey:
-         Name: executionId
-         Type: String
-       ProvisionedThroughput:
-         ReadCapacityUnits: 5
-         WriteCapacityUnits: 5
-
-
   SlinkLogGroup:
     Type: "AWS::Logs::LogGroup"
 
