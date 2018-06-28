@@ -79,6 +79,18 @@ Resources:
           - "SlinkIntroductionRule"
           - "Arn"
 
+
+  SlinkIntroductionExecution:
+     Type: AWS::Serverless::SimpleTable
+     Properties:
+       PrimaryKey:
+         Name: executionId
+         Type: String
+       ProvisionedThroughput:
+         ReadCapacityUnits: 5
+         WriteCapacityUnits: 5
+
+
   SlinkLogGroup:
     Type: "AWS::Logs::LogGroup"
 
@@ -94,29 +106,29 @@ Resources:
     Properties:
       LogGroupName: !Ref SlinkLogGroup
       FilterPattern: "Request failed with status code 429"
-      MetricTransformations: 
-      - 
+      MetricTransformations:
+      -
         MetricValue: "1"
         MetricNamespace: "SlinkMetrics"
         MetricName: "429Errors"
-  
+
   SlinkCandidatesSentSuccessMetric:
     Type: "AWS::Logs::MetricFilter"
     Properties:
       LogGroupName: !Ref SlinkLogGroup
       FilterPattern: "Sent candidate to SAP"
-      MetricTransformations: 
-      - 
+      MetricTransformations:
+      -
         MetricValue: "1"
         MetricNamespace: "SlinkMetrics"
         MetricName: "CandidatesSentSuccess"
 
   Slink429Alarm:
     Type: "AWS::CloudWatch::Alarm"
-    Properties: 
+    Properties:
       AlarmName: "Slink 429 Alarm"
       AlarmDescription: "Alarm for 429 errors"
-      AlarmActions: 
+      AlarmActions:
       - !Ref SlinkSNSTopic
       ComparisonOperator: GreaterThanOrEqualToThreshold
       EvaluationPeriods: "15"
@@ -125,13 +137,13 @@ Resources:
       Period: '60'
       Statistic: Maximum
       Threshold: '1'
-      
+
   SlinkCandidatesSentSuccessNotification:
     Type: "AWS::CloudWatch::Alarm"
-    Properties: 
+    Properties:
       AlarmName: "Slink Candidates Sent Notiication"
       AlarmDescription: "Notification for candidates sent"
-      AlarmActions: 
+      AlarmActions:
       - !Ref SlinkSNSTopic
       ComparisonOperator: GreaterThanOrEqualToThreshold
       EvaluationPeriods: "15"
