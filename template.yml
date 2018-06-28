@@ -39,7 +39,7 @@ Resources:
       AutoPublishAlias: STAGE
       Environment:
         Variables:
-          INTRODUCTION_EXECUTION_TABLE: !Ref SlinkIntroductionExecution
+          INTRO_RUN_TABLE: !Ref SlinkIntroRun
       Role:
         Fn::ImportValue:
           !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
@@ -50,11 +50,11 @@ Resources:
             Method: get
             Path: /slink
 
-  SlinkIntroductionExecution:
+  SlinkIntroRun:
      Type: AWS::Serverless::SimpleTable
      Properties:
        PrimaryKey:
-         Name: invokeId
+         Name: requestId
          Type: String
        ProvisionedThroughput:
          ReadCapacityUnits: 5
