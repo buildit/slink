@@ -92,8 +92,7 @@ Resources:
   Slink429MetricFilter:
     Type: "AWS::Logs::MetricFilter"
     Properties:
-      LogGroupName: 
-      - !Ref SlinkLogGroup
+      LogGroupName: !Ref SlinkLogGroup
       FilterPattern: "Request failed with status code 429"
       MetricTransformations: 
       - 
