@@ -39,7 +39,9 @@ Resources:
       AutoPublishAlias: STAGE
       Environment:
         Variables:
-          INTRO_RUN_TABLE: !Ref SlinkIntroRun
+          RUN_TABLE: !Ref RunTable
+          LAST_RUN_DATE_TABLE: !Ref LastRunDateTable
+          APPLICANT_TABLE: !Ref ApplicantTable
       Role:
         Fn::ImportValue:
           !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
@@ -49,6 +51,68 @@ Resources:
           Properties:
             Method: get
             Path: /slink
+
+  RunTable:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      TableName: "Run"
+      AttributeDefinitions:
+        -
+          AttributeName: "requestId"
+          AttributeType: "S"
+        -
+          AttributeName: "alias"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "requestId"
+          KeyType: "HASH"
+        -
+          AttributeName: "alias"
+          AttributeType: "RANGE"
+      ProvisionedThroughput:
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
+
+  LastRunDateTable:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      TableName: "LastRunDate"
+      AttributeDefinitions:
+        -
+          AttributeName: "alias"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "alias"
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
+
+
+  ApplicantTable:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      TableName: "Applicant"
+      AttributeDefinitions:
+        -
+          AttributeName: "srCandidateId"
+          AttributeType: "S"
+        -
+          AttributeName: "alias"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "srCandidateId"
+          KeyType: "HASH"
+        -
+          AttributeName: "alias"
+          AttributeType: "RANGE"
+      ProvisionedThroughput:
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
+
 
   SlinkIntroRun:
      Type: AWS::Serverless::SimpleTable

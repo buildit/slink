@@ -2,7 +2,7 @@
 
 const aws = require('./aws');
 
-const params = {
+const localParams = {
   SAP_ADD_EMPLOYEE_URL: {
     name: 'sap/ADD_EMPLOYEE_URL',
     value: undefined
@@ -71,14 +71,14 @@ const loadConfigParams = async (context) => {
   }
 
   try {
-    const parameters = await aws.getParams(paramPath);
-    // console.log(`SSM Params: ${JSON.stringify(parameters)}`);
+    const ssmParams = await aws.getParams(paramPath);
+    // console.log(`SSM Params: ${JSON.stringify(ssmParams)}`);
 
     // Load all param values in our configParams list
-    const keys = Object.keys(params);
+    const keys = Object.keys(localParams);
     keys.forEach((configParamKey) => {
-      const configParam = params[configParamKey];
-      const paramFound = parameters.filter(p => p.Name.includes(configParam.name));
+      const configParam = localParams[configParamKey];
+      const paramFound = ssmParams.filter(p => p.Name.includes(configParam.name));
       if (paramFound !== undefined && paramFound.length === 1) {
         configParam.value = paramFound[0].Value;
       } else {
@@ -87,7 +87,9 @@ const loadConfigParams = async (context) => {
       }
     });
 
-    return params;
+    // Jam in LAMBDA_ALIAS so that other code can access it if needed
+    localParams.LAMBDA_ALIAS = { value: alias };
+    return localParams;
   } catch (e) {
     console.log(`Problem accessing SSM parameters for ${paramPath}`, e);
     return null;
@@ -96,5 +98,5 @@ const loadConfigParams = async (context) => {
 
 module.exports = {
   loadConfigParams,
-  params
+  params: localParams
 };
