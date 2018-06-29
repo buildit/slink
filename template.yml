@@ -93,16 +93,6 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: "5"
         WriteCapacityUnits: "5"
-      GlobalSecondaryIndexes:
-        -
-          IndexName: "runDateIndex"
-          KeySchema:
-            -
-              AttributeName: "runSerialDate"
-              KeyType: "HASH"
-            -
-              AttributeName: "numCandidates"
-              KeyType: "RANGE"
 
   ApplicantTable:
     Type: "AWS::DynamoDB::Table"
@@ -125,18 +115,6 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: "5"
         WriteCapacityUnits: "5"
-      GlobalSecondaryIndexes:
-        -
-          IndexName: "employeeIdIndex"
-          KeySchema:
-            -
-              AttributeName: "sapEmployeeId"
-              KeyType: "HASH"
-          Projection:
-            NonKeyAttributes:
-              - "srCandidateId"
-              - "resumeNumber"
-            ProjectionType: "INCLUDE"
 
 
   SlinkIntroRun:
