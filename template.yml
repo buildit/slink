@@ -50,6 +50,95 @@ Resources:
             Method: get
             Path: /slink
 
+  LastRunDateTable:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      TableName: "LastRunDate"
+      AttributeDefinitions:
+        -
+          AttributeName: "alias"
+          AttributeType: "S"
+        -
+          AttributeName: "lastRunSerialDate"
+          AttributeType: "N"
+      KeySchema:
+        -
+          AttributeName: "alias"
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
+
+  RunTable:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      TableName: "Run"
+      AttributeDefinitions:
+        -
+          AttributeName: "requestId"
+          AttributeType: "S"
+        -
+          AttributeName: "runSerialDate"
+          AttributeType: "N"
+        -
+          AttributeName: "numCandidates"
+          AttributeType: "N"
+      KeySchema:
+        -
+          AttributeName: "requestId"
+          KeyType: "HASH"
+        -
+          AttributeName: "runSerialDate"
+          KeyType: "RANGE"
+      ProvisionedThroughput:
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
+      LocalSecondaryIndexes:
+        -
+          IndexName: "runDateIndex"
+          KeySchema:
+            -
+              AttributeName: "runSerialDate"
+              KeyType: "HASH"
+            -
+              AttributeName: "numCandidates"
+              KeyType: "RANGE"
+
+  ApplicantTable:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      TableName: "Applicant"
+      AttributeDefinitions:
+        -
+          AttributeName: "srCandidateId"
+          AttributeType: "S"
+        -
+          AttributeName: "sapEmployeeId"
+          AttributeType: "S"
+        -
+          AttributeName: "resumeNumber"
+          AttributeType: "N"
+      KeySchema:
+        -
+          AttributeName: "srCandidateId"
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
+      LocalSecondaryIndexes:
+        -
+          IndexName: "employeeIdIndex"
+          KeySchema:
+            -
+              AttributeName: "sapEmployeeId"
+              KeyType: "HASH"
+          Projection:
+            NonKeyAttributes:
+              - "srCandidateId"
+              - "resumeNumber"
+            ProjectionType: "INCLUDE"
+
+
   SlinkIntroRun:
      Type: AWS::Serverless::SimpleTable
      Properties:
