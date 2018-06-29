@@ -8,7 +8,6 @@ const timeSource = require('./timesource');
 
 module.exports.handler = async (event, context, callback) => {
   try {
-    console.log(`#### context:  ${JSON.stringify(context)}`);
     console.log(`#### Function ARN:  ${context.invokedFunctionArn}`);
 
     // Load all configuration parameters from AWS SSM
@@ -40,13 +39,10 @@ module.exports.handler = async (event, context, callback) => {
 async function writeRunRecord(context) {
   try {
     const requestId = context.awsRequestId;
-    console.log(`Writing run record to Dynamo, ID: ${requestId}`);
-    const serialTime = timeSource.getSerialTime();
-    console.log(`'serialTime', ${JSON.stringify(serialTime)}`);
-    await runDao.write(requestId, serialTime);
-    console.log('Write to Dynamo successful');
+    console.log(`Writing run record to DynamoDb, ID: ${requestId}`);
+    await runDao.write(requestId, timeSource.getSerialTime());
   } catch (e) {
-    console.log('Write to Dynamo unsuccessful', e);
+    console.log('Error writing to DynamoDb unsuccessful', e);
     throw e;
   }
 }
