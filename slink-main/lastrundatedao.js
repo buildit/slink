@@ -5,7 +5,6 @@ const config = require('./config');
 
 async function write(requestId, runSerialDate) {
   const alias = config.params.LAMBDA_ALIAS;
-  console.log(`'alias', ${JSON.stringify(alias)}`);
 
   const params = {
     Item: {
