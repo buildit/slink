@@ -38,8 +38,8 @@ const params = {
 };
 
 /**
- * Loads the configuration paramaters from AWS Parameter Store.<br/>
- * It uses the Lambda ALIAS to determine which paramaters to load (STAGE or PROD).<br/>
+ * Loads the configuration parameters from AWS Parameter Store.<br/>
+ * It uses the Lambda ALIAS to determine which parameters to load (STAGE or PROD).<br/>
  * In order for this work correctly, we must ensure that the Lambda functions have aliases assigned
  * to a specific version.<br/>
  *
