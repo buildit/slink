@@ -1,7 +1,8 @@
 'use strict';
 
-const aws = require('../../aws.js');
-const runDao = require('../../rundao.js');
+const aws = require('../../aws');
+const runDao = require('../../rundao');
+const timeSource = require('../../timesource');
 
 jest.mock('../../aws.js');
 
@@ -12,11 +13,14 @@ describe('Run DAO', () => {
   });
 
   it('write saves a valid item to DynamoDb', async () => {
-    runDao.write('abc123');
+    runDao.write('abc123', 12345);
     const params = {
       Item: {
         requestId: {
           S: 'abc123'
+        },
+        runSerialDate: {
+          N: '12345'
         }
       },
       TableName: 'testing'

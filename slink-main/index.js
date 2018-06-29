@@ -3,6 +3,7 @@
 const introduction = require('./introduction');
 const config = require('./config');
 const runDao = require('./rundao');
+const timeSource = require('./timesource');
 
 
 module.exports.handler = async (event, context, callback) => {
@@ -40,7 +41,9 @@ async function writeRunRecord(context) {
   try {
     const requestId = context.awsRequestId;
     console.log(`Writing run record to Dynamo, ID: ${requestId}`);
-    await runDao.write(requestId);
+    const serialTime = timeSource.getSerialTime();
+    console.log(`'serialTime', ${JSON.stringify(serialTime)}`);
+    await runDao.write(requestId, serialTime);
     console.log('Write to Dynamo successful');
   } catch (e) {
     console.log('Write to Dynamo unsuccessful', e);
