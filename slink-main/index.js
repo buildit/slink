@@ -2,6 +2,9 @@
 
 const introduction = require('./introduction');
 const config = require('./config');
+const runDao = require('./rundao');
+const timeSource = require('./timesource');
+
 
 module.exports.handler = async (event, context, callback) => {
   try {
@@ -17,6 +20,8 @@ module.exports.handler = async (event, context, callback) => {
       console.log(`${JSON.stringify(applicant)}`);
     });
 
+    await writeRunRecord(context);
+
     const response = {
       statusCode: 200,
       body: JSON.stringify({ message: `Sent ${result.applicantsIntroducedToSap.length} candidate(s) to SAP` })
@@ -30,3 +35,14 @@ module.exports.handler = async (event, context, callback) => {
     });
   }
 };
+
+async function writeRunRecord(context) {
+  try {
+    const requestId = context.awsRequestId;
+    console.log(`Writing run record to DynamoDb, ID: ${requestId}`);
+    await runDao.write(requestId, timeSource.getSerialTime());
+  } catch (e) {
+    console.log('Error writing to DynamoDb unsuccessful', e);
+    throw e;
+  }
+}

@@ -37,18 +37,28 @@ Resources:
     Properties:
       CodeUri: ./slink-main/
       AutoPublishAlias: STAGE
+      Environment:
+        Variables:
+          INTRO_RUN_TABLE: !Ref SlinkIntroRun
       Role:
         Fn::ImportValue:
           !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
-#        Fn::GetAtt:
-#          - "ParameterStoreRole"
-#          - "Arn"
       Events:
         GetApiEndpoint:
           Type: Api
           Properties:
             Method: get
             Path: /slink
+
+  SlinkIntroRun:
+     Type: AWS::Serverless::SimpleTable
+     Properties:
+       PrimaryKey:
+         Name: requestId
+         Type: String
+       ProvisionedThroughput:
+         ReadCapacityUnits: 5
+         WriteCapacityUnits: 5
 
   SlinkIntroductionRule:
     Type: "AWS::Events::Rule"
