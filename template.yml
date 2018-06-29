@@ -55,7 +55,6 @@ Resources:
   RunTable:
     Type: "AWS::DynamoDB::Table"
     Properties:
-      TableName: "Run"
       AttributeDefinitions:
         -
           AttributeName: "requestId"
@@ -77,7 +76,6 @@ Resources:
   LastRunDateTable:
     Type: "AWS::DynamoDB::Table"
     Properties:
-      TableName: "LastRunDate"
       AttributeDefinitions:
         -
           AttributeName: "alias"
@@ -94,7 +92,6 @@ Resources:
   ApplicantTable:
     Type: "AWS::DynamoDB::Table"
     Properties:
-      TableName: "Applicant"
       AttributeDefinitions:
         -
           AttributeName: "srCandidateId"
