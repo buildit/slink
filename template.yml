@@ -69,7 +69,7 @@ Resources:
           KeyType: "HASH"
         -
           AttributeName: "alias"
-          AttributeType: "RANGE"
+          KeyType: "RANGE"
       ProvisionedThroughput:
         ReadCapacityUnits: "5"
         WriteCapacityUnits: "5"
@@ -108,7 +108,7 @@ Resources:
           KeyType: "HASH"
         -
           AttributeName: "alias"
-          AttributeType: "RANGE"
+          KeyType: "RANGE"
       ProvisionedThroughput:
         ReadCapacityUnits: "5"
         WriteCapacityUnits: "5"
