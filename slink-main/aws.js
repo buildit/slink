@@ -1,6 +1,7 @@
 'use strict';
 
 const awsParamStore = require('aws-param-store');
+const AWS = require('aws-sdk');
 
 /**
  * Helper function to call AWS API to retrieve parameter values
@@ -11,6 +12,12 @@ const awsParamStore = require('aws-param-store');
  */
 const getParams = async (paramPath, awsRegion) => awsParamStore.getParametersByPath(paramPath, { region: awsRegion });
 
+const putDynamoDb = async (params) => {
+  const dynamoDb = new AWS.DynamoDB();
+  return dynamoDb.putItem(params).promise();
+};
+
 module.exports = {
-  getParams
+  getParams,
+  putDynamoDb
 };

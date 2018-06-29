@@ -2,21 +2,8 @@
 
 const introduction = require('./introduction');
 const config = require('./config');
-const aws = require('aws-sdk');
+const runDao = require('./rundao');
 
-async function write(requestId) {
-  const dynamodb = new aws.DynamoDB();
-
-  const params = {
-    Item: {
-      requestId: {
-        S: requestId
-      }
-    },
-    TableName: process.env.INTRODUCTION_EXECUTION_TABLE
-  };
-  await dynamodb.putItem(params).promise();
-}
 
 module.exports.handler = async (event, context, callback) => {
   try {
@@ -33,13 +20,7 @@ module.exports.handler = async (event, context, callback) => {
       console.log(`${JSON.stringify(applicant)}`);
     });
 
-    console.log(`Writing invocationId to Dynamo: ${context.awsRequestId}`);
-    try {
-      await write(context.awsRequestId);
-    } catch (e) {
-      console.log('Write to Dynamo unsuccessful', e);
-    }
-    console.log('Write to Dynamo successful');
+    await writeRunRecord(context);
 
     const response = {
       statusCode: 200,
@@ -54,3 +35,15 @@ module.exports.handler = async (event, context, callback) => {
     });
   }
 };
+
+async function writeRunRecord(context) {
+  try {
+    const requestId = context.awsRequestId;
+    console.log(`Writing run record to Dynamo, ID: ${requestId}`);
+    await runDao.write(requestId);
+    console.log('Write to Dynamo successful');
+  } catch (e) {
+    console.log('Write to Dynamo unsuccessful', e);
+    throw e;
+  }
+}

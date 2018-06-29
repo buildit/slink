@@ -1,14 +1,19 @@
 'use strict';
 
 const getType = require('jest-get-type');
-const index = require('../../index.js');
+const index = require('../../index');
 const introduction = require('../../introduction');
 const config = require('../../config');
+const runDao = require('../../rundao');
 
 jest.mock('../../introduction');
 jest.mock('../../config');
+jest.mock('../../rundao');
 
-const context = { invokedFunctionArn: 'unit-test' };
+const context = {
+  invokedFunctionArn: 'unit-test',
+  awsRequestId: 'requestid'
+};
 
 describe('Handler invocation', () => {
   beforeEach(() => {
@@ -23,6 +28,7 @@ describe('Handler invocation', () => {
       expect(result.statusCode).toEqual(200);
       expect(getType(result.body)).toEqual('string');
       expect(result.body).toEqual(JSON.stringify({ message: 'Sent 1 candidate(s) to SAP' }));
+      expect(runDao.write).toHaveBeenCalledWith('requestid');
     });
   });
 
