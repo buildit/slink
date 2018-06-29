@@ -1,21 +1,27 @@
 'use strict';
 
 const aws = require('../../aws');
-const runDao = require('../../rundao');
-const timeSource = require('../../timesource');
+const lastRunDateDao = require('../../lastrundatedao');
+const config = require('../../config');
 
-jest.mock('../../aws.js');
+jest.mock('../../aws');
+jest.mock('../../config');
 
 describe('Run DAO', () => {
   beforeEach(() => {
-    process.env.INTRO_RUN_TABLE = 'testing';
+    process.env.LAST_RUN_DATE_TABLE = 'testing';
     aws.putDynamoDb.mockClear();
   });
 
   it('write saves a valid item to DynamoDb', async () => {
-    runDao.write('abc123', 12345);
+    config.params.LAMBDA_ALIAS = { value: 'foo' };
+
+    lastRunDateDao.write('abc123', 12345);
     const params = {
       Item: {
+        alias: {
+          S: 'foo'
+        },
         requestId: {
           S: 'abc123'
         },

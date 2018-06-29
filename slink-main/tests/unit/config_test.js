@@ -84,17 +84,16 @@ describe('Handler invocation', () => {
     SR_TOKEN: {
       name: 'smartrecruiters/TOKEN',
       value: 'xxxxxxxxxx'
+    },
+    LAMBDA_ALIAS: {
+      value: 'STAGE'
     }
   };
 
   it('checks if all parameters are defined in AWS parameter store', async () => {
-    try {
-      aws.getParams.mockResolvedValue(mockedAWSParamResult.data);
-      const configParams = await config.loadConfigParams(context);
-      expect(JSON.stringify(configParams) === JSON.stringify(mockedExpectedResult)).toBe(true);
-    } catch (e) {
-      throw new Error(`Error: ${e.message}`);
-    }
+    aws.getParams.mockResolvedValue(mockedAWSParamResult.data);
+    const configParams = await config.loadConfigParams(context);
+    expect(configParams).toEqual(mockedExpectedResult);
   });
 
   it('throws an exception on failure', async () => {

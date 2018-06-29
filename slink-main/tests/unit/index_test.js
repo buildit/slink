@@ -4,12 +4,12 @@ const getType = require('jest-get-type');
 const index = require('../../index');
 const introduction = require('../../introduction');
 const config = require('../../config');
-const runDao = require('../../rundao');
+const runDao = require('../../lastrundatedao');
 const timeSource = require('../../timesource');
 
 jest.mock('../../introduction');
 jest.mock('../../config');
-jest.mock('../../rundao');
+jest.mock('../../lastrundatedao');
 jest.mock('../../timesource');
 
 const context = {
