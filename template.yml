@@ -93,7 +93,7 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: "5"
         WriteCapacityUnits: "5"
-      LocalSecondaryIndexes:
+      GlobalSecondaryIndexes:
         -
           IndexName: "runDateIndex"
           KeySchema:
@@ -125,7 +125,7 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: "5"
         WriteCapacityUnits: "5"
-      LocalSecondaryIndexes:
+      GlobalSecondaryIndexes:
         -
           IndexName: "employeeIdIndex"
           KeySchema:
