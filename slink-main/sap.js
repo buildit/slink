@@ -32,14 +32,14 @@ const postApplicant = async (applicant, resumeNumber) => {
 
     const { output } = sapResponse.data;
     if (output && output.ReturnFlag === 'F') {
-      console.log(`SAP post failed.  Applicant:  ${JSON.stringify(util.sanitizeApplicant(applicant))}, Resume number: ${resumeNumber}, Response: ${JSON.stringify(output)}`);
+      console.error(`SAP post failed.  Applicant:  ${JSON.stringify(util.sanitizeApplicant(applicant))}, Resume number: ${resumeNumber}, Response: ${JSON.stringify(output)}`);
       return null;
     }
 
-    console.log(`SAP post succeeded.  Applicant:  ${JSON.stringify(util.sanitizeApplicant(applicant))}, Resume number: ${resumeNumber}, Response: ${JSON.stringify(output)}`);
+    console.info(`SAP post succeeded.  Applicant:  ${JSON.stringify(util.sanitizeApplicant(applicant))}, Resume number: ${resumeNumber}, Response: ${JSON.stringify(output)}`);
     return output.EmployeeId;
   } catch (err) {
-    console.log(`Exception posting applicant to SAP: ${err.message}`);
+    console.error(`Exception posting applicant to SAP: ${err.message}`);
     throw err;
   }
 };
