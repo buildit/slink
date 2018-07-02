@@ -25,13 +25,19 @@ describe('Handler invocation', () => {
   });
 
   it('runs introduction process and gives successful response', async () => {
-    introduction.process.mockResolvedValue({ applicantsIntroducedToSap: [{ id: 'abc-123' }] });
+    introduction.process.mockResolvedValue({
+      attempted: 2,
+      successful: 1,
+      unsuccessful: 1,
+      successfulApplicants: [{ id: 'abc-123' }],
+      unsuccessfulApplicants: [{ id: 'xyz-890' }]
+    });
     timeSource.getSerialTime.mockReturnValue(12345);
 
     await index.handler({}, context, (err, result) => {
       expect(result.statusCode).toEqual(200);
       expect(getType(result.body)).toEqual('string');
-      expect(result.body).toEqual(JSON.stringify({ message: 'Sent 1 candidate(s) to SAP' }));
+      expect(result.body).toEqual(JSON.stringify({ message: 'Sent 1 candidate(s) to SAP, failed: 1' }));
       expect(runDao.write).toHaveBeenCalledWith('requestid', 12345);
     });
   });

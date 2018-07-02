@@ -124,8 +124,14 @@ describe('Applicant introduction process', () => {
 
     expect(smartrecruiters.storeEmployeeId).not.toHaveBeenCalledWith(3333, 'job3', null);
 
-    expect(results.applicantsIntroducedToSap.length)
+    expect(results.attempted)
       .toBe(applicants.length - 2); // Contractors and already-introduced applicants are not processed
+
+    expect(results.successful)
+      .toBe(2);
+
+    expect(results.unsuccessful)
+      .toBe(2);
 
     const successResult1 = {
       applicant: Object.assign(util.sanitizeApplicant(successApplicant1), { employeeId: 1010101 }),
@@ -145,8 +151,12 @@ describe('Applicant introduction process', () => {
       status: 'Failed',
       reason: 'SR post failure'
     };
-    expect(results.applicantsIntroducedToSap)
-      .toEqual([successResult1, srFailResult, successResult2, sapFailResult]);
+
+    expect(results.successfulApplicants)
+      .toEqual([successResult1, successResult2]);
+
+    expect(results.unsuccessfulApplicants)
+      .toEqual([srFailResult, sapFailResult]);
   });
 });
 
