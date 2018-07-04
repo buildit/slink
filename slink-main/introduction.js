@@ -51,7 +51,16 @@ const process = async () => {
         };
       }));
 
-  return { applicantsIntroducedToSap };
+  const successfulApplicants = applicantsIntroducedToSap.filter(item => item.status === 'Succeeded');
+  const unsuccessfulApplicants = applicantsIntroducedToSap.filter(item => item.status === 'Failed');
+
+  return {
+    attempted: successfulApplicants.length + unsuccessfulApplicants.length,
+    successful: successfulApplicants.length,
+    unsuccessful: unsuccessfulApplicants.length,
+    successfulApplicants,
+    unsuccessfulApplicants
+  };
 };
 
 /**
