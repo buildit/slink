@@ -12,22 +12,22 @@ const util = require('./util');
  */
 const process = async () => {
   const applicants = await sr.getApplicants();
-  console.log(`Collected ${applicants.length} applicants from SmartRecruiters`);
+  console.info(`Collected ${applicants.length} applicants from SmartRecruiters`);
 
   const splitByFte = split(applicant => applicant.fullTime === true);
   const splitByNeedsIntroduction = split(applicant => applicant.employeeId === null);
 
   const ftes = splitByFte(applicants);
-  console.log(`Non-FTE applicants skipped: ${ftes.rejects.length}`);
+  console.info(`Non-FTE applicants skipped: ${ftes.rejects.length}`);
   const ftesNeedingIntroduction = splitByNeedsIntroduction(ftes.matches);
-  console.log(`Already-introduced applicants skipped: ${ftesNeedingIntroduction.rejects.length}`);
+  console.info(`Already-introduced applicants skipped: ${ftesNeedingIntroduction.rejects.length}`);
 
   const applicantsIntroducedToSap =
     await Promise.all(ftesNeedingIntroduction.matches
       .map(async (applicant) => {
         const sanitizedApplicant = util.sanitizeApplicant(applicant);
 
-        console.log(`Preparing to post applicant to SAP: ${JSON.stringify(sanitizedApplicant)}`);
+        console.info(`Preparing to post applicant to SAP: ${JSON.stringify(sanitizedApplicant)}`);
         const employeeId = await sap.postApplicant(applicant, util.generateResumeNumber());
 
         if (employeeId != null) { // TODO more detailed return from postApplicant?
@@ -73,7 +73,7 @@ function split(predicate) {
 }
 
 async function postEmployeeIdToSmartRecruiters(employeeId, applicant) {
-  console.log(`Preparing to add SAP employee id to Smart Recruiters: ${employeeId}`);
+  console.info(`Preparing to add SAP employee id to Smart Recruiters: ${employeeId}`);
   return sr.storeEmployeeId(
     applicant.id,
     applicant.primaryAssignment.job.id,
