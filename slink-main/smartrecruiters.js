@@ -96,14 +96,14 @@ const storeEmployeeId = async (applicantId, jobId, sapId) => {
 
     const srResponse = await axios.put(apiEndpoint, putBody, options);
     if (srResponse && srResponse.status === 204) {
-      console.log(`Smart Recruiters post succeeded.  Applicant:  ${applicantId}, SAP employee id: ${sapId}`);
+      console.info(`Smart Recruiters post succeeded.  Applicant:  ${applicantId}, SAP employee id: ${sapId}`);
       return true;
     }
 
-    console.log(`Smart Recruiters post failed.  ApplicantId:  ${applicantId}, employee id: ${sapId}, Response: ${JSON.stringify(srResponse)}`);
+    console.error(`Smart Recruiters post failed.  ApplicantId:  ${applicantId}, employee id: ${sapId}, Response: ${JSON.stringify(srResponse)}`);
     return false;
   } catch (err) {
-    console.log(`Exception posting applicant employee id to Smart Recruiters: ${err.message}`);
+    console.error(`Exception posting applicant employee id to Smart Recruiters: ${err.message}`);
     throw err;
   }
 };
@@ -121,11 +121,11 @@ async function srGet(url) {
     return reply.data;
   } catch (err) {
     if (err.response) {
-      console.log(`Error response from SmartRecruiters API. Status: ${err.response.status}, URL: ${url}, Headers: ${err.response.headers}, Error: ${err}`);
+      console.error(`Error response from SmartRecruiters API. Status: ${err.response.status}, URL: ${url}, Headers: ${err.response.headers}, Error: ${err}`);
     } else if (err.request) {
-      console.log(`Error calling SmartRecruiters API. Status: ${err.request}, Error: ${err}`);
+      console.error(`Error calling SmartRecruiters API. Status: ${err.request}, Error: ${err}`);
     } else {
-      console.log('Unexpected error interacting with SmartRecruiters', err.message);
+      console.error('Unexpected error interacting with SmartRecruiters', err.message);
     }
     throw err;
   }
