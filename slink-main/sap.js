@@ -9,12 +9,12 @@ const DEFAULT_STRING = 'NA';
 const DEFAULT_ZIP_CODE = '40391'; // Unlikely marker zip code because SAP appears to require one.
 
 /**
- * Receives an applicant object and uses it to POST to SAP, resulting in an employee.
+ * Receives an applicant object and uses it to POST to SAP, resulting in an employee (and importantly, an employee ID).
  * @param applicant The object to submit to SAP.
  * @param resumeNumber The 'resume number' to use with SAP.  Does not come from SR data.
  * @returns {Promise<String>} Employee ID.
  */
-const postApplicant = async (applicant, resumeNumber) => {
+const createEmployee = async (applicant, resumeNumber) => {
   try {
     const apiEndpoint = config.params.SAP_ADD_EMPLOYEE_URL.value;
     const options = {
@@ -202,7 +202,7 @@ function postResultMessage(disposition, applicant, resumeNumber, output) {
 }
 
 module.exports = {
-  postApplicant,
+  createEmployee,
   buildPostBody,
   MISSING_STRING,
   DEFAULT_STRING,

@@ -14,7 +14,7 @@ util.generateResumeNumber = jest.fn();
 describe('Applicant introduction process', () => {
   beforeEach(() => {
     smartrecruiters.getApplicants.mockClear();
-    sap.postApplicant.mockClear();
+    sap.createEmployee.mockClear();
   });
 
   it('calls SAP for each FTE Applicant from SmartRecruiters, and registers Employee ID in SmartRecruiters', async () => {
@@ -97,30 +97,30 @@ describe('Applicant introduction process', () => {
     smartrecruiters.getApplicants.mockResolvedValueOnce(applicants);
 
     util.generateResumeNumber.mockReturnValueOnce(1111);
-    sap.postApplicant.mockReturnValueOnce(1010101);
+    sap.createEmployee.mockReturnValueOnce(1010101);
     smartrecruiters.storeEmployeeId.mockReturnValueOnce(true);
 
     util.generateResumeNumber.mockReturnValueOnce(6666);
-    sap.postApplicant.mockReturnValueOnce(6060606);
+    sap.createEmployee.mockReturnValueOnce(6060606);
     smartrecruiters.storeEmployeeId.mockReturnValueOnce(false);
 
     util.generateResumeNumber.mockReturnValueOnce(2222);
-    sap.postApplicant.mockReturnValueOnce(2020202);
+    sap.createEmployee.mockReturnValueOnce(2020202);
     smartrecruiters.storeEmployeeId.mockReturnValueOnce(true);
 
     // Error case.  Need to handle in a more detailed way.
     util.generateResumeNumber.mockReturnValueOnce(3333);
-    sap.postApplicant.mockReturnValueOnce(null);
+    sap.createEmployee.mockReturnValueOnce(null);
 
     const results = await introduction.process();
 
     expect(util.generateResumeNumber).toHaveBeenCalledTimes(4);
 
-    expect(sap.postApplicant).toHaveBeenCalledWith(successApplicant1, 1111);
-    expect(sap.postApplicant).toHaveBeenCalledWith(srFailApplicant, 6666);
-    expect(sap.postApplicant).toHaveBeenCalledWith(successApplicant2, 2222);
-    expect(sap.postApplicant).toHaveBeenCalledWith(sapFailApplicant, 3333);
-    expect(sap.postApplicant).toHaveBeenCalledTimes(4);
+    expect(sap.createEmployee).toHaveBeenCalledWith(successApplicant1, 1111);
+    expect(sap.createEmployee).toHaveBeenCalledWith(srFailApplicant, 6666);
+    expect(sap.createEmployee).toHaveBeenCalledWith(successApplicant2, 2222);
+    expect(sap.createEmployee).toHaveBeenCalledWith(sapFailApplicant, 3333);
+    expect(sap.createEmployee).toHaveBeenCalledTimes(4);
 
     expect(smartrecruiters.storeEmployeeId).not.toHaveBeenCalledWith(3333, 'job3', null);
 
