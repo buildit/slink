@@ -11,10 +11,9 @@ const DEFAULT_ZIP_CODE = '40391'; // Unlikely marker zip code because SAP appear
 /**
  * Receives an applicant object and uses it to POST to SAP, resulting in an employee (and importantly, an employee ID).
  * @param applicant The object to submit to SAP.
- * @param resumeNumber The 'resume number' to use with SAP.  Does not come from SR data.
- * @returns {Promise<String>} Employee ID.
+ * @returns {Promise<boolean>} Employee ID.
  */
-const execute = async (applicant, resumeNumber) => {
+const execute = async (applicant) => {
   try {
     const apiEndpoint = config.params.SAP_ADD_EMPLOYEE_URL.value;
     const options = {
@@ -26,17 +25,17 @@ const execute = async (applicant, resumeNumber) => {
       }
     };
 
-    const postBody = buildPostBody(applicant, resumeNumber);
+    const postBody = buildPostBody(applicant);
     const sapResponse = await axios.post(apiEndpoint, postBody, options);
 
     const { output } = sapResponse.data;
-    if (output && output.ReturnFlag === 'F') {
-      console.error(postResultMessage('failed', applicant, resumeNumber, output));
-      return null;
+    if (output && output.Response === 'SUCCESS') {
+      console.error(postResultMessage('succeeded', applicant, output));
+      return true;
     }
 
-    console.info(postResultMessage('succeeded', applicant, resumeNumber, output));
-    return output.EmployeeId;
+    console.info(postResultMessage('failed', applicant, output));
+    return false;
   } catch (err) {
     console.error(`Exception posting applicant to SAP: ${err.message}`);
     throw err;
@@ -77,8 +76,8 @@ function currentDateIfNull(date) {
   return new Date(date || new Date().getTime());
 }
 
-function postResultMessage(disposition, applicant, resumeNumber, output) {
-  return `SAP post ${disposition}.  Applicant:  ${JSON.stringify(util.sanitizeApplicant(applicant))}, Resume number: ${resumeNumber}, Response: ${JSON.stringify(output)}`;
+function postResultMessage(disposition, applicant, output) {
+  return `SAP post ${disposition}.  Applicant:  ${JSON.stringify(util.sanitizeApplicant(applicant))}, Response: ${JSON.stringify(output)}`;
 }
 
 module.exports = {

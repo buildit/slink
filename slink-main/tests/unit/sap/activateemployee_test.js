@@ -28,7 +28,7 @@ const mockResponseBad = {
 };
 
 
-describe.skip('execute()', () => {
+describe('execute()', () => {
   beforeAll(() => {
     config.params.SAP_USERNAME.value = 'username';
     config.params.SAP_PASSWORD.value = 'password';
@@ -42,20 +42,20 @@ describe.skip('execute()', () => {
   it('returns resume number if a good response', async () => {
     axios.post.mockResolvedValue(mockResponseGood);
 
-    const result = await sapActivateEmployee.execute(testmodels.applicant, 111);
-    expect(result).toEqual('123456');
+    const result = await sapActivateEmployee.execute(testmodels.applicant);
+    expect(result).toEqual(true);
   });
 
   it('returns null if a bad response', async () => {
     axios.post.mockResolvedValue(mockResponseBad);
-    const result = await sapActivateEmployee.execute(testmodels.applicant, 111);
-    expect(result).toEqual(null);
+    const result = await sapActivateEmployee.execute(testmodels.applicant);
+    expect(result).toEqual(false);
   });
 
   it('throws an exception on failure', () => {
-    const error = new Error('Error from unit test (sap_test)');
+    const error = new Error('Error from unit test (activateemployee_test)');
     axios.post.mockRejectedValue(error);
-    return expect(sapActivateEmployee.execute(testmodels.applicant, 111)).rejects.toBe(error);
+    return expect(sapActivateEmployee.execute(testmodels.applicant)).rejects.toBe(error);
   });
 });
 

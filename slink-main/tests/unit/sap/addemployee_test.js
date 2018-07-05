@@ -54,7 +54,7 @@ describe('execute()', () => {
   });
 
   it('throws an exception on failure', () => {
-    const error = new Error('Error from unit test (sap_test)');
+    const error = new Error('Error from unit test (addemployee_test)');
     axios.post.mockRejectedValue(error);
     return expect(sapAddEmployee.execute(testmodels.applicant, 111)).rejects.toBe(error);
   });
