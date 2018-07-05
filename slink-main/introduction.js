@@ -28,9 +28,9 @@ const process = async () => {
         const sanitizedApplicant = util.sanitizeApplicant(applicant);
 
         console.info(`Preparing to post applicant to SAP: ${JSON.stringify(sanitizedApplicant)}`);
-        const employeeId = await sap.createEmployee(applicant, util.generateResumeNumber());
+        const employeeId = await sap.addEmployee(applicant, util.generateResumeNumber());
 
-        if (employeeId != null) { // TODO more detailed return from createEmployee?
+        if (employeeId != null) { // TODO more detailed return from addEmployee?
           sanitizedApplicant.employeeId = employeeId;
           const srSuccess = await postEmployeeIdToSmartRecruiters(employeeId, applicant);
 
