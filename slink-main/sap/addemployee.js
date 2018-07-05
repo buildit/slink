@@ -1,8 +1,8 @@
 'use strict';
 
 const axios = require('axios');
-const util = require('./util');
-const config = require('./config');
+const util = require('../util');
+const config = require('../config');
 
 const MISSING_STRING = '';
 const DEFAULT_STRING = 'NA';
@@ -14,7 +14,7 @@ const DEFAULT_ZIP_CODE = '40391'; // Unlikely marker zip code because SAP appear
  * @param resumeNumber The 'resume number' to use with SAP.  Does not come from SR data.
  * @returns {Promise<String>} Employee ID.
  */
-const addEmployee = async (applicant, resumeNumber) => {
+const execute = async (applicant, resumeNumber) => {
   try {
     const apiEndpoint = config.params.SAP_ADD_EMPLOYEE_URL.value;
     const options = {
@@ -202,7 +202,7 @@ function postResultMessage(disposition, applicant, resumeNumber, output) {
 }
 
 module.exports = {
-  addEmployee,
+  execute,
   buildAddEmployeeBody,
   MISSING_STRING,
   DEFAULT_STRING,
