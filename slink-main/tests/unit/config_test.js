@@ -22,6 +22,10 @@ describe('Handler invocation', () => {
         Value: 'https://appstore.wipro.com/synergy/AltRecruitService?opr=empIdGen'
       },
       {
+        Name: '/slink/STAGE/sap/ACTIVATE_EMPLOYEE_URL',
+        Value: 'https://appstore.wipro.com/services/rest/onboardHiring/proActiveEmployeeIdActivation'
+      },
+      {
         Name: '/slink/STAGE/sap/PASSWORD',
         Value: 'password'
       },
@@ -56,6 +60,10 @@ describe('Handler invocation', () => {
     SAP_ADD_EMPLOYEE_URL: {
       name: 'sap/ADD_EMPLOYEE_URL',
       value: 'https://appstore.wipro.com/synergy/AltRecruitService?opr=empIdGen'
+    },
+    SAP_ACTIVATE_EMPLOYEE_URL: {
+      name: 'sap/ACTIVATE_EMPLOYEE_URL',
+      value: 'https://appstore.wipro.com/services/rest/onboardHiring/proActiveEmployeeIdActivation'
     },
     SAP_USERNAME: {
       name: 'sap/USERNAME',

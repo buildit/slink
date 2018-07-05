@@ -7,6 +7,10 @@ const localParams = {
     name: 'sap/ADD_EMPLOYEE_URL',
     value: undefined
   },
+  SAP_ACTIVATE_EMPLOYEE_URL: {
+    name: 'sap/ACTIVATE_EMPLOYEE_URL',
+    value: undefined
+  },
   SAP_USERNAME: {
     name: 'sap/USERNAME',
     value: undefined
