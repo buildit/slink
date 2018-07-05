@@ -54,13 +54,17 @@ const process = async () => {
   const successfulApplicants = applicantsIntroducedToSap.filter(item => item.status === 'Succeeded');
   const unsuccessfulApplicants = applicantsIntroducedToSap.filter(item => item.status === 'Failed');
 
-  return {
+  const result = {
     attempted: successfulApplicants.length + unsuccessfulApplicants.length,
     successful: successfulApplicants.length,
     unsuccessful: unsuccessfulApplicants.length,
     successfulApplicants,
     unsuccessfulApplicants
   };
+
+  console.info(`Introduction process complete. Results: ${JSON.stringify(result)}`);
+
+  return result;
 };
 
 /**

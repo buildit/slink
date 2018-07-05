@@ -7,18 +7,13 @@ const timeSource = require('./timesource');
 
 
 module.exports.handler = async (event, context, callback) => {
-  try {
-    console.info(`#### Function ARN:  ${context.invokedFunctionArn}`);
+  console.info(`#### Function ARN:  ${context.invokedFunctionArn}`);
 
+  try {
     // Load all configuration parameters from AWS SSM
     await config.loadConfigParams(context);
 
     const result = await introduction.process();
-
-    console.info(`Process complete. Applicants sent to SAP in this run: ${JSON.stringify(result)}`);
-    result.successfulApplicants.forEach((applicant) => {
-      console.info(`${JSON.stringify(applicant)}`);
-    });
 
     await writeRunRecord(context);
 
