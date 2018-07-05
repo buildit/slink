@@ -28,7 +28,7 @@ const mockResponseBad = {
 };
 
 
-describe('POSTing Employee Data', () => {
+describe('addEmployee()', () => {
   beforeAll(() => {
     config.params.SAP_USERNAME.value = 'username';
     config.params.SAP_PASSWORD.value = 'password';
@@ -60,12 +60,12 @@ describe('POSTing Employee Data', () => {
 });
 
 
-describe('Building an SAP post body', () => {
+describe('Building an addEmployee() post body', () => {
   it('with normal applicant results in a POSTable object', () => {
     const applicantWithProperties = testmodels.applicant;
     const asOfDate = new Date(2018, 0, 5);
 
-    const body = sap.buildPostBody(applicantWithProperties, 1234, asOfDate);
+    const body = sap.buildAddEmployeeBody(applicantWithProperties, 1234, asOfDate);
 
     const applicantId = body.input.applicantId;
     expect(applicantId.Resume_Number).toEqual(1234);
@@ -98,7 +98,7 @@ describe('Building an SAP post body', () => {
     hackedApplicant.primaryAssignment.job.offeredCurrency = null; // Can happen with contractors
     const asOfDate = new Date(2018, 0, 5);
 
-    const body = sap.buildPostBody(hackedApplicant, 1234, asOfDate);
+    const body = sap.buildAddEmployeeBody(hackedApplicant, 1234, asOfDate);
 
     const {
       // eslint-disable-next-line camelcase
@@ -117,7 +117,7 @@ describe('Building an SAP post body', () => {
     hackedApplicant.phoneNumber = '+919591875888';
     const asOfDate = new Date(2018, 0, 5);
 
-    const body = sap.buildPostBody(hackedApplicant, 1234, asOfDate);
+    const body = sap.buildAddEmployeeBody(hackedApplicant, 1234, asOfDate);
 
     // eslint-disable-next-line camelcase
     const { Contact_Number } = body.input.applicantId;
