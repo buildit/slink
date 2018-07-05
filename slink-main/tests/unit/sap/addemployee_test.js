@@ -65,7 +65,7 @@ describe('Building an execute() post body', () => {
     const applicantWithProperties = testmodels.applicant;
     const asOfDate = new Date(2018, 0, 5);
 
-    const body = sapAddEmployee.buildAddEmployeeBody(applicantWithProperties, 1234, asOfDate);
+    const body = sapAddEmployee.buildPostBody(applicantWithProperties, 1234, asOfDate);
 
     const { applicantId } = body.input;
     expect(applicantId.Resume_Number).toEqual(1234);
@@ -98,7 +98,7 @@ describe('Building an execute() post body', () => {
     hackedApplicant.primaryAssignment.job.offeredCurrency = null; // Can happen with contractors
     const asOfDate = new Date(2018, 0, 5);
 
-    const body = sapAddEmployee.buildAddEmployeeBody(hackedApplicant, 1234, asOfDate);
+    const body = sapAddEmployee.buildPostBody(hackedApplicant, 1234, asOfDate);
 
     const {
       // eslint-disable-next-line camelcase
@@ -117,7 +117,7 @@ describe('Building an execute() post body', () => {
     hackedApplicant.phoneNumber = '+919591875888';
     const asOfDate = new Date(2018, 0, 5);
 
-    const body = sapAddEmployee.buildAddEmployeeBody(hackedApplicant, 1234, asOfDate);
+    const body = sapAddEmployee.buildPostBody(hackedApplicant, 1234, asOfDate);
 
     // eslint-disable-next-line camelcase
     const { Contact_Number } = body.input.applicantId;

@@ -26,7 +26,7 @@ const execute = async (applicant, resumeNumber) => {
       }
     };
 
-    const postBody = buildAddEmployeeBody(applicant, resumeNumber);
+    const postBody = buildPostBody(applicant, resumeNumber);
     const sapResponse = await axios.post(apiEndpoint, postBody, options);
 
     const { output } = sapResponse.data;
@@ -54,7 +54,7 @@ const execute = async (applicant, resumeNumber) => {
  * @param offerDate Date used as a source for date fields sent to SAP.  This is a punt, for now.
  * @returns fully filled-out body that can be posted to SAP
  */
-function buildAddEmployeeBody(applicant, resumeNumber, offerDate = new Date()) {
+function buildPostBody(applicant, resumeNumber, offerDate = new Date()) {
   return {
     input: {
       applicantId: {
@@ -203,7 +203,7 @@ function postResultMessage(disposition, applicant, resumeNumber, output) {
 
 module.exports = {
   execute,
-  buildAddEmployeeBody,
+  buildPostBody,
   MISSING_STRING,
   DEFAULT_STRING,
   DEFAULT_ZIP_CODE
