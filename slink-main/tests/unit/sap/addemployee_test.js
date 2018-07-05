@@ -6,6 +6,7 @@ const config = require('../../../config');
 const testmodels = require('../models');
 
 jest.mock('axios');
+
 // Not sure about ReturnFlag value for a good response.  Below is just a guess for now.
 const mockResponseGood = {
   data: {
