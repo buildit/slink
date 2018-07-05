@@ -27,16 +27,15 @@ const postApplicant = async (applicant, resumeNumber) => {
     };
 
     const postBody = buildPostBody(applicant, resumeNumber);
-    // console.log(`'postBody', ${JSON.stringify(postBody)}`);
     const sapResponse = await axios.post(apiEndpoint, postBody, options);
 
     const { output } = sapResponse.data;
     if (output && output.ReturnFlag === 'F') {
-      console.error(`SAP post failed.  Applicant:  ${JSON.stringify(util.sanitizeApplicant(applicant))}, Resume number: ${resumeNumber}, Response: ${JSON.stringify(output)}`);
+      console.error(postResultMessage('failed', applicant, resumeNumber, output));
       return null;
     }
 
-    console.info(`SAP post succeeded.  Applicant:  ${JSON.stringify(util.sanitizeApplicant(applicant))}, Resume number: ${resumeNumber}, Response: ${JSON.stringify(output)}`);
+    console.info(postResultMessage('succeeded', applicant, resumeNumber, output));
     return output.EmployeeId;
   } catch (err) {
     console.error(`Exception posting applicant to SAP: ${err.message}`);
@@ -196,6 +195,10 @@ function formatCity(city) {
 
 function currentDateIfNull(date) {
   return new Date(date || new Date().getTime());
+}
+
+function postResultMessage(disposition, applicant, resumeNumber, output) {
+  return `SAP post ${disposition}.  Applicant:  ${JSON.stringify(util.sanitizeApplicant(applicant))}, Resume number: ${resumeNumber}, Response: ${JSON.stringify(output)}`;
 }
 
 module.exports = {
