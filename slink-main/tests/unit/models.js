@@ -505,7 +505,7 @@ sap.badReplyEmp002 = {
 };
 
 module.exports = {
-  applicant: applicant,
+  applicant,
   sr,
   sap
 };

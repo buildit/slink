@@ -1,11 +1,12 @@
 'use strict';
 
 const axios = require('axios');
-const sap = require('../../sap');
-const config = require('../../config');
-const testmodels = require('./models');
+const sapAddEmployee = require('../../../sap/addemployee');
+const config = require('../../../config');
+const testmodels = require('../models');
 
 jest.mock('axios');
+
 // Not sure about ReturnFlag value for a good response.  Below is just a guess for now.
 const mockResponseGood = {
   data: {
@@ -28,7 +29,7 @@ const mockResponseBad = {
 };
 
 
-describe('POSTing Employee Data', () => {
+describe('execute()', () => {
   beforeAll(() => {
     config.params.SAP_USERNAME.value = 'username';
     config.params.SAP_PASSWORD.value = 'password';
@@ -42,32 +43,32 @@ describe('POSTing Employee Data', () => {
   it('returns employee ID if a good response', async () => {
     axios.post.mockResolvedValue(mockResponseGood);
 
-    const result = await sap.postApplicant(testmodels.applicant, 111);
+    const result = await sapAddEmployee.execute(testmodels.applicant, 111);
     expect(result).toEqual('123456');
   });
 
   it('returns null if a bad response', async () => {
     axios.post.mockResolvedValue(mockResponseBad);
-    const result = await sap.postApplicant(testmodels.applicant, 111);
+    const result = await sapAddEmployee.execute(testmodels.applicant, 111);
     expect(result).toEqual(null);
   });
 
   it('throws an exception on failure', () => {
-    const error = new Error('Error from unit test (sap_test)');
+    const error = new Error('Error from unit test (addemployee_test)');
     axios.post.mockRejectedValue(error);
-    return expect(sap.postApplicant(testmodels.applicant, 111)).rejects.toBe(error);
+    return expect(sapAddEmployee.execute(testmodels.applicant, 111)).rejects.toBe(error);
   });
 });
 
 
-describe('Building an SAP post body', () => {
+describe('Building an execute() post body', () => {
   it('with normal applicant results in a POSTable object', () => {
     const applicantWithProperties = testmodels.applicant;
     const asOfDate = new Date(2018, 0, 5);
 
-    const body = sap.buildPostBody(applicantWithProperties, 1234, asOfDate);
+    const body = sapAddEmployee.buildPostBody(applicantWithProperties, 1234, asOfDate);
 
-    const applicantId = body.input.applicantId;
+    const { applicantId } = body.input;
     expect(applicantId.Resume_Number).toEqual(1234);
     expect(applicantId.First_Name).toEqual(applicantWithProperties.firstName);
     expect(applicantId.Last_Name).toEqual(applicantWithProperties.lastName);
@@ -98,15 +99,15 @@ describe('Building an SAP post body', () => {
     hackedApplicant.primaryAssignment.job.offeredCurrency = null; // Can happen with contractors
     const asOfDate = new Date(2018, 0, 5);
 
-    const body = sap.buildPostBody(hackedApplicant, 1234, asOfDate);
+    const body = sapAddEmployee.buildPostBody(hackedApplicant, 1234, asOfDate);
 
     const {
       // eslint-disable-next-line camelcase
       Contact_Number, Pin_Code, Employer_City
     } = body.input.applicantId;
     expect(Contact_Number).toEqual('1234567890');
-    expect(Pin_Code).toEqual(sap.DEFAULT_ZIP_CODE);
-    expect(Employer_City).toEqual(sap.MISSING_STRING);
+    expect(Pin_Code).toEqual(sapAddEmployee.DEFAULT_ZIP_CODE);
+    expect(Employer_City).toEqual(sapAddEmployee.MISSING_STRING);
     const qplc = body.input.contractOffer.salary.find(it => it.compCode === 'QPLC').compValue;
     expect(qplc).toEqual('0');
     expect(body.input.contractOffer.offeredCurrency).toEqual('USD');
@@ -117,7 +118,7 @@ describe('Building an SAP post body', () => {
     hackedApplicant.phoneNumber = '+919591875888';
     const asOfDate = new Date(2018, 0, 5);
 
-    const body = sap.buildPostBody(hackedApplicant, 1234, asOfDate);
+    const body = sapAddEmployee.buildPostBody(hackedApplicant, 1234, asOfDate);
 
     // eslint-disable-next-line camelcase
     const { Contact_Number } = body.input.applicantId;

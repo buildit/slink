@@ -2,19 +2,19 @@
 
 // const introduction = require('../../introduction');
 
-const sap = require('../../sap');
+const sapAddEmployee = require('../../sap/addemployee');
 const smartrecruiters = require('../../smartrecruiters');
 const introduction = require('../../introduction');
 const util = require('../../util');
 
 jest.mock('../../smartrecruiters');
-jest.mock('../../sap');
+jest.mock('../../sap/addemployee');
 util.generateResumeNumber = jest.fn();
 
 describe('Applicant introduction process', () => {
   beforeEach(() => {
     smartrecruiters.getApplicants.mockClear();
-    sap.postApplicant.mockClear();
+    sapAddEmployee.execute.mockClear();
   });
 
   it('calls SAP for each FTE Applicant from SmartRecruiters, and registers Employee ID in SmartRecruiters', async () => {
@@ -97,30 +97,30 @@ describe('Applicant introduction process', () => {
     smartrecruiters.getApplicants.mockResolvedValueOnce(applicants);
 
     util.generateResumeNumber.mockReturnValueOnce(1111);
-    sap.postApplicant.mockReturnValueOnce(1010101);
+    sapAddEmployee.execute.mockReturnValueOnce(1010101);
     smartrecruiters.storeEmployeeId.mockReturnValueOnce(true);
 
     util.generateResumeNumber.mockReturnValueOnce(6666);
-    sap.postApplicant.mockReturnValueOnce(6060606);
+    sapAddEmployee.execute.mockReturnValueOnce(6060606);
     smartrecruiters.storeEmployeeId.mockReturnValueOnce(false);
 
     util.generateResumeNumber.mockReturnValueOnce(2222);
-    sap.postApplicant.mockReturnValueOnce(2020202);
+    sapAddEmployee.execute.mockReturnValueOnce(2020202);
     smartrecruiters.storeEmployeeId.mockReturnValueOnce(true);
 
     // Error case.  Need to handle in a more detailed way.
     util.generateResumeNumber.mockReturnValueOnce(3333);
-    sap.postApplicant.mockReturnValueOnce(null);
+    sapAddEmployee.execute.mockReturnValueOnce(null);
 
     const results = await introduction.process();
 
     expect(util.generateResumeNumber).toHaveBeenCalledTimes(4);
 
-    expect(sap.postApplicant).toHaveBeenCalledWith(successApplicant1, 1111);
-    expect(sap.postApplicant).toHaveBeenCalledWith(srFailApplicant, 6666);
-    expect(sap.postApplicant).toHaveBeenCalledWith(successApplicant2, 2222);
-    expect(sap.postApplicant).toHaveBeenCalledWith(sapFailApplicant, 3333);
-    expect(sap.postApplicant).toHaveBeenCalledTimes(4);
+    expect(sapAddEmployee.execute).toHaveBeenCalledWith(successApplicant1, 1111);
+    expect(sapAddEmployee.execute).toHaveBeenCalledWith(srFailApplicant, 6666);
+    expect(sapAddEmployee.execute).toHaveBeenCalledWith(successApplicant2, 2222);
+    expect(sapAddEmployee.execute).toHaveBeenCalledWith(sapFailApplicant, 3333);
+    expect(sapAddEmployee.execute).toHaveBeenCalledTimes(4);
 
     expect(smartrecruiters.storeEmployeeId).not.toHaveBeenCalledWith(3333, 'job3', null);
 
