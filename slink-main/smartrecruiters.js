@@ -5,11 +5,14 @@ const R = require('ramda');
 const config = require('./config');
 
 
-const getApplicants = async () => {
+const getApplicants = async ({
+  updatedAfter = '2018-02-01T10:15:00.500+00:00', status = 'OFFERED', subStatus = 'Offer Accepted', limit = 100
+} = {}) => {
   const CANDIDATE_BATCH_SIZE = 2;
   const SLEEP_TIME_PER_BATCH = 750;
-
-  const candidateSummaries = await srGet(config.params.SR_SUMMARY_URL.value);
+  const baseUrl = config.params.SR_SUMMARY_URL.value;
+  const urlWithQueryStr = encodeURI(`${baseUrl}?updatedAfter=${updatedAfter}&status=${status}&subStatus=${subStatus}&limit=${limit}`);
+  const candidateSummaries = await srGet(urlWithQueryStr);
   const candidateBatches = R.splitEvery(CANDIDATE_BATCH_SIZE, candidateSummaries.content);
 
   const batchedApplicants =

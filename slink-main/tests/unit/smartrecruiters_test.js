@@ -13,18 +13,17 @@ describe('Get candidate summary', () => {
   const { get } = axios;
 
   beforeAll(() => {
-    config.params.SR_SUMMARY_URL.value = 'http://mockurl/';
+    config.params.SR_SUMMARY_URL.value = 'http://mockurl/candidates';
     config.params.SR_JOB_PROPS_URL.value = 'https://api.smartrecruiters.com/candidates/{candidateId}/jobs/{jobId}/properties';
     config.params.SR_EMPLOYEE_PROP_ID.value = 'abc-123';
   });
 
   beforeEach(() => {
-    axios.mockClear();
+    get.mockClear();
 
     get.mockResolvedValueOnce(mockSummaryResponse);
     get.mockResolvedValueOnce(testmodels.sr.candidateDetail);
     get.mockResolvedValueOnce(testmodels.sr.jobDetail);
-
   });
 
   it('builds applicant if required data is present', async () => {
@@ -53,6 +52,16 @@ describe('Get candidate summary', () => {
     expect(response[0]).toEqual(applicantWithEmployeeId);
   });
 
+  it('can take different query parameters', async () => {
+    const query = {
+      updatedAfter: '2018-07-01', status: 'OFFERED', subStatus: 'onboarding', limit: 100
+    };
+    get.mockResolvedValueOnce(testmodels.sr.jobProperties);
+    const response = await smartrecruiters.getApplicants(query);
+    expect(response.length).toBeGreaterThan(0);
+    expect(get.mock.calls[0][0])
+      .toBe(`${config.params.SR_SUMMARY_URL.value}?updatedAfter=${query.updatedAfter}&status=${query.status}&subStatus=${query.subStatus}&limit=${query.limit}`);
+  });
 
   it('throws an exception on failure', () => {
     const error = new Error('Error from unit test (smartrecruiters_test 1)');
@@ -63,7 +72,7 @@ describe('Get candidate summary', () => {
 
   function expectSmartRecruitersCalls(get) {
     expect(get.mock.calls[0][0])
-      .toBe(config.params.SR_SUMMARY_URL.value);
+      .toBe(`${config.params.SR_SUMMARY_URL.value}?updatedAfter=2018-02-01T10:15:00.500+00:00&status=OFFERED&subStatus=Offer%20Accepted&limit=100`);
     expect(get.mock.calls[1][0])
       .toBe(testmodels.sr.rawCandidateSummaries.data.content[0].actions.details.url);
     expect(get.mock.calls[2][0])
@@ -74,7 +83,6 @@ describe('Get candidate summary', () => {
 });
 
 describe('Add Employee Id property to SR', () => {
-
   const mockPutResponseGood = {
     status: 204
   };
