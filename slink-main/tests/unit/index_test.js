@@ -32,13 +32,16 @@ describe('Handler invocation', () => {
       successfulApplicants: [{ id: 'abc-123' }],
       unsuccessfulApplicants: [{ id: 'xyz-890' }]
     });
-    timeSource.getSerialTime.mockReturnValue(12345);
+    timeSource.getSerialTime.mockReturnValue(2222);
+    runDao.read.mockReturnValue({ Item: { runSerialDate: { N: 1111 } } });
 
     await index.handler({}, context, (err, result) => {
+      expect(runDao.read).toHaveBeenCalledWith();
+      expect(introduction.process).toHaveBeenCalledWith(new Date(1111).toISOString());
       expect(result.statusCode).toEqual(200);
       expect(getType(result.body)).toEqual('string');
       expect(result.body).toEqual(JSON.stringify({ message: 'Sent 1 candidate(s) to SAP, failed: 1' }));
-      expect(runDao.write).toHaveBeenCalledWith('requestid', 12345);
+      expect(runDao.write).toHaveBeenCalledWith('requestid', 2222);
     });
   });
 

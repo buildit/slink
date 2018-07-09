@@ -23,6 +23,8 @@ const getApplicants = async ({
   const SLEEP_TIME_PER_BATCH = 750;
   const baseUrl = config.params.SR_SUMMARY_URL.value;
   const urlWithQueryStr = encodeURI(`${baseUrl}?updatedAfter=${updatedAfter}&status=${status}&subStatus=${subStatus}&limit=${limit}`);
+  console.log('SR query:', urlWithQueryStr);
+
   const candidateSummaries = await srGet(urlWithQueryStr);
   const candidateBatches = R.splitEvery(CANDIDATE_BATCH_SIZE, candidateSummaries.content);
 

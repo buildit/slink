@@ -10,8 +10,8 @@ const util = require('./util');
  * Obtains applicants by calling the SmartRecruiters facade and calls SAP with each applicant.
  * @returns {Promise<{successfulApplicants: Array}>}
  */
-const process = async () => {
-  const applicants = await sr.getApplicants();
+const process = async (lastRunDate) => {
+  const applicants = await sr.getApplicants({ updatedAfter: lastRunDate });
   console.info(`Collected ${applicants.length} applicants from SmartRecruiters`);
 
   const splitByFte = split(applicant => applicant.fullTime === true);

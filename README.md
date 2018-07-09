@@ -3,9 +3,11 @@ _Slink_ is a SmartRecruiters to SAP integration service.  It is implemented usin
 
 # Building and Deploying #
 
+
 ## Dependencies ##
 - Node 8.10+ / NPM 5.6.0+
 - It is highly recommended to use `nvm` [https://github.com/creationix/nvm]
+
 
 ## Building Locally ##
 - Clone this repository
@@ -22,27 +24,60 @@ working with first, since that's what is actually built by the CI/CD pipeline.
 ## Running Lambda Functions Locally via "SAM Local" ##
 There is a CodeStar-managed CodePipeline in AWS that runs tests and deploys the function(s) in this package.  But what if you want to run/test locally?
 
-Follow these steps:
+### Local Development
+
+#### To execute Lambda
 - Install and run Docker
-- Install the SAM CLI:  https://github.com/awslabs/aws-sam-cli#installation
+
+- [Install the SAM CLI](https://github.com/awslabs/aws-sam-cli#installation)
+
 - Take special note of the requirement to add your project root directory to Docker's File Sharing preferences
-- Run the appropriate `sam local invoke` command.  See https://github.com/awslabs/aws-sam-cli#invoke-functions-locally
 
-### Example command for `slink-main` function, passing in Lambda environment variable:
+#### To have a Local DynamoDb
+- [Download local DynamoDb](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.html)
+- Start local DynamoDb using Amazon's instructions
+- Run `./bin/create-local-tables.sh`
+- Map an IP so that the Lambda container can see the Dynamo instance (`localhost` won't work): 
 
-sam local invoke SlinkMainFunction -e event.json`
+  `sudo ifconfig lo0 alias <some IP for Dynamo>` (I use 10.1.1.22)
+  
+  undo with
+  
+  `ifconfig lo0 -alias <some IP for Dynamo>`
+  
+- You should be able to do the following after these steps:
+    ```
+    ❯ aws dynamodb list-tables --endpoint-url http://<some IP for Dynamo>:8000
+    {
+        "TableNames": [
+            "LastRunDateTable"
+        ]
+    }
+    ```
+    
+    
+- Run the appropriate `sam local invoke` command.  See [AWS docs](https://github.com/awslabs/aws-sam-cli#invoke-functions-locally).
+
+#### To run the Lambda
+Adding up all the above, the command to run locally is:
+
+`LOCAL_DYNAMO_IP=<some IP> LAST_RUN_DATE_TABLE=LastRunDateTable sam local invoke SlinkMainFunction -e event.json`
 
 _**Note**_: Runtime configuration settings are managed in AWS Parameter Store. There are two sets of configuration settings 
 for STAGE and PROD environments. When running locally via SAM local, we use the STAGE configuration. The parameters are 
 managed under /slink path in AWS Parameter Store.
+
+#### Troubleshooting
+If you get a `Requested resource not found` error, then you probably screwed up your local DynamoDb setup.
 
 
 ## AWS Deployment ##
 The code is automatically built and deployed by CodeStar when code is committed to `master`.  Currently, branches
 are not built by the CI/CD system.
 
-Please see the [CodeStar Dashboard](http://tinyurl.com/yc4ymbrm) to check deployment status.  
+Please see the [CodeStar Dashboard](https://console.aws.amazon.com/codestar/home?region=us-east-1#/projects/buildit-slink/dashboard) to check deployment status.  
 Contact a team member, if you don't have access.
+
 
 ## Team Practices ##
 - We track work using Github issues and the [project board](https://github.com/buildit/slink/projects/1).
@@ -52,12 +87,11 @@ Contact a team member, if you don't have access.
 - We encourage Github "squash merges" for branches with messy commits. 
 - Minor fixes/doc changes, etc, can go straight to `master`.
 
----
-
-# AWS CodeStar Stuff #
-
-Welcome to the AWS CodeStar sample web service
-==============================================
+# Original CodeStar Content    
+<details>
+<summary>
+  Click for more ...
+</summary>
 
 This sample code helps get you started with a simple Express web service
 deployed by AWS CloudFormation to AWS Lambda and Amazon API Gateway.
@@ -122,3 +156,4 @@ should also regularly review and apply any available patches or associated secur
 advisories for dependencies used within your application.
 
 Best Practices: https://docs.aws.amazon.com/codestar/latest/userguide/best-practices.html?icmpid=docs_acs_rm_sec
+</details>
