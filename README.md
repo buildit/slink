@@ -37,7 +37,7 @@ There is a CodeStar-managed CodePipeline in AWS that runs tests and deploys the 
 - Run `./bin/create-local-tables.sh`
 - Map an IP so that the Lambda container can see the Dynamo instance (`localhost` won't work): 
 
-  `sudo ifconfig lo0 alias <some IP for Dynamo>` (I use 10.1.1.22)
+  `sudo ifconfig lo0 alias <some IP for Dynamo>` (I use `10.1.1.22`)
   
   undo with
   
@@ -59,7 +59,7 @@ There is a CodeStar-managed CodePipeline in AWS that runs tests and deploys the 
 #### To run the Lambda
 Adding up all the above, the command to run locally is:
 
-`LOCAL_DYNAMO_IP=<some IP> LAST_RUN_DATE_TABLE=LastRunDateTable sam local invoke SlinkMainFunction -e event.json`
+`LOCAL_DYNAMO_IP=<some IP for Dynamo> LAST_RUN_DATE_TABLE=LastRunDateTable sam local invoke SlinkMainFunction -e event.json`
 
 _**Note**_: Runtime configuration settings are managed in AWS Parameter Store. There are two sets of configuration settings 
 for STAGE and PROD environments. When running locally via SAM local, we use the STAGE configuration. The parameters are 
