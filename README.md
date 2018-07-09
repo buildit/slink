@@ -24,8 +24,6 @@ working with first, since that's what is actually built by the CI/CD pipeline.
 ## Running Lambda Functions Locally via "SAM Local" ##
 There is a CodeStar-managed CodePipeline in AWS that runs tests and deploys the function(s) in this package.  But what if you want to run/test locally?
 
-### Local Development
-
 #### To execute Lambda
 - Install and run Docker
 
