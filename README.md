@@ -53,10 +53,10 @@ There is a CodeStar-managed CodePipeline in AWS that runs tests and deploys the 
     }
     ```
     
-    
-- Run the appropriate `sam local invoke` command.  See [AWS docs](https://github.com/awslabs/aws-sam-cli#invoke-functions-locally).
 
 #### To run the Lambda
+See [AWS docs](https://github.com/awslabs/aws-sam-cli#invoke-functions-locally).
+
 Adding up all the above, the command to run locally is:
 
 `LOCAL_DYNAMO_IP=<some IP for Dynamo> LAST_RUN_DATE_TABLE=LastRunDateTable sam local invoke SlinkMainFunction -e event.json`
