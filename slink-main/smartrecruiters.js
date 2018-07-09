@@ -5,8 +5,19 @@ const R = require('ramda');
 const config = require('./config');
 
 
+/**
+ * Obtains applicant data, including summary, detail, and properties.
+ * @param updatedAfter Date/time (ISO format) to restrict returned applicants (pass through to SR).
+ * @param status SR status filter.
+ * @param subStatus SR substatus filter.
+ * @param limit Maximum results to return from SR.
+ * @returns {Promise<void>}
+ */
 const getApplicants = async ({
-  updatedAfter = '2018-02-01T10:15:00.500+00:00', status = 'OFFERED', subStatus = 'Offer Accepted', limit = 100
+  updatedAfter = '2018-02-01T10:15:00.500+00:00',
+  status = 'OFFERED',
+  subStatus = 'Offer Accepted',
+  limit = 100
 } = {}) => {
   const CANDIDATE_BATCH_SIZE = 2;
   const SLEEP_TIME_PER_BATCH = 750;
