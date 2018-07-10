@@ -15,7 +15,7 @@ describe('Applicant DAO', () => {
     aws.putDynamoDbItem.mockClear();
   });
 
-  it('write saves a valid item to DynamoDb', async () => {
+  it('write saves a valid applicant item to DynamoDb', async () => {
     return applicantDao.write({
       srCandidateId: 'candidateId',
       slinkResumeNumber: 'resumeNumber',
@@ -34,7 +34,7 @@ describe('Applicant DAO', () => {
               S: 'resumeNumber'
             },
             sapEmployeeId: {
-              S: 'employeeId'
+              N: 'employeeId'
             }
           },
           TableName: 'applicant'
@@ -49,11 +49,11 @@ describe('Applicant DAO', () => {
       .then(() => {
         const params = {
           Key: {
-            alias: {
-              S: 'baz'
-            },
             srCandidateId: {
               S: 'candidateId'
+            },
+            alias: {
+              S: 'baz'
             }
           },
           TableName: 'applicant'

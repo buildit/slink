@@ -6,3 +6,10 @@ aws dynamodb create-table \
   --key-schema AttributeName=alias,KeyType=HASH \
   --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 \
   --endpoint-url http://localhost:${port:-8000}
+
+aws dynamodb create-table \
+  --table-name ApplicantTable \
+  --attribute-definitions AttributeName=candidateId,AttributeType=S AttributeName=alias,AttributeType=S \
+  --key-schema AttributeName=candidateId,KeyType=HASH  AttributeName=alias,KeyType=RANGE \
+  --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 \
+  --endpoint-url http://localhost:${port:-8000}

@@ -3,20 +3,20 @@
 const aws = require('../aws');
 const config = require('../config');
 
-async function write({ srCandidateId, slinkResumeNumber = '', sapEmployeeId = '' } = {}) {
+async function write({ srCandidateId, slinkResumeNumber = 0, sapEmployeeId = 0 } = {}) {
   const params = {
     Item: {
-      alias: {
-        S: config.params.LAMBDA_ALIAS.value
-      },
       srCandidateId: {
         S: srCandidateId
       },
+      alias: {
+        S: config.params.LAMBDA_ALIAS.value
+      },
       slinkResumeNumber: {
-        S: slinkResumeNumber
+        S: slinkResumeNumber !== 0 ? `${slinkResumeNumber}` : ''
       },
       sapEmployeeId: {
-        S: sapEmployeeId
+        N: sapEmployeeId
       }
     },
     TableName: process.env.APPLICANT_TABLE
@@ -27,11 +27,11 @@ async function write({ srCandidateId, slinkResumeNumber = '', sapEmployeeId = ''
 async function read(srCandidateId) {
   const params = {
     Key: {
-      alias: {
-        S: config.params.LAMBDA_ALIAS.value
-      },
       srCandidateId: {
         S: srCandidateId
+      },
+      alias: {
+        S: config.params.LAMBDA_ALIAS.value
       },
     },
     TableName: process.env.APPLICANT_TABLE

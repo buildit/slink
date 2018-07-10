@@ -13,7 +13,7 @@ describe('Run DAO', () => {
     aws.putDynamoDbItem.mockClear();
   });
 
-  it('write saves a valid item to DynamoDb', async () => {
+  it('write saves a valid run item to DynamoDb', async () => {
     config.params.LAMBDA_ALIAS = { value: 'foo' };
 
     lastRunDateDao.write('abc123', 12345);
