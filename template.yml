@@ -42,6 +42,7 @@ Resources:
           RUN_TABLE: !Ref RunTable
           LAST_RUN_DATE_TABLE: !Ref LastRunDateTable
           APPLICANT_TABLE: !Ref ApplicantTable
+          LOCAL_DYNAMO_IP: ''
       Role:
         Fn::ImportValue:
           !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
@@ -237,5 +238,3 @@ Resources:
 #                  Action:
 #                    - 'ssm:GetParameter*'
 #                  Resource: !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/slink*'
-
-Transform: AWS::Serverless-2016-10-31

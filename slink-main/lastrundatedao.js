@@ -4,12 +4,10 @@ const aws = require('./aws');
 const config = require('./config');
 
 async function write(requestId, runSerialDate) {
-  const alias = config.params.LAMBDA_ALIAS;
-
   const params = {
     Item: {
       alias: {
-        S: alias.value
+        S: config.params.LAMBDA_ALIAS.value
       },
       requestId: {
         S: requestId
@@ -20,10 +18,23 @@ async function write(requestId, runSerialDate) {
     },
     TableName: process.env.LAST_RUN_DATE_TABLE
   };
-  await aws.putDynamoDb(params);
+  return aws.putDynamoDbItem(params);
+}
+
+async function read() {
+  const params = {
+    Key: {
+      alias: {
+        S: config.params.LAMBDA_ALIAS.value
+      }
+    },
+    TableName: process.env.LAST_RUN_DATE_TABLE
+  };
+  return aws.getDynamoDbItem(params);
 }
 
 module.exports = {
-  write
+  write,
+  read
 };
 

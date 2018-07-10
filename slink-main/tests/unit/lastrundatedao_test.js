@@ -10,7 +10,7 @@ jest.mock('../../config');
 describe('Run DAO', () => {
   beforeEach(() => {
     process.env.LAST_RUN_DATE_TABLE = 'testing';
-    aws.putDynamoDb.mockClear();
+    aws.putDynamoDbItem.mockClear();
   });
 
   it('write saves a valid item to DynamoDb', async () => {
@@ -31,6 +31,21 @@ describe('Run DAO', () => {
       },
       TableName: 'testing'
     };
-    expect(aws.putDynamoDb).toHaveBeenCalledWith(params);
+    expect(aws.putDynamoDbItem).toHaveBeenCalledWith(params);
+  });
+
+  it('read obtains an item from DynamoDb', async () => {
+    config.params.LAMBDA_ALIAS = { value: 'foo' };
+
+    lastRunDateDao.read();
+    const params = {
+      Key: {
+        alias: {
+          S: 'foo'
+        }
+      },
+      TableName: 'testing'
+    };
+    expect(aws.getDynamoDbItem).toHaveBeenCalledWith(params);
   });
 });
