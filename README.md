@@ -24,12 +24,28 @@ working with first, since that's what is actually built by the CI/CD pipeline.
 ## Running Lambda Functions Locally via "SAM Local" ##
 There is a CodeStar-managed CodePipeline in AWS that runs tests and deploys the function(s) in this package.  But what if you want to run/test locally?
 
-#### To execute Lambda
+#### To Work with AWS from the command-line
+- [Install and configure the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/installing.html) 
+  (us-east-1 is recommended for your default region, at least for this project) 
+- Test your installation:
+    ```bash
+    ❯ aws codestar list-projects
+    {
+        "projects": [
+            {
+                "projectId": "buildit-slink",
+                "projectArn": "arn:aws:codestar:us-east-1:006393696278:project/buildit-slink"
+            }
+        ]
+    }
+    ```
+
+#### To Execute Lambda Functions
 - Install and run Docker
 
 - [Install the SAM CLI](https://github.com/awslabs/aws-sam-cli#installation)
 
-- Take special note of the requirement to add your project root directory to Docker's File Sharing preferences
+- _Take special note of the requirement to add your project root directory to Docker's File Sharing preferences_
 
 #### To have a Local DynamoDb
 - [Download local DynamoDb](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.html)
