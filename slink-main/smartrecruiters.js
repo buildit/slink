@@ -24,6 +24,9 @@ const getApplicants = async ({
   return R.flatten(await batchedApplicants);
 };
 
+// specialized function to extract candidates, who have substatus set to 'ONBOARDING'
+const getApplicantsOnboarding = async () => getApplicants({ subStatus: 'ONBOARDING' });
+
 
 async function toApplicant(summary) {
   const candidateDetail = await srGet(summary.actions.details.url);
@@ -164,5 +167,6 @@ function promiseTimer(ms) {
 
 module.exports = {
   getApplicants,
+  getApplicantsOnboarding,
   storeEmployeeId
 };
