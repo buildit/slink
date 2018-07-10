@@ -16,50 +16,48 @@ describe('Applicant DAO', () => {
   });
 
   it('write saves a valid applicant item to DynamoDb', async () => {
-    return applicantDao.write({
+    await applicantDao.write({
       srCandidateId: 'candidateId',
       slinkResumeNumber: 'resumeNumber',
       sapEmployeeId: 'employeeId'
-    })
-      .then(() => {
-        const params = {
-          Item: {
-            alias: {
-              S: 'baz'
-            },
-            srCandidateId: {
-              S: 'candidateId'
-            },
-            slinkResumeNumber: {
-              S: 'resumeNumber'
-            },
-            sapEmployeeId: {
-              N: 'employeeId'
-            }
-          },
-          TableName: 'applicant'
-        };
-        expect(aws.putDynamoDbItem)
-          .toHaveBeenCalledWith(params);
-      });
+    });
+
+    const params = {
+      Item: {
+        alias: {
+          S: 'baz'
+        },
+        srCandidateId: {
+          S: 'candidateId'
+        },
+        slinkResumeNumber: {
+          S: 'resumeNumber'
+        },
+        sapEmployeeId: {
+          N: 'employeeId'
+        }
+      },
+      TableName: 'applicant'
+    };
+    expect(aws.putDynamoDbItem)
+      .toHaveBeenCalledWith(params);
   });
 
   it('read obtains an applicant item from DynamoDb', async () => {
-    return applicantDao.read('candidateId')
-      .then(() => {
-        const params = {
-          Key: {
-            srCandidateId: {
-              S: 'candidateId'
-            },
-            alias: {
-              S: 'baz'
-            }
-          },
-          TableName: 'applicant'
-        };
-        expect(aws.getDynamoDbItem)
-          .toHaveBeenCalledWith(params);
-      });
+    await applicantDao.read('candidateId');
+
+    const params = {
+      Key: {
+        srCandidateId: {
+          S: 'candidateId'
+        },
+        alias: {
+          S: 'baz'
+        }
+      },
+      TableName: 'applicant'
+    };
+    expect(aws.getDynamoDbItem)
+      .toHaveBeenCalledWith(params);
   });
 });

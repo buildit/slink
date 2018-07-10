@@ -16,7 +16,7 @@ describe('Run DAO', () => {
   it('write saves a valid run item to DynamoDb', async () => {
     config.params.LAMBDA_ALIAS = { value: 'foo' };
 
-    lastRunDateDao.write('abc123', 12345);
+    await lastRunDateDao.write('abc123', 12345);
     const params = {
       Item: {
         alias: {
@@ -37,7 +37,7 @@ describe('Run DAO', () => {
   it('read obtains an item from DynamoDb', async () => {
     config.params.LAMBDA_ALIAS = { value: 'foo' };
 
-    lastRunDateDao.read();
+    await lastRunDateDao.read();
     const params = {
       Key: {
         alias: {
