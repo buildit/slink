@@ -75,7 +75,7 @@ const loadConfigParams = async (context) => {
   }
 
   try {
-    const ssmParams = await aws.getParams(paramPath);
+    const ssmParams = await aws.getParams(paramPath, awsRegion);
     // console.log(`SSM Params: ${JSON.stringify(ssmParams)}`);
 
     // Load all param values in our configParams list

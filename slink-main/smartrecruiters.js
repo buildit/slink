@@ -50,7 +50,7 @@ async function toApplicant(summary) {
 
   const applicant = {
     id: summary.id,
-    employeeId,
+    employeeId: employeeId || null,
     firstName: summary.firstName,
     lastName: summary.lastName,
     email: summary.email,
