@@ -21,11 +21,12 @@ module.exports.handler = async (event, context, callback) => {
 
     const response = {
       statusCode: 200,
-      body: JSON.stringify({
-        message: `Sent ${introductionResult.successful} candidate(s) to SAP, failed: ${introductionResult.unsuccessful}. ` +
-                 `Activated ${activationResult.successful} candidate(s) in SAP, ` +
-                   `failed to activate: ${activationResult.unsuccessful}`
-      })
+      body: {
+        introductionResult,
+        activationResult,
+        message: `Candidate(s) introduced to SAP: ${introductionResult.successful}, failed: ${introductionResult.unsuccessful}. ` +
+                `Candidate(s) activated in SAP: ${activationResult.successful}, failed: ${activationResult.unsuccessful}.`
+      }
     };
     callback(null, response);
   } catch (e) {

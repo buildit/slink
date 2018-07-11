@@ -3,11 +3,13 @@
 const getType = require('jest-get-type');
 const index = require('../../index');
 const introduction = require('../../introduction');
+const activation = require('../../activation');
 const config = require('../../config');
 const runDao = require('../../lastrundatedao');
 const timeSource = require('../../timesource');
 
 jest.mock('../../introduction');
+jest.mock('../../activation');
 jest.mock('../../config');
 jest.mock('../../lastrundatedao');
 jest.mock('../../timesource');
@@ -21,24 +23,42 @@ describe('Handler invocation', () => {
   beforeEach(() => {
     // Clear all instances and calls to constructor and all methods
     introduction.process.mockClear();
+    activation.process.mockClear();
     timeSource.getSerialTime.mockClear();
   });
 
   it('runs introduction process and gives successful response', async () => {
-    introduction.process.mockResolvedValue({
+    const introductionResult = {
       attempted: 2,
       successful: 1,
       unsuccessful: 1,
       successfulApplicants: [{ id: 'abc-123' }],
       unsuccessfulApplicants: [{ id: 'xyz-890' }]
-    });
+    };
+    introduction.process.mockResolvedValue(introductionResult);
+
+    const activationResult = {
+      attempted: 5,
+      successful: 2,
+      unsuccessful: 3,
+      successfulApplicants: [{ id: 'abc-123' }],
+      unsuccessfulApplicants: [{ id: 'xyz-890' }]
+    };
+    activation.process.mockResolvedValue(activationResult);
+
+    const expectedResult = {
+      statusCode: 200,
+      body: {
+        introductionResult,
+        activationResult,
+        message: 'Candidate(s) introduced to SAP: 1, failed: 1. Candidate(s) activated in SAP: 2, failed: 3.'
+      }
+    };
+
     timeSource.getSerialTime.mockReturnValue(12345);
 
     await index.handler({}, context, (err, result) => {
-      expect(result.statusCode).toEqual(200);
-      expect(getType(result.body)).toEqual('string');
-      expect(result.body).toEqual(JSON.stringify({ message: 'Sent 1 candidate(s) to SAP, failed: 1' }));
-      expect(runDao.write).toHaveBeenCalledWith('requestid', 12345);
+      expect(result).toEqual(expectedResult);
     });
   });
 
