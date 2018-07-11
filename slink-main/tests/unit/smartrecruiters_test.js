@@ -59,8 +59,9 @@ describe('Get candidate summary', () => {
     get.mockResolvedValueOnce(testmodels.sr.jobProperties);
     const response = await smartrecruiters.getApplicants(query);
     expect(response.length).toBeGreaterThan(0);
+    const queryString = `updatedAfter=${query.updatedAfter}&status=${query.status}&subStatus=${query.subStatus}&limit=${query.limit}`;
     expect(get.mock.calls[0][0])
-      .toBe(`${config.params.SR_SUMMARY_URL.value}?updatedAfter=${query.updatedAfter}&status=${query.status}&subStatus=${query.subStatus}&limit=${query.limit}`);
+      .toBe(`${config.params.SR_SUMMARY_URL.value}?${encodeURIComponent(queryString)}`);
   });
 
   it('throws an exception on failure', () => {
@@ -72,7 +73,7 @@ describe('Get candidate summary', () => {
 
   function expectSmartRecruitersCalls(get) {
     expect(get.mock.calls[0][0])
-      .toBe(`${config.params.SR_SUMMARY_URL.value}?updatedAfter=2018-02-01T10:15:00.500+00:00&status=OFFERED&subStatus=Offer%20Accepted&limit=100`);
+      .toBe(`${config.params.SR_SUMMARY_URL.value}?${encodeURIComponent('updatedAfter=2018-02-01T10:15:00.500+00:00&status=OFFERED&subStatus=Offer Accepted&limit=100')}`);
     expect(get.mock.calls[1][0])
       .toBe(testmodels.sr.rawCandidateSummaries.data.content[0].actions.details.url);
     expect(get.mock.calls[2][0])

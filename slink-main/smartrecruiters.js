@@ -22,10 +22,10 @@ const getApplicants = async ({
   const CANDIDATE_BATCH_SIZE = 2;
   const SLEEP_TIME_PER_BATCH = 750;
   const baseUrl = config.params.SR_SUMMARY_URL.value;
-  const urlWithQueryStr = encodeURI(`${baseUrl}?updatedAfter=${updatedAfter}&status=${status}&subStatus=${subStatus}&limit=${limit}`);
-  console.log('SR query:', urlWithQueryStr);
+  const queryString = encodeURIComponent(`updatedAfter=${updatedAfter}&status=${status}&subStatus=${subStatus}&limit=${limit}`);
+  console.log('SR query:', `${baseUrl}?${queryString}`);
 
-  const candidateSummaries = await srGet(urlWithQueryStr);
+  const candidateSummaries = await srGet(`${baseUrl}?${queryString}`);
   const candidateBatches = R.splitEvery(CANDIDATE_BATCH_SIZE, candidateSummaries.content);
 
   const batchedApplicants =
@@ -137,7 +137,7 @@ async function srGet(url) {
     return reply.data;
   } catch (err) {
     if (err.response) {
-      console.error(`Error response from SmartRecruiters API. Status: ${err.response.status}, URL: ${url}, Headers: ${err.response.headers}, Error: ${err}`);
+      console.error(`Error response from SmartRecruiters API. Status: ${err.response.status}, URL: ${url}, Headers: ${JSON.stringify(err.response.headers)}, Error: ${err}`);
     } else if (err.request) {
       console.error(`Error calling SmartRecruiters API. Status: ${err.request}, Error: ${err}`);
     } else {
