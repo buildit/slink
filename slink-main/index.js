@@ -12,8 +12,7 @@ module.exports.handler = async (event, context, callback) => {
   try {
     await config.loadConfigParams(context);
 
-    const lastRunDateIso = getLastRunDateIso();
-    const result = await introduction.process(await lastRunDateIso);
+    const result = await introduction.process();
     await writeRunRecord(context);
 
     const response = {
@@ -31,16 +30,16 @@ module.exports.handler = async (event, context, callback) => {
 };
 
 
-async function getLastRunDateIso() {
-  const lastRunDateObj = await runDao.read();
-
-  if (lastRunDateObj.Item && lastRunDateObj.Item.runSerialDate) {
-    const runSerialDate = lastRunDateObj.Item.runSerialDate.N;
-    return new Date(Number(runSerialDate)).toISOString();
-  }
-  console.info('Last run date not found. Defaulting to today\'s date');
-  return new Date().toISOString();
-}
+// async function getLastRunDateIso() {
+//   const lastRunDateObj = await runDao.read();
+//
+//   if (lastRunDateObj.Item && lastRunDateObj.Item.runSerialDate) {
+//     const runSerialDate = lastRunDateObj.Item.runSerialDate.N;
+//     return new Date(Number(runSerialDate)).toISOString();
+//   }
+//   console.info('Last run date not found. Defaulting to today\'s date');
+//   return new Date().toISOString();
+// }
 
 async function writeRunRecord(context) {
   try {

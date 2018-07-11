@@ -33,11 +33,12 @@ describe('Handler invocation', () => {
       unsuccessfulApplicants: [{ id: 'xyz-890' }]
     });
     timeSource.getSerialTime.mockReturnValue(2222);
-    runDao.read.mockReturnValue({ Item: { runSerialDate: { N: 1111 } } });
+    // read() not called for introduction, but will be needed for activation.  Left here as an example.
+    // runDao.read.mockReturnValue({ Item: { runSerialDate: { N: 1111 } } });
 
     await index.handler({}, context, (err, result) => {
-      expect(runDao.read).toHaveBeenCalledWith();
-      expect(introduction.process).toHaveBeenCalledWith(new Date(1111).toISOString());
+      // expect(runDao.read).toHaveBeenCalledWith();
+      expect(introduction.process).toHaveBeenCalled();
       expect(result.statusCode).toEqual(200);
       expect(getType(result.body)).toEqual('string');
       expect(result.body).toEqual(JSON.stringify({ message: 'Sent 1 candidate(s) to SAP, failed: 1' }));
