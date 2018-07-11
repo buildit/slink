@@ -12,18 +12,6 @@ Parameters:
     Description: Function Alias that is executed by the CW Event rule for scheduled runs.
     Default: PROD
 
-# Enable blue/green deployments using this Globals section. For instructions, see the AWS CodeStar User Guide:
-# https://docs.aws.amazon.com/codestar/latest/userguide/how-to-modify-serverless-project.html?icmpid=docs_acs_rm_tr
-#
-# Globals:
-#   Function:
-#     AutoPublishAlias: live
-#     DeploymentPreference:
-#       Enabled: true
-#       Type: Canary10Percent5Minutes
-#     Environment:
-#       Variables:
-#         TABLE_NAME: data-table
 
 Globals:
   Function:
@@ -201,7 +189,7 @@ Resources:
   SlinkCandidatesSentSuccessNotification:
     Type: "AWS::CloudWatch::Alarm"
     Properties:
-      AlarmName: "Slink Candidates Sent Notiication"
+      AlarmName: "Slink Candidates Sent Notification"
       AlarmDescription: "Notification for candidates sent"
       AlarmActions:
       - !Ref SlinkSNSTopic
@@ -212,29 +200,3 @@ Resources:
       Period: '60'
       Statistic: Maximum
       Threshold: '1'
-#  ParameterStoreRole:
-#      Type: AWS::IAM::Role
-#      Properties:
-#        AssumeRolePolicyDocument:
-#          Version: '2012-10-17'
-#          Statement:
-#            -
-#              Effect: Allow
-#              Principal:
-#                Service:
-#                  - 'lambda.amazonaws.com'
-#              Action:
-#                - 'sts:AssumeRole'
-#        ManagedPolicyArns:
-#          - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
-#        Policies:
-#          -
-#            PolicyName: 'ParameterStoreSlinkAccess'
-#            PolicyDocument:
-#              Version: '2012-10-17'
-#              Statement:
-#                -
-#                  Effect: Allow
-#                  Action:
-#                    - 'ssm:GetParameter*'
-#                  Resource: !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/slink*'
