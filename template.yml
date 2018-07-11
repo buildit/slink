@@ -160,6 +160,17 @@ Resources:
         MetricNamespace: "SlinkMetrics"
         MetricName: "429Errors"
 
+  SapPostFailuresMetric:
+    Type: "AWS::Logs::MetricFilter"
+    Properties:
+      LogGroupName: !Ref SlinkLogGroup
+      FilterPattern: "SAP post failed"
+      MetricTransformations:
+      -
+        MetricValue: "1"
+        MetricNamespace: "SlinkMetrics"
+        MetricName: "SapPostFailures"
+
   SlinkCandidatesSentSuccessMetric:
     Type: "AWS::Logs::MetricFilter"
     Properties:
@@ -183,6 +194,21 @@ Resources:
       Namespace: Slink/Alarms
       MetricName: Slink429Metric
       Period: '60'
+      Statistic: Maximum
+      Threshold: '1'
+
+  SlinkSapPostFailureAlarm:
+    Type: "AWS::CloudWatch::Alarm"
+    Properties:
+      AlarmName: "Slink SAP Post Failure Alarm"
+      AlarmDescription: "Alarm for failures when posting to SAP API"
+      AlarmActions:
+      - !Ref SlinkSNSTopic
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      EvaluationPeriods: "1"
+      Namespace: Slink/Alarms
+      MetricName: SapPostFailuresMetric
+      Period: '3600'
       Statistic: Maximum
       Threshold: '1'
 
