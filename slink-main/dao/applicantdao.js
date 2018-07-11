@@ -16,7 +16,7 @@ async function write({ srCandidateId, slinkResumeNumber = 0, sapEmployeeId = 0 }
         S: slinkResumeNumber !== 0 ? `${slinkResumeNumber}` : ''
       },
       sapEmployeeId: {
-        N: sapEmployeeId
+        N: `${sapEmployeeId}`
       }
     },
     TableName: process.env.APPLICANT_TABLE
