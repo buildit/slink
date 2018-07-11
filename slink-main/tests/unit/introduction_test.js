@@ -3,18 +3,22 @@
 // const introduction = require('../../introduction');
 
 const sapAddEmployee = require('../../sap/addemployee');
+const applicantDao = require('../../dao/applicantdao');
 const smartrecruiters = require('../../smartrecruiters');
 const introduction = require('../../introduction');
 const util = require('../../util');
 
 jest.mock('../../smartrecruiters');
 jest.mock('../../sap/addemployee');
+jest.mock('../../dao/applicantdao');
+
 util.generateResumeNumber = jest.fn();
 
 describe('Applicant introduction process', () => {
   beforeEach(() => {
     smartrecruiters.getApplicants.mockClear();
     sapAddEmployee.execute.mockClear();
+    applicantDao.write.mockClear();
   });
 
   it('calls SAP for each FTE Applicant from SmartRecruiters, and registers Employee ID in SmartRecruiters', async () => {
@@ -120,7 +124,12 @@ describe('Applicant introduction process', () => {
     expect(sapAddEmployee.execute).toHaveBeenCalledWith(srFailApplicant, 6666);
     expect(sapAddEmployee.execute).toHaveBeenCalledWith(successApplicant2, 2222);
     expect(sapAddEmployee.execute).toHaveBeenCalledWith(sapFailApplicant, 3333);
+
+    expect(applicantDao.write).toHaveBeenCalledWith({ srCandidateId: 'guid1', slinkResumeNumber: 1111, sapEmployeeId: 1010101 });
+    expect(applicantDao.write).toHaveBeenCalledWith({ srCandidateId: 'guid2', slinkResumeNumber: 2222, sapEmployeeId: 2020202 });
+
     expect(sapAddEmployee.execute).toHaveBeenCalledTimes(4);
+    expect(applicantDao.write).toHaveBeenCalledTimes(3);
 
     expect(smartrecruiters.storeEmployeeId).not.toHaveBeenCalledWith(3333, 'job3', null);
 
