@@ -11,7 +11,6 @@ module.exports.handler = async (event, context, callback) => {
   console.info(`#### Function ARN:  ${context.invokedFunctionArn}`);
 
   try {
-    // Load all configuration parameters from AWS SSM
     await config.loadConfigParams(context);
 
     const introductionResult = await introduction.process();
@@ -37,6 +36,18 @@ module.exports.handler = async (event, context, callback) => {
     });
   }
 };
+
+
+// async function getLastRunDateIso() {
+//   const lastRunDateObj = await runDao.read();
+//
+//   if (lastRunDateObj.Item && lastRunDateObj.Item.runSerialDate) {
+//     const runSerialDate = lastRunDateObj.Item.runSerialDate.N;
+//     return new Date(Number(runSerialDate)).toISOString();
+//   }
+//   console.info('Last run date not found. Defaulting to today\'s date');
+//   return new Date().toISOString();
+// }
 
 async function writeRunRecord(context) {
   try {

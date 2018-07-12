@@ -28,6 +28,11 @@ const mockResponseBad = {
   }
 };
 
+const mockStupidResponseButHasActuallyHappened = {
+  data: {
+    output: {}
+  }
+};
 
 describe('execute()', () => {
   beforeAll(() => {
@@ -49,6 +54,12 @@ describe('execute()', () => {
 
   it('returns null if a bad response', async () => {
     axios.post.mockResolvedValue(mockResponseBad);
+    const result = await sapAddEmployee.execute(testmodels.applicant, 111);
+    expect(result).toEqual(null);
+  });
+
+  it('returns null if an empty/indeterminate response', async () => {
+    axios.post.mockResolvedValue(mockStupidResponseButHasActuallyHappened);
     const result = await sapAddEmployee.execute(testmodels.applicant, 111);
     expect(result).toEqual(null);
   });

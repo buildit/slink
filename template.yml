@@ -12,18 +12,6 @@ Parameters:
     Description: Function Alias that is executed by the CW Event rule for scheduled runs.
     Default: PROD
 
-# Enable blue/green deployments using this Globals section. For instructions, see the AWS CodeStar User Guide:
-# https://docs.aws.amazon.com/codestar/latest/userguide/how-to-modify-serverless-project.html?icmpid=docs_acs_rm_tr
-#
-# Globals:
-#   Function:
-#     AutoPublishAlias: live
-#     DeploymentPreference:
-#       Enabled: true
-#       Type: Canary10Percent5Minutes
-#     Environment:
-#       Variables:
-#         TABLE_NAME: data-table
 
 Globals:
   Function:
@@ -42,6 +30,7 @@ Resources:
           RUN_TABLE: !Ref RunTable
           LAST_RUN_DATE_TABLE: !Ref LastRunDateTable
           APPLICANT_TABLE: !Ref ApplicantTable
+          LOCAL_DYNAMO_IP: ''
       Role:
         Fn::ImportValue:
           !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
@@ -171,6 +160,17 @@ Resources:
         MetricNamespace: "SlinkMetrics"
         MetricName: "429Errors"
 
+  SapPostFailuresMetric:
+    Type: "AWS::Logs::MetricFilter"
+    Properties:
+      LogGroupName: !Ref SlinkLogGroup
+      FilterPattern: "SAP post failed"
+      MetricTransformations:
+      -
+        MetricValue: "1"
+        MetricNamespace: "SlinkMetrics"
+        MetricName: "SapPostFailures"
+
   SlinkCandidatesSentSuccessMetric:
     Type: "AWS::Logs::MetricFilter"
     Properties:
@@ -197,10 +197,25 @@ Resources:
       Statistic: Maximum
       Threshold: '1'
 
+  SlinkSapPostFailureAlarm:
+    Type: "AWS::CloudWatch::Alarm"
+    Properties:
+      AlarmName: "Slink SAP Post Failure Alarm"
+      AlarmDescription: "Alarm for failures when posting to SAP API"
+      AlarmActions:
+      - !Ref SlinkSNSTopic
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      EvaluationPeriods: "1"
+      Namespace: Slink/Alarms
+      MetricName: SapPostFailuresMetric
+      Period: '3600'
+      Statistic: Maximum
+      Threshold: '1'
+
   SlinkCandidatesSentSuccessNotification:
     Type: "AWS::CloudWatch::Alarm"
     Properties:
-      AlarmName: "Slink Candidates Sent Notiication"
+      AlarmName: "Slink Candidates Sent Notification"
       AlarmDescription: "Notification for candidates sent"
       AlarmActions:
       - !Ref SlinkSNSTopic
@@ -211,31 +226,3 @@ Resources:
       Period: '60'
       Statistic: Maximum
       Threshold: '1'
-#  ParameterStoreRole:
-#      Type: AWS::IAM::Role
-#      Properties:
-#        AssumeRolePolicyDocument:
-#          Version: '2012-10-17'
-#          Statement:
-#            -
-#              Effect: Allow
-#              Principal:
-#                Service:
-#                  - 'lambda.amazonaws.com'
-#              Action:
-#                - 'sts:AssumeRole'
-#        ManagedPolicyArns:
-#          - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
-#        Policies:
-#          -
-#            PolicyName: 'ParameterStoreSlinkAccess'
-#            PolicyDocument:
-#              Version: '2012-10-17'
-#              Statement:
-#                -
-#                  Effect: Allow
-#                  Action:
-#                    - 'ssm:GetParameter*'
-#                  Resource: !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/slink*'
-
-Transform: AWS::Serverless-2016-10-31

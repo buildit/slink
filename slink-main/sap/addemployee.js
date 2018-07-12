@@ -33,10 +33,13 @@ const execute = async (applicant, resumeNumber) => {
     if (output && output.ReturnFlag === 'F') {
       console.error(postResultMessage('failed', applicant, resumeNumber, output));
       return null;
+    } else if (output && output.ReturnFlag === 'T') {
+      console.info(postResultMessage('succeeded', applicant, resumeNumber, output));
+      return output.EmployeeId;
     }
 
-    console.info(postResultMessage('succeeded', applicant, resumeNumber, output));
-    return output.EmployeeId;
+    console.error(postResultMessage('indeterminate', applicant, resumeNumber, output));
+    return null;
   } catch (err) {
     console.error(`Exception posting applicant to SAP: ${err.message}`);
     throw err;

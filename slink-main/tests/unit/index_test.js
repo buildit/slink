@@ -55,10 +55,13 @@ describe('Handler invocation', () => {
       }
     };
 
-    timeSource.getSerialTime.mockReturnValue(12345);
+    timeSource.getSerialTime.mockReturnValue(2222);
 
     await index.handler({}, context, (err, result) => {
+      expect(introduction.process).toHaveBeenCalled();
+      expect(activation.process).toHaveBeenCalled();
       expect(result).toEqual(expectedResult);
+      expect(runDao.write).toHaveBeenCalledWith('requestid', 2222);
     });
   });
 

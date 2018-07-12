@@ -5,14 +5,27 @@ const R = require('ramda');
 const config = require('./config');
 
 
+/**
+ * Obtains applicant data, including summary, detail, and properties.
+ * @param updatedAfter Date/time (ISO format) to restrict returned applicants (pass through to SR).
+ * @param status SR status filter.
+ * @param subStatus SR substatus filter.
+ * @param limit Maximum results to return from SR.
+ * @returns {Promise<void>}
+ */
 const getApplicants = async ({
-  updatedAfter = '2018-02-01T10:15:00.500+00:00', status = 'OFFERED', subStatus = 'Offer Accepted', limit = 100
+  updatedAfter = '2018-02-01T10:15:00.500+00:00',
+  status = 'OFFERED',
+  subStatus = 'Offer Accepted',
+  limit = 100
 } = {}) => {
   const CANDIDATE_BATCH_SIZE = 2;
   const SLEEP_TIME_PER_BATCH = 750;
   const baseUrl = config.params.SR_SUMMARY_URL.value;
-  const urlWithQueryStr = encodeURI(`${baseUrl}?updatedAfter=${updatedAfter}&status=${status}&subStatus=${subStatus}&limit=${limit}`);
-  const candidateSummaries = await srGet(urlWithQueryStr);
+  const queryString = encodeURIComponent(`updatedAfter=${updatedAfter}&status=${status}&subStatus=${subStatus}&limit=${limit}`);
+  console.log('SR query:', `${baseUrl}?${queryString}`);
+
+  const candidateSummaries = await srGet(`${baseUrl}?${queryString}`);
   const candidateBatches = R.splitEvery(CANDIDATE_BATCH_SIZE, candidateSummaries.content);
 
   const batchedApplicants =
@@ -127,7 +140,7 @@ async function srGet(url) {
     return reply.data;
   } catch (err) {
     if (err.response) {
-      console.error(`Error response from SmartRecruiters API. Status: ${err.response.status}, URL: ${url}, Headers: ${err.response.headers}, Error: ${err}`);
+      console.error(`Error response from SmartRecruiters API. Status: ${err.response.status}, URL: ${url}, Headers: ${JSON.stringify(err.response.headers)}, Error: ${err}`);
     } else if (err.request) {
       console.error(`Error calling SmartRecruiters API. Status: ${err.request}, Error: ${err}`);
     } else {

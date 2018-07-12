@@ -12,12 +12,30 @@ const AWS = require('aws-sdk');
  */
 const getParams = async (paramPath, awsRegion) => awsParamStore.getParametersByPath(paramPath, { region: awsRegion });
 
-const putDynamoDb = async (params) => {
-  const dynamoDb = new AWS.DynamoDB();
+const putDynamoDbItem = async (params) => {
+  const dynamoDb = createDynamoDb();
   return dynamoDb.putItem(params).promise();
 };
 
+const getDynamoDbItem = async (params) => {
+  const dynamoDb = createDynamoDb();
+  return dynamoDb.getItem(params).promise();
+};
+
+function createDynamoDb() {
+  if (process.env.LOCAL_DYNAMO_IP === '' || process.env.LOCAL_DYNAMO_IP.length === 0) {
+    return new AWS.DynamoDB();
+  }
+
+  const url = `http://${process.env.LOCAL_DYNAMO_IP}:8000`;
+  console.info('NOTE:  Using local DynamoDb url:', url);
+  const localEndpoint = { endpoint: new AWS.Endpoint(url) };
+
+  return new AWS.DynamoDB(localEndpoint);
+}
+
 module.exports = {
   getParams,
-  putDynamoDb
+  putDynamoDbItem,
+  getDynamoDbItem
 };
