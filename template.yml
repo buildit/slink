@@ -139,9 +139,6 @@ Resources:
           - "SlinkIntroductionRule"
           - "Arn"
 
-  SlinkLogGroup:
-    Type: "AWS::Logs::LogGroup"
-
   SlinkSNSTopic:
     Type: "AWS::SNS::Topic"
     Properties:
@@ -152,7 +149,7 @@ Resources:
   Slink429Metric:
     Type: "AWS::Logs::MetricFilter"
     Properties:
-      LogGroupName: !Ref SlinkLogGroup
+      LogGroupName: !Join ['/', ['aws', 'lambda', !Ref SlinkMainFunction]]
       FilterPattern: "Request failed with status code 429"
       MetricTransformations:
       -
@@ -163,7 +160,7 @@ Resources:
   SapPostFailuresMetric:
     Type: "AWS::Logs::MetricFilter"
     Properties:
-      LogGroupName: !Ref SlinkLogGroup
+      LogGroupName: !Join ['/', ['aws', 'lambda', !Ref SlinkMainFunction]]
       FilterPattern: "SAP post failed"
       MetricTransformations:
       -
@@ -174,7 +171,7 @@ Resources:
   SlinkCandidatesSentSuccessMetric:
     Type: "AWS::Logs::MetricFilter"
     Properties:
-      LogGroupName: !Ref SlinkLogGroup
+      LogGroupName: !Join ['/', ['aws', 'lambda', !Ref SlinkMainFunction]]
       FilterPattern: "Sent candidate to SAP"
       MetricTransformations:
       -
