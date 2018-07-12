@@ -13,20 +13,26 @@ const process = async () => {
 
   console.info(`Non-FTE applicants skipped: ${ftes.rejects.length}`);
 
-  const splitByEmployeeId = util.split(applicant => applicant.employeeId !== null);
-  const ftesWithId = splitByEmployeeId(applicants);
+  const splitByEmployeeId = util.split(fte => fte.employeeId !== null);
+  const ftesWithId = splitByEmployeeId(ftes.matches);
 
   console.info(`Employees with no employee ID skipped: ${ftesWithId.rejects.length}`);
 
   const applicantsActivatedInSap =
     await Promise.all(ftesWithId.matches
-      .map(async (applicant) => {
-        const sapStatus = await sapActivateEmployee.execute(applicant);
+      .map(async (fteWithId) => {
+        const sapStatus = await sapActivateEmployee.execute(fteWithId);
 
-        return {
-          applicant,
+        const result = {
+          applicant: util.sanitizeApplicant(fteWithId),
           status: (sapStatus ? 'Succeeded' : 'Failed')
         };
+
+        if (!sapStatus) {
+          result.reason = 'SAP post failure';
+        }
+
+        return result;
       }));
 
   const successfulActivations = applicantsActivatedInSap.filter(item => item.status === 'Succeeded');
