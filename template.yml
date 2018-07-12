@@ -157,7 +157,7 @@ Resources:
       MetricTransformations:
       -
         MetricValue: "1"
-        MetricNamespace: "SlinkMetrics"
+        MetricNamespace: "Slink"
         MetricName: "429Errors"
 
   SapPostFailuresMetric:
@@ -168,7 +168,7 @@ Resources:
       MetricTransformations:
       -
         MetricValue: "1"
-        MetricNamespace: "SlinkMetrics"
+        MetricNamespace: "Slink"
         MetricName: "SapPostFailures"
 
   SlinkCandidatesSentSuccessMetric:
@@ -179,7 +179,7 @@ Resources:
       MetricTransformations:
       -
         MetricValue: "1"
-        MetricNamespace: "SlinkMetrics"
+        MetricNamespace: "Slink"
         MetricName: "CandidatesSentSuccess"
 
   Slink429Alarm:
@@ -191,7 +191,7 @@ Resources:
       - !Ref SlinkSNSTopic
       ComparisonOperator: GreaterThanOrEqualToThreshold
       EvaluationPeriods: "15"
-      Namespace: Slink/Alarms
+      Namespace: Slink
       MetricName: Slink429Metric
       Period: '60'
       Statistic: Maximum
@@ -206,7 +206,7 @@ Resources:
       - !Ref SlinkSNSTopic
       ComparisonOperator: GreaterThanOrEqualToThreshold
       EvaluationPeriods: "1"
-      Namespace: Slink/Alarms
+      Namespace: Slink
       MetricName: SapPostFailuresMetric
       Period: '3600'
       Statistic: Maximum
@@ -221,7 +221,7 @@ Resources:
       - !Ref SlinkSNSTopic
       ComparisonOperator: GreaterThanOrEqualToThreshold
       EvaluationPeriods: "15"
-      Namespace: Slink/Alarms
+      Namespace: Slink
       MetricName: SlinkCandidatesSentSuccessMetric
       Period: '60'
       Statistic: Maximum
