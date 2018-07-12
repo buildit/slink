@@ -1,6 +1,7 @@
 'use strict';
 
 const introduction = require('./introduction');
+const activation = require('./activation');
 const config = require('./config');
 const runDao = require('./lastrundatedao');
 const timeSource = require('./timesource');
@@ -12,12 +13,19 @@ module.exports.handler = async (event, context, callback) => {
   try {
     await config.loadConfigParams(context);
 
-    const result = await introduction.process();
+    const introductionResult = await introduction.process();
+    const activationResult = await activation.process();
+
     await writeRunRecord(context);
 
     const response = {
       statusCode: 200,
-      body: JSON.stringify({ message: `Sent ${result.successful} candidate(s) to SAP, failed: ${result.unsuccessful}` })
+      body: {
+        introductionResult,
+        activationResult,
+        message: `Candidate(s) introduced to SAP: ${introductionResult.successful}, failed: ${introductionResult.unsuccessful}. ` +
+                `Candidate(s) activated in SAP: ${activationResult.successful}, failed: ${activationResult.unsuccessful}.`
+      }
     };
     callback(null, response);
   } catch (e) {
