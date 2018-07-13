@@ -21,11 +21,13 @@ const getApplicants = async ({
 } = {}) => {
   const CANDIDATE_BATCH_SIZE = 2;
   const SLEEP_TIME_PER_BATCH = 750;
+
   const baseUrl = config.params.SR_SUMMARY_URL.value;
   const queryString = encodeURIComponent(`updatedAfter=${updatedAfter}&status=${status}&subStatus=${subStatus}&limit=${limit}`);
-  console.log('SR query:', `${baseUrl}?${queryString}`);
+  const fullUrl = `${baseUrl}?${queryString}`;
+  console.log('SR query:', fullUrl);
 
-  const candidateSummaries = await srGet(`${baseUrl}?${queryString}`);
+  const candidateSummaries = await srGet(fullUrl);
   const candidateBatches = R.splitEvery(CANDIDATE_BATCH_SIZE, candidateSummaries.content);
 
   const batchedApplicants =
