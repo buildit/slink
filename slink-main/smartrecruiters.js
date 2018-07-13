@@ -14,7 +14,6 @@ const config = require('./config');
  * @returns {Promise<void>}
  */
 const getApplicants = async ({
-  updatedAfter = '2018-02-01T10:15:00.500+00:00',
   status = 'OFFERED',
   subStatus = 'Offer Accepted',
   limit = 100
@@ -23,7 +22,7 @@ const getApplicants = async ({
   const SLEEP_TIME_PER_BATCH = 750;
 
   const baseUrl = config.params.SR_SUMMARY_URL.value;
-  const queryString = encodeURIComponent(`updatedAfter=${updatedAfter}&status=${status}&subStatus=${subStatus}&limit=${limit}`);
+  const queryString = `status=${status}&subStatus=${subStatus}&limit=${limit}`;
   const fullUrl = `${baseUrl}?${queryString}`;
   console.log('SR query:', fullUrl);
 
