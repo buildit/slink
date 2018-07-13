@@ -1,7 +1,7 @@
 'use strict';
 
 const aws = require('../../../aws');
-const applicantDao = require('../../../dao/applicantdao');
+const applicantDao = require('../../../dao/introductionsdao');
 const config = require('../../../config');
 
 jest.mock('../../../aws');
@@ -10,7 +10,7 @@ jest.mock('../../../config');
 describe('Applicant DAO', () => {
   beforeEach(() => {
     config.params.LAMBDA_ALIAS = { value: 'baz' };
-    process.env.APPLICANT_TABLE = 'applicant';
+    process.env.INTRODUCTIONS_TABLE = 'Introductions';
 
     aws.putDynamoDbItem.mockClear();
   });
@@ -37,7 +37,7 @@ describe('Applicant DAO', () => {
           N: 'employeeId'
         }
       },
-      TableName: 'applicant'
+      TableName: 'Introductions'
     };
     expect(aws.putDynamoDbItem)
       .toHaveBeenCalledWith(params);
@@ -55,7 +55,7 @@ describe('Applicant DAO', () => {
           S: 'baz'
         }
       },
-      TableName: 'applicant'
+      TableName: 'Introductions'
     };
     expect(aws.getDynamoDbItem)
       .toHaveBeenCalledWith(params);

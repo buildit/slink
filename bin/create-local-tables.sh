@@ -8,14 +8,14 @@ aws dynamodb create-table \
   --endpoint-url http://localhost:${port:-8000}
 
 aws dynamodb create-table \
-  --table-name ApplicantTable \
+  --table-name Introductions \
   --attribute-definitions AttributeName=srCandidateId,AttributeType=S AttributeName=alias,AttributeType=S \
   --key-schema AttributeName=srCandidateId,KeyType=HASH  AttributeName=alias,KeyType=RANGE \
   --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 \
   --endpoint-url http://localhost:${port:-8000}
 
 aws dynamodb create-table \
-  --table-name ActivatedApplicantTable \
+  --table-name Activations \
   --attribute-definitions AttributeName=srCandidateId,AttributeType=S AttributeName=alias,AttributeType=S \
   --key-schema AttributeName=srCandidateId,KeyType=HASH  AttributeName=alias,KeyType=RANGE \
   --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 \

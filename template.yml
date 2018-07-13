@@ -29,8 +29,8 @@ Resources:
         Variables:
           RUN_TABLE: !Ref RunTable
           LAST_RUN_DATE_TABLE: !Ref LastRunDateTable
-          APPLICANT_TABLE: !Ref ApplicantTable
-          ACTIVATED_APPLICANT_TABLE: !Ref ActivatedApplicantTable
+          INTRODUCTIONS_TABLE: Introductions
+          ACTIVATIONS_TABLE: Activations
           LOCAL_DYNAMO_IP: ''
       Role:
         Fn::ImportValue:
@@ -79,7 +79,7 @@ Resources:
         WriteCapacityUnits: "5"
 
 
-  ApplicantTable:
+  Applicant:
     Type: "AWS::DynamoDB::Table"
     Properties:
       AttributeDefinitions:
@@ -100,7 +100,7 @@ Resources:
         ReadCapacityUnits: "5"
         WriteCapacityUnits: "5"
 
-  ActivatedApplicantTable:
+  ActivatedApplicant:
     Type: "AWS::DynamoDB::Table"
     Properties:
       AttributeDefinitions:

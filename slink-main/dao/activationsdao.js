@@ -16,7 +16,7 @@ async function write({ srCandidateId, sapEmployeeId = 0 } = {}) {
         N: `${sapEmployeeId}`
       }
     },
-    TableName: process.env.ACTIVATED_APPLICANT_TABLE
+    TableName: process.env.ACTIVATIONS_TABLE
   };
   return aws.putDynamoDbItem(params);
 }
@@ -31,7 +31,7 @@ async function read(srCandidateId) {
         S: config.params.LAMBDA_ALIAS.value
       },
     },
-    TableName: process.env.ACTIVATED_APPLICANT_TABLE
+    TableName: process.env.ACTIVATIONS_TABLE
   };
   return aws.getDynamoDbItem(params);
 }

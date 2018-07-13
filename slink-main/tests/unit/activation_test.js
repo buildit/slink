@@ -3,14 +3,14 @@
 // const introduction = require('../../introduction');
 
 const sapActivateEmployee = require('../../sap/activateemployee');
-const activatedApplicantDao = require('../../dao/activatedapplicantdao');
+const activationsDao = require('../../dao/activationsdao');
 const smartrecruiters = require('../../smartrecruiters');
 const activation = require('../../activation');
 const util = require('../../util');
 
 jest.mock('../../smartrecruiters');
 jest.mock('../../sap/activateemployee');
-jest.mock('../../dao/activatedapplicantdao')
+jest.mock('../../dao/activationsdao')
 
 util.generateResumeNumber = jest.fn();
 
@@ -18,7 +18,7 @@ describe('Applicant activation process', () => {
   beforeEach(() => {
     smartrecruiters.getApplicantsOnboarding.mockClear();
     sapActivateEmployee.execute.mockClear();
-    activatedApplicantDao.write.mockClear();
+    activationsDao.write.mockClear();
   });
 
   it('calls SAP for each FTE Applicant from SmartRecruiters, and activates each Employee', async () => {
@@ -102,13 +102,13 @@ describe('Applicant activation process', () => {
     expect(sapActivateEmployee.execute).toHaveBeenCalledWith(successApplicant2);
     expect(sapActivateEmployee.execute).toHaveBeenCalledWith(sapFailApplicant);
 
-    expect(activatedApplicantDao.write)
+    expect(activationsDao.write)
       .toHaveBeenCalledWith({ srCandidateId: 'guid1', sapEmployeeId: 1000 });
-    expect(activatedApplicantDao.write)
+    expect(activationsDao.write)
       .toHaveBeenCalledWith({ srCandidateId: 'guid2', sapEmployeeId: 1001 });
 
     expect(sapActivateEmployee.execute).toHaveBeenCalledTimes(3);
-    expect(activatedApplicantDao.write).toHaveBeenCalledTimes(2);
+    expect(activationsDao.write).toHaveBeenCalledTimes(2);
 
     expect(results.attempted)
       .toBe(applicants.length - 2); // Contractors and already-introduced applicants are not processed

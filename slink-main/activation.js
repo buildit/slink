@@ -2,7 +2,7 @@
 
 const sr = require('./smartrecruiters');
 const sapActivateEmployee = require('./sap/activateemployee');
-const activatedApplicantDao = require('./dao/activatedapplicantdao');
+const activatedApplicantDao = require('./dao/activationsdao');
 const util = require('./util');
 
 const process = async () => {
