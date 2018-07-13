@@ -3,7 +3,7 @@
 const aws = require('../aws');
 const config = require('../config');
 
-async function write({ srCandidateId, sapEmployeeId = 0, sapActivated = true } = {}) {
+async function write({ srCandidateId, sapEmployeeId = 0 } = {}) {
   const params = {
     Item: {
       srCandidateId: {
@@ -14,12 +14,9 @@ async function write({ srCandidateId, sapEmployeeId = 0, sapActivated = true } =
       },
       sapEmployeeId: {
         N: `${sapEmployeeId}`
-      },
-      sapActivated: {
-        BOOL: sapActivated
       }
     },
-    TableName: process.env.APPLICANT_TABLE
+    TableName: process.env.ACTIVATED_APPLICANT_TABLE
   };
   return aws.putDynamoDbItem(params);
 }
@@ -34,7 +31,7 @@ async function read(srCandidateId) {
         S: config.params.LAMBDA_ALIAS.value
       },
     },
-    TableName: process.env.APPLICANT_ACTIVATION_TABLE
+    TableName: process.env.ACTIVATED_APPLICANT_TABLE
   };
   return aws.getDynamoDbItem(params);
 }

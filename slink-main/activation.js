@@ -2,6 +2,7 @@
 
 const sr = require('./smartrecruiters');
 const sapActivateEmployee = require('./sap/activateemployee');
+const activatedApplicantDao = require('./dao/activatedapplicantdao');
 const util = require('./util');
 
 const process = async () => {
@@ -28,7 +29,14 @@ const process = async () => {
           status: (sapStatus ? 'Succeeded' : 'Failed')
         };
 
-        if (!sapStatus) {
+        if (sapStatus) {
+          // all good! save result to DB
+          await activatedApplicantDao.write({
+            srCandidateId: fteWithId.id,
+            sapEmployeeId: fteWithId.employeeId
+          });
+        } else {
+          // sap failure of some sort - to be clarified later
           result.reason = 'SAP post failure';
         }
 
