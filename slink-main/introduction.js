@@ -1,7 +1,5 @@
 'use strict';
 
-const R = require('ramda');
-
 const sr = require('./smartrecruiters');
 const sapAddEmployee = require('./sap/addemployee');
 const applicantDao = require('./dao/applicantdao');
@@ -15,8 +13,8 @@ const process = async () => {
   const applicants = await sr.getApplicants();
   console.info(`Collected ${applicants.length} applicants from SmartRecruiters`);
 
-  const splitByFte = split(applicant => applicant.fullTime === true);
-  const splitByNeedsIntroduction = split(applicant => applicant.employeeId === null);
+  const splitByFte = util.split(applicant => applicant.fullTime === true);
+  const splitByNeedsIntroduction = util.split(applicant => applicant.employeeId === null);
 
   const ftes = splitByFte(applicants);
   console.info(`Non-FTE applicants skipped: ${ftes.rejects.length}`);
@@ -74,15 +72,6 @@ const process = async () => {
 
   return result;
 };
-
-/**
- * Returns a function that splits an Array into an object containing matches and non-matches.
- * @param predicate
- * @returns {{matches: *, rejects: *}}
- */
-function split(predicate) {
-  return R.pipe(R.partition(predicate), R.zipObj(['matches', 'rejects']));
-}
 
 async function postEmployeeIdToSmartRecruiters(employeeId, applicant) {
   console.info(`Preparing to add SAP employee id to Smart Recruiters: ${employeeId}`);

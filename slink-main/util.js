@@ -2,9 +2,7 @@
 
 const R = require('ramda');
 
-
 const sanitizeApplicant = applicant => R.pick(['id', 'lastName', 'firstName'], applicant);
-
 
 /**
  * Creates a half-assed, semi-random, hopefully-unique number to give to the SAP API.<br/>
@@ -17,7 +15,17 @@ function generateResumeNumber() {
   return Math.floor((Math.random() * (max - min)) + min);
 }
 
+/**
+ * Returns a function that splits an Array into an object containing matches and non-matches.
+ * @param predicate
+ * @returns {{matches: *, rejects: *}}
+ */
+function split(predicate) {
+  return R.pipe(R.partition(predicate), R.zipObj(['matches', 'rejects']));
+}
+
 module.exports = {
   sanitizeApplicant,
-  generateResumeNumber
+  generateResumeNumber,
+  split
 };
