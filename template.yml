@@ -29,7 +29,8 @@ Resources:
         Variables:
           RUN_TABLE: !Ref RunTable
           LAST_RUN_DATE_TABLE: !Ref LastRunDateTable
-          APPLICANT_TABLE: !Ref ApplicantTable
+          INTRODUCTIONS_TABLE: Introductions
+          ACTIVATIONS_TABLE: Activations
           LOCAL_DYNAMO_IP: ''
       Role:
         Fn::ImportValue:
@@ -78,7 +79,7 @@ Resources:
         WriteCapacityUnits: "5"
 
 
-  ApplicantTable:
+  Applicant:
     Type: "AWS::DynamoDB::Table"
     Properties:
       AttributeDefinitions:
@@ -99,6 +100,26 @@ Resources:
         ReadCapacityUnits: "5"
         WriteCapacityUnits: "5"
 
+  ActivatedApplicant:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      AttributeDefinitions:
+        -
+          AttributeName: "srCandidateId"
+          AttributeType: "S"
+        -
+          AttributeName: "alias"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "srCandidateId"
+          KeyType: "HASH"
+        -
+          AttributeName: "alias"
+          KeyType: "RANGE"
+      ProvisionedThroughput:
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
 
   SlinkIntroRun:
      Type: AWS::Serverless::SimpleTable
