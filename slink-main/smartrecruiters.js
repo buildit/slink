@@ -5,6 +5,15 @@ const R = require('ramda');
 const config = require('./config');
 
 
+async function getCandidateSummaries(status, subStatus, limit) {
+  const baseUrl = config.params.SR_SUMMARY_URL.value;
+  const queryString = `status=${status}&subStatus=${subStatus}&limit=${limit}`;
+  const fullUrl = `${baseUrl}?${queryString}`;
+  console.log('SR query:', fullUrl);
+
+  return srGet(fullUrl);
+}
+
 /**
  * Obtains applicant data, including summary, detail, and properties.
  * @param updatedAfter Date/time (ISO format) to restrict returned applicants (pass through to SR).
@@ -20,13 +29,7 @@ const getApplicants = async ({
 } = {}) => {
   const CANDIDATE_BATCH_SIZE = 2;
   const SLEEP_TIME_PER_BATCH = 750;
-
-  const baseUrl = config.params.SR_SUMMARY_URL.value;
-  const queryString = `status=${status}&subStatus=${subStatus}&limit=${limit}`;
-  const fullUrl = `${baseUrl}?${queryString}`;
-  console.log('SR query:', fullUrl);
-
-  const candidateSummaries = await srGet(fullUrl);
+  const candidateSummaries = await getCandidateSummaries(status, subStatus, limit);
   const candidateBatches = R.splitEvery(CANDIDATE_BATCH_SIZE, candidateSummaries.content);
 
   const batchedApplicants =
@@ -182,5 +185,7 @@ function promiseTimer(ms) {
 module.exports = {
   getApplicants,
   getApplicantsOnboarding,
-  storeEmployeeId
+  storeEmployeeId,
+  getCandidateSummaries,
+  toApplicant
 };

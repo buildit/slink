@@ -20,9 +20,33 @@ Globals:
     Handler: index.handler
 
 Resources:
+
   SlinkMainFunction:
     Type: AWS::Serverless::Function
     Properties:
+      CodeUri: ./slink-main/
+      AutoPublishAlias: STAGE
+      Environment:
+        Variables:
+          RUN_TABLE: !Ref RunTable
+          LAST_RUN_DATE_TABLE: !Ref LastRunDateTable
+          INTRODUCTIONS_TABLE: Introductions
+          ACTIVATIONS_TABLE: Activations
+          LOCAL_DYNAMO_IP: ''
+      Role:
+        Fn::ImportValue:
+          !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
+      Events:
+        GetApiEndpoint:
+          Type: Api
+          Properties:
+            Method: get
+            Path: /slink
+
+  SlinkMain2Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index2.handler
       CodeUri: ./slink-main/
       AutoPublishAlias: STAGE
       Environment:
