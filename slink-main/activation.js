@@ -7,6 +7,7 @@ const activatedApplicantDao = require('./dao/activationsdao');
 const util = require('./util');
 
 const process = async () => {
+  console.info('### Starting ACTIVATION process');
   const applicants = await getEligibleApplicants();
 
   const applicantsActivatedInSap =

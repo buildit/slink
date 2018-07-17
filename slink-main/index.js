@@ -27,7 +27,8 @@ module.exports.handler = async (event, context, callback) => {
                 `Candidate(s) activated in SAP: ${activationResult.successful}, failed: ${activationResult.unsuccessful}.`
       }
     };
-    console.log('Writing response');
+    console.info('Writing response:');
+    console.dir(response, { depth: null });
     callback(null, response);
   } catch (e) {
     console.error(`Error in handler:  ${e.message}`);
