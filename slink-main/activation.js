@@ -6,7 +6,7 @@ const activatedApplicantDao = require('./dao/activationsdao');
 const util = require('./util');
 
 const process = async () => {
-  const applicants = await sr.getApplicantsOnboarding();
+  const applicants = await sr.getApplicants({ subStatus: 'ONBOARDING' });
   console.info(`Activation: Collected ${applicants.length} applicants from SmartRecruiters`);
 
   const splitByFte = util.split(applicant => applicant.fullTime === true);

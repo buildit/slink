@@ -11,41 +11,30 @@ const config = require('./config');
  * @param status SR status filter.
  * @param subStatus SR substatus filter.
  * @param limit Maximum results to return from SR.
- * @returns {Promise<void>}
+ * @return {Promise<any[]>}
  */
 const getApplicants = async ({
   status = 'OFFERED',
   subStatus = 'Offer Accepted',
-  limit = 100
+  limit = 15 // avoid 429
 } = {}) => {
-  const CANDIDATE_BATCH_SIZE = 2;
-  const SLEEP_TIME_PER_BATCH = 750;
-
   const baseUrl = config.params.SR_SUMMARY_URL.value;
   const queryString = `status=${status}&subStatus=${subStatus}&limit=${limit}`;
   const fullUrl = `${baseUrl}?${queryString}`;
-  console.log('SR query:', fullUrl);
+  console.info('SR query:', fullUrl);
 
   const candidateSummaries = await srGet(fullUrl);
-  const candidateBatches = R.splitEvery(CANDIDATE_BATCH_SIZE, candidateSummaries.content);
+  console.info('Number of summaries:', candidateSummaries.content.length);
 
-  const batchedApplicants =
-    Promise.all(candidateBatches.map(async (candidateBatch) => {
-      const batchOfApplicants = await Promise.all(candidateBatch.map(async candidate => toApplicant(candidate)));
-      await promiseTimer(SLEEP_TIME_PER_BATCH);
-      return batchOfApplicants;
-    }));
-  return R.flatten(await batchedApplicants);
+  return Promise.all(candidateSummaries.content.map(async candidate => toApplicant(candidate)));
 };
-
-// specialized function to extract candidates, who have substatus set to 'ONBOARDING'
-const getApplicantsOnboarding = async () => getApplicants({ subStatus: 'ONBOARDING' });
 
 
 async function toApplicant(summary) {
   const candidateDetail = await srGet(summary.actions.details.url);
   const jobDetail = await srGet(candidateDetail.primaryAssignment.job.actions.details.url);
 
+  console.info('getting job properties', summary.lastName);
   const jobProps = await getJobProperties(summary.id, summary.primaryAssignment.job.id);
   const salaryPropertyValue = findPropertyValueBy(jobProps.content, 'label', 'Annual Salary');
   const annualBonusValue = findPropertyValueBy(jobProps.content, 'label', 'Annual Bonus');
@@ -173,14 +162,7 @@ function getCode(property) {
   return property != null ? property.code : null;
 }
 
-function promiseTimer(ms) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
-
 module.exports = {
   getApplicants,
-  getApplicantsOnboarding,
   storeEmployeeId
 };
