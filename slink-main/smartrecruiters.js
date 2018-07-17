@@ -18,7 +18,7 @@ const CONCURRENT_APPLICANTS = 3;
 const getApplicants = async ({
   status = 'OFFERED',
   subStatus = 'Offer Accepted',
-  limit = 100 // avoid 429
+  limit = 100
 } = {}) => {
   const baseUrl = config.params.SR_SUMMARY_URL.value;
   const queryString = `status=${status}&subStatus=${subStatus}&limit=${limit}`;
@@ -26,7 +26,7 @@ const getApplicants = async ({
   console.info('SR query:', fullUrl);
 
   const candidateSummaries = await srGet(fullUrl);
-  const throttle = asyncThrottle(CONCURRENT_APPLICANTS);
+  const throttle = asyncThrottle(CONCURRENT_APPLICANTS); // Avoid 429
   console.info(`Converting ${candidateSummaries.content.length} candidates to applicants, ${CONCURRENT_APPLICANTS} at a time`);
   return Promise.all(candidateSummaries.content.map(candidate => throttle(async () => toApplicant(candidate))));
 };
