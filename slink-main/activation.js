@@ -73,7 +73,7 @@ async function activate(applicant) {
 }
 
 async function getEligibleApplicants() {
-  const applicants = await sr.getApplicantsOnboarding();
+  const applicants = await sr.getApplicants({ subStatus: 'ONBOARDING' });
   console.info(`Activation: Collected ${applicants.length} applicants from SmartRecruiters`);
 
   const splitByFte = util.split(applicant => app.isFte(applicant));
