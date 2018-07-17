@@ -54,7 +54,7 @@ describe('Get candidate summary', () => {
 
   it('can take different query parameters', async () => {
     const query = {
-      updatedAfter: '2018-07-01', status: 'OFFERED', subStatus: 'onboarding', limit: 100
+      updatedAfter: '2018-07-01', status: 'OFFERED', subStatus: 'onboarding', limit: 15
     };
     get.mockResolvedValueOnce(testmodels.sr.jobProperties);
     const response = await smartrecruiters.getApplicants(query);
@@ -73,7 +73,7 @@ describe('Get candidate summary', () => {
 
   function expectSmartRecruitersCalls(get) {
     expect(get.mock.calls[0][0])
-      .toBe(`${config.params.SR_SUMMARY_URL.value}?${'status=OFFERED&subStatus=Offer Accepted&limit=100'}`);
+      .toBe(`${config.params.SR_SUMMARY_URL.value}?${'status=OFFERED&subStatus=Offer Accepted&limit=15'}`);
     expect(get.mock.calls[1][0])
       .toBe(testmodels.sr.rawCandidateSummaries.data.content[0].actions.details.url);
     expect(get.mock.calls[2][0])
