@@ -1,6 +1,6 @@
 'use strict';
 
-const throttledQueue = require('throttled-queue');
+const asyncThrottle = require('async-throttle');
 
 
 /**
@@ -12,7 +12,7 @@ const throttledQueue = require('throttled-queue');
  * @returns {Promise<{processedApplicants: Array, ineligibleApplicantCount: number}>}
  */
 const execute = async (candidateSummaries, applicantConverter, eligibilityFilter, applicantOperation) => {
-  const throttle = throttledQueue(2, 1000);
+  const throttle = asyncThrottle(2);
   const processedApplicants = [];
   let ineligibleApplicantCount = 0;
   candidateSummaries.content.forEach((summary) => {
