@@ -16,7 +16,7 @@ util.generateResumeNumber = jest.fn();
 
 describe('Applicant activation process', () => {
   beforeEach(() => {
-    smartrecruiters.getApplicantsOnboarding.mockClear();
+    smartrecruiters.getApplicants.mockClear();
     sapActivateEmployee.execute.mockClear();
     activationsDao.write.mockClear();
   });
@@ -90,7 +90,7 @@ describe('Applicant activation process', () => {
       sapFailApplicant
     ];
 
-    smartrecruiters.getApplicantsOnboarding.mockResolvedValueOnce(applicants);
+    smartrecruiters.getApplicants.mockResolvedValueOnce(applicants);
 
     sapActivateEmployee.execute.mockReturnValueOnce(true);
     sapActivateEmployee.execute.mockReturnValueOnce(true);
