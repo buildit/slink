@@ -1,9 +1,11 @@
 'use strict';
 
 const axios = require('axios');
+const asyncThrottle = require('async-throttle');
 const R = require('ramda');
 const config = require('./config');
 
+const CONCURRENT_APPLICANTS = 3;
 
 /**
  * Obtains applicant data, including summary, detail, and properties.
@@ -16,7 +18,7 @@ const config = require('./config');
 const getApplicants = async ({
   status = 'OFFERED',
   subStatus = 'Offer Accepted',
-  limit = 15 // avoid 429
+  limit = 100 // avoid 429
 } = {}) => {
   const baseUrl = config.params.SR_SUMMARY_URL.value;
   const queryString = `status=${status}&subStatus=${subStatus}&limit=${limit}`;
@@ -24,9 +26,9 @@ const getApplicants = async ({
   console.info('SR query:', fullUrl);
 
   const candidateSummaries = await srGet(fullUrl);
-  console.info('Number of summaries:', candidateSummaries.content.length);
-
-  return Promise.all(candidateSummaries.content.map(async candidate => toApplicant(candidate)));
+  const throttle = asyncThrottle(CONCURRENT_APPLICANTS);
+  console.info(`Converting ${candidateSummaries.content.length} candidates to applicants, ${CONCURRENT_APPLICANTS} at a time`);
+  return Promise.all(candidateSummaries.content.map(candidate => throttle(async () => toApplicant(candidate))));
 };
 
 
@@ -34,7 +36,6 @@ async function toApplicant(summary) {
   const candidateDetail = await srGet(summary.actions.details.url);
   const jobDetail = await srGet(candidateDetail.primaryAssignment.job.actions.details.url);
 
-  console.info('getting job properties', summary.lastName);
   const jobProps = await getJobProperties(summary.id, summary.primaryAssignment.job.id);
   const salaryPropertyValue = findPropertyValueBy(jobProps.content, 'label', 'Annual Salary');
   const annualBonusValue = findPropertyValueBy(jobProps.content, 'label', 'Annual Bonus');

@@ -10,8 +10,8 @@ const util = require('./util');
  * @returns {Promise<{successfulApplicants: Array}>}
  */
 const process = async () => {
+  console.info('### Starting INTRODUCTION process');
   const applicants = await sr.getApplicants();
-  console.info(`Collected ${applicants.length} applicants from SmartRecruiters`);
 
   const splitByFte = util.split(applicant => applicant.fullTime === true);
   const splitByNeedsIntroduction = util.split(applicant => applicant.employeeId === null);
