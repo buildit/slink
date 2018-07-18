@@ -113,7 +113,7 @@ Adding up all the above, the command to run locally is:
 ```$bash
 LOCAL_DYNAMO_IP=10.1.1.22
 LAST_RUN_DATE_TABLE=LastRunDate \
-RUN_TABLE=Runs \
+RUNS_TABLE=Runs \
 INTRODUCTIONS_TABLE=Introductions \
 ACTIVATIONS_TABLE=Activations \
 sam local invoke SlinkMainFunction -e event.json

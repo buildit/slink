@@ -9,15 +9,9 @@ async function write(requestId, runSerialDate) {
 
   const params = {
     Item: {
-      alias: {
-        S: config.params.LAMBDA_ALIAS.value
-      },
-      requestId: {
-        S: requestId
-      },
-      runSerialDate: {
-        N: `${runSerialDate}`
-      }
+      alias: config.params.LAMBDA_ALIAS.value,
+      requestId,
+      runSerialDate
     },
     TableName: table
   };

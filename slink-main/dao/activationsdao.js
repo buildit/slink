@@ -6,15 +6,9 @@ const config = require('../config');
 async function write({ srCandidateId, sapEmployeeId = 0 } = {}) {
   const params = {
     Item: {
-      srCandidateId: {
-        S: srCandidateId
-      },
-      alias: {
-        S: config.params.LAMBDA_ALIAS.value
-      },
-      sapEmployeeId: {
-        N: `${sapEmployeeId}`
-      }
+      srCandidateId,
+      alias: config.params.LAMBDA_ALIAS.value,
+      sapEmployeeId
     },
     TableName: process.env.ACTIVATIONS_TABLE
   };

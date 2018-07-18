@@ -7,7 +7,7 @@ const config = require('../../../config');
 jest.mock('../../../aws');
 jest.mock('../../../config');
 
-describe('Activated Applicant DAO', () => {
+describe('Activations DAO', () => {
   beforeEach(() => {
     config.params.LAMBDA_ALIAS = { value: 'baz' };
     process.env.ACTIVATIONS_TABLE = 'Activations';
@@ -18,22 +18,16 @@ describe('Activated Applicant DAO', () => {
   it('write saves a valid activated applicant item to DynamoDb', async () => {
     await applicantDao.write({
       srCandidateId: 'candidateId',
-      sapEmployeeId: 'employeeId'
+      sapEmployeeId: 12345
     });
 
     const params = {
       Item: {
-        alias: {
-          S: 'baz'
-        },
-        srCandidateId: {
-          S: 'candidateId'
-        },
-        sapEmployeeId: {
-          N: 'employeeId'
-        }
+        alias: 'baz',
+        srCandidateId: 'candidateId',
+        sapEmployeeId: 12345
       },
-      TableName: 'Activations'
+      TableName: 'Activations',
     };
     expect(aws.putDynamoDbItem)
       .toHaveBeenCalledWith(params);

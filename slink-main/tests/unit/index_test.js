@@ -5,13 +5,15 @@ const index = require('../../index');
 const introduction = require('../../introduction');
 const activation = require('../../activation');
 const config = require('../../config');
-const runDao = require('../../dao/lastrundatedao');
+const lastRunDateDao = require('../../dao/lastrundatedao');
+const runsDao = require('../../dao/runsdao');
 const timeSource = require('../../timesource');
 
 jest.mock('../../introduction');
 jest.mock('../../activation');
 jest.mock('../../config');
 jest.mock('../../dao/lastrundatedao');
+jest.mock('../../dao/runsdao');
 jest.mock('../../timesource');
 
 const context = {
@@ -20,6 +22,8 @@ const context = {
 };
 
 describe('Handler invocation', () => {
+  const SERIAL_DATE = 2222;
+
   beforeEach(() => {
     // Clear all instances and calls to constructor and all methods
     introduction.process.mockClear();
@@ -55,13 +59,15 @@ describe('Handler invocation', () => {
       }
     };
 
-    timeSource.getSerialTime.mockReturnValue(2222);
+
+    timeSource.getSerialTime.mockReturnValue(SERIAL_DATE);
 
     await index.handler({}, context, (err, result) => {
       expect(introduction.process).toHaveBeenCalled();
       expect(activation.process).toHaveBeenCalled();
+      expect(lastRunDateDao.write).toHaveBeenCalledWith('requestid', SERIAL_DATE);
+      expect(runsDao.write).toHaveBeenCalledWith('requestid', SERIAL_DATE, result);
       expect(result).toEqual(expectedResult);
-      expect(runDao.write).toHaveBeenCalledWith('requestid', 2222);
     });
   });
 
@@ -70,6 +76,8 @@ describe('Handler invocation', () => {
     introduction.process.mockRejectedValue(new Error('Some random error occurred'));
     await index.handler({}, context, (err, result) => {
       console.log(`error: ${err}`);
+      expect(lastRunDateDao.write).toHaveBeenCalledWith('requestid', SERIAL_DATE);
+      expect(runsDao.write).toHaveBeenCalledWith('requestid', SERIAL_DATE, result);
       expect(result.statusCode).toEqual(500);
       expect(getType(result.body)).toEqual('object');
       expect(result.body).toEqual({ message: 'Error: Some random error occurred' });

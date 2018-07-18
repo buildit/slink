@@ -3,12 +3,16 @@
 const introduction = require('./introduction');
 const activation = require('./activation');
 const config = require('./config');
-const runDao = require('./dao/lastrundatedao');
+const lastRunDateDao = require('./dao/lastrundatedao');
+const runsDao = require('./dao/runsdao');
 const timeSource = require('./timesource');
 
 
 module.exports.handler = async (event, context, callback) => {
   console.info(`#### Function ARN:  ${context.invokedFunctionArn}`);
+  console.info(`#### Request ID:  ${context.awsRequestId}`);
+
+  const serialTime = timeSource.getSerialTime();
 
   try {
     await config.loadConfigParams(context);
@@ -16,7 +20,6 @@ module.exports.handler = async (event, context, callback) => {
     const introductionResult = await introduction.process();
     const activationResult = await activation.process();
 
-    await writeRunRecord(context);
 
     const response = {
       statusCode: 200,
@@ -27,25 +30,43 @@ module.exports.handler = async (event, context, callback) => {
                 `Candidate(s) activated in SAP: ${activationResult.successful}, failed: ${activationResult.unsuccessful}.`
       }
     };
-    console.info('Writing response:');
-    console.dir(response, { depth: null });
+
+    await writeLastRunDateRecord(context, serialTime);
+    await writeRunRecord(context, serialTime, response);
+
     callback(null, response);
   } catch (e) {
     console.error(`Error in handler:  ${e.message}`);
-    callback(e, {
+    const response = {
       statusCode: 500,
       body: { message: e.toString() }
-    });
+    };
+
+    await writeLastRunDateRecord(context, serialTime);
+    await writeRunRecord(context, serialTime, response);
+
+    callback(e, response);
   }
 };
 
-async function writeRunRecord(context) {
+async function writeLastRunDateRecord(context, serialDateTime) {
   try {
     const requestId = context.awsRequestId;
-    console.info(`Writing last run item to DynamoDb, ID: ${requestId}`);
-    await runDao.write(requestId, timeSource.getSerialTime());
+    console.info('Writing last run date item to DynamoDb, requestId:', requestId);
+    await lastRunDateDao.write(requestId, serialDateTime);
   } catch (e) {
-    console.error('Error writing last run item to DynamoDb unsuccessful', e);
+    console.error('Error writing last run date item to DynamoDb', e);
+    throw e;
+  }
+}
+
+async function writeRunRecord(context, serialDateTime, response) {
+  try {
+    const requestId = context.awsRequestId;
+    console.info('Writing run item to DynamoDb, requestId:', requestId);
+    await runsDao.write(requestId, serialDateTime, response);
+  } catch (e) {
+    console.error('Error writing run item to DynamoDb', e);
     throw e;
   }
 }
