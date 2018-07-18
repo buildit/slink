@@ -2,7 +2,7 @@
 
 const sr = require('./smartrecruiters');
 const sapAddEmployee = require('./sap/addemployee');
-const applicantDao = require('./dao/introductionsdao');
+const introductionsDao = require('./dao/introductionsdao');
 const util = require('./util');
 
 /*
@@ -26,17 +26,15 @@ const process = async () => {
       .map(async (applicant) => {
         const sanitizedApplicant = util.sanitizeApplicant(applicant);
 
-        console.info(`Preparing to post applicant to SAP: ${JSON.stringify(sanitizedApplicant)}`);
         const resumeNumber = util.generateResumeNumber();
+        console.info(`Posting applicant to SAP.  Resume number: ${resumeNumber}, applicant: ${JSON.stringify(sanitizedApplicant)}`);
         const employeeId = await sapAddEmployee.execute(applicant, resumeNumber);
 
         if (employeeId != null) {
-          await applicantDao.write({
-            srCandidateId: applicant.id,
-            slinkResumeNumber: resumeNumber,
-            sapEmployeeId: employeeId
-          });
+          console.info('Writing item to introduction table for candidate', applicant.id);
+          await writeIntroductionRecord(applicant, resumeNumber, employeeId);
 
+          console.info('Posting SAP employee ID to SmartRecruiters for candidate', applicant.id);
           sanitizedApplicant.employeeId = employeeId;
           const srSuccess = await postEmployeeIdToSmartRecruiters(employeeId, applicant);
 
@@ -80,6 +78,14 @@ async function postEmployeeIdToSmartRecruiters(employeeId, applicant) {
     applicant.primaryAssignment.job.id,
     employeeId
   );
+}
+
+async function writeIntroductionRecord(applicant, resumeNumber, employeeId) {
+  await introductionsDao.write({
+    srCandidateId: applicant.id,
+    slinkResumeNumber: resumeNumber,
+    sapEmployeeId: employeeId
+  });
 }
 
 module.exports = {
