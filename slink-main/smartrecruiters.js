@@ -7,6 +7,15 @@ const config = require('./config');
 
 const CONCURRENT_APPLICANTS = 3;
 
+async function getCandidateSummaries(status, subStatus, limit) {
+  const baseUrl = config.params.SR_SUMMARY_URL.value;
+  const queryString = `status=${status}&subStatus=${subStatus}&limit=${limit}`;
+  const fullUrl = `${baseUrl}?${queryString}`;
+  console.log('SR query:', fullUrl);
+
+  return srGet(fullUrl);
+}
+
 /**
  * Obtains applicant data, including summary, detail, and properties.
  * @param updatedAfter Date/time (ISO format) to restrict returned applicants (pass through to SR).
@@ -165,5 +174,7 @@ function getCode(property) {
 
 module.exports = {
   getApplicants,
-  storeEmployeeId
+  storeEmployeeId,
+  getCandidateSummaries,
+  toApplicant
 };
