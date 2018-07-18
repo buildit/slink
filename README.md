@@ -4,16 +4,16 @@ _Slink_ is a SmartRecruiters to SAP integration service.  It is implemented usin
 ```
                          +--------------------+
                          |  CloudWatch Event  |
-                         +--------------------+
+                         +---------+----------+
                                    |
-                                   |  Scheduled Trigger
-                                   |
-                                   |
-+-----------------+   GET   +------v------+    POST    +---------+
++------------------+               |
+| SSM Param Store  <---------+     |  Scheduled Trigger
++------------------+         |     |
+                             |     |
+                             |     |
++-----------------+   GET   ++-----v------+    POST    +---------+
 | SmartRecruiters <---------+    Lambda   +------------>   SAP   |
-+-----------------+         +-------------+            +---------+
-                                   |
-                                   |
++-----------------+         +------+------+            +---------+
                                    |
                                    |
                                    |
@@ -22,11 +22,14 @@ _Slink_ is a SmartRecruiters to SAP integration service.  It is implemented usin
                             +-------------+
                          (State/Medata/Stats)
 
+
 ```
 
 A scheduled CloudWatch Event triggers the Lambda function, which queries SmartRecruiters for candidates in certain 
 states, converts them to "applicants", and then posts them to SAP, to either "introduce" them to SAP, or to "activate" 
-them in SAP.  Minimal data about the runs, introductions, and activations is stored in DynamoDB.
+them in SAP.  Private/secret configuration data is obtained from Amazon's SSM Param Store.  Minimal data about the 
+runs, introductions, and activations is stored in DynamoDB.
+
 
 # Building and Deploying #
 
@@ -41,11 +44,13 @@ them in SAP.  Minimal data about the runs, introductions, and activations is sto
 - `npm install`
 - `npm test -- --silent` (silent causes `console.log()` messages not to print, giving cleaner output)
 
-_Note_:  The solution is modular.  That is, there are several "module" subdirectories within the source tree.  Each
-module represents a Lambda function and has its own `package.json`.  We are striving to keep the commands the same
-within a given module as within the project root.  However, since `npm` does not support hierarchical project structures
-in the same way as say Java's Maven or Gradle, when in doubt, run `npm` commands from within the module you're
-working with first, since that's what is actually built by the CI/CD pipeline.
+_Note_:  The solution was intended to be modular.  That is, there are can be several "module" subdirectories within 
+the source tree (though there is currently only one).  Each module is meant to represent a Lambda function and has 
+its own `package.json`.  We were striving to keep the commands the same within a given module as within the project 
+root.  However, since `npm` does not support hierarchical project structures in the same way as say Java's Maven or 
+Gradle, when in doubt, run `npm` commands from within the module you're working with first, since that's what is 
+actually built by the CI/CD pipeline.
+
 
 ## Running Lambda Functions Locally via "SAM Local" ##
 There is a CodeStar-managed CodePipeline in AWS that runs tests and deploys the function(s) in this package.  But what 
@@ -91,7 +96,10 @@ if you want to run/test locally?
     ❯ aws dynamodb list-tables --endpoint-url http://<some IP for Dynamo>:8000
     {
         "TableNames": [
-            "LastRunDateTable"
+            "Activations",
+            "Introductions",
+            "LastRunDate",
+            "Runs"
         ]
     }
     ```
@@ -102,11 +110,24 @@ See [AWS docs](https://github.com/awslabs/aws-sam-cli#invoke-functions-locally).
 
 Adding up all the above, the command to run locally is:
 
-`LOCAL_DYNAMO_IP=<some IP for Dynamo> LAST_RUN_DATE_TABLE=LastRunDateTable sam local invoke SlinkMainFunction -e event.json`
+```$bash
+LOCAL_DYNAMO_IP=10.1.1.22
+LAST_RUN_DATE_TABLE=LastRunDate \
+RUN_TABLE=Runs \
+INTRODUCTIONS_TABLE=Introductions \
+ACTIVATIONS_TABLE=Activations \
+sam local invoke SlinkMainFunction -e event.json
+```
 
-_**Note**_: Runtime configuration settings are managed in AWS Parameter Store. There are two sets of configuration settings 
-for STAGE and PROD environments. When running locally via SAM local, we use the STAGE configuration. The parameters are 
-managed under /slink path in AWS Parameter Store.
+_**Note**_: Runtime configuration settings and secrets are manually managed in AWS Parameter Store. There are two sets of 
+configuration settings for STAGE and PROD environments. When running locally via SAM local, the code automatically 
+uses the STAGE configuration. The parameters are managed under the `/slink` path in AWS Parameter Store, as follows:
+
+Pattern:
+`/slink/[environment]/grouping/name`
+
+Example:
+`/slink/STAGE/smartrecruiters/EMPLOYEE_PROP_ID`
 
 #### Troubleshooting
 If you get a `Requested resource not found` error, then you probably screwed up your local DynamoDb setup.
