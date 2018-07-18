@@ -5,7 +5,7 @@ const config = require('../config');
 
 async function write(requestId, runSerialDate) {
   const table = process.env.LAST_RUN_DATE_TABLE;
-  console.trace(`Writing to table: ${table}`);
+  console.info(`Writing to table: ${table}`);
 
   const params = {
     Item: {
