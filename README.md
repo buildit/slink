@@ -28,7 +28,7 @@ _Slink_ is a SmartRecruiters to SAP integration service.  It is implemented usin
 A scheduled CloudWatch Event triggers the Lambda function, which queries SmartRecruiters for candidates in certain 
 states, converts them to "applicants", and then posts them to SAP, to either "introduce" them to SAP, or to "activate" 
 them in SAP.  Private/secret configuration data is obtained from Amazon's SSM Param Store.  Minimal data about the 
-runs, introductions, and activations is stored in DynamoDB.
+runs, introductions, and activations is (intended to be) stored in DynamoDB.
 
 
 # Building and Deploying #
@@ -159,6 +159,52 @@ Note that the `PROD` alias is executed by the scheduled CloudWatch Event.  The `
 using the Lambda's URL or in the Lambda console:
 
 `https://<see codestart project page>/Stage/slink`
+
+
+## Trivia and Gotchas ##
+
+#### Not all DynamoDB tables have code to populate them
+
+###### Activations Table
+In the introduction process a new candidate is added to the SAP HR system, and an employee ID is handed back.  That
+employee ID is then stored (PUT) in a SmartRecruiters custom property.  We don't want to introduce a given candidate more
+than once.  A trick that we used to avoid re-introducing a candidate, without using DynamoDB, was to include the 
+candidate employee ID property when building an applicant.  Then, we just skip those applicants that already have 
+an employee ID.  Obviously, this could have been achieved by storing in DynamoDB but the original approach a) fulfilled
+the requirement to store the employee ID in SmartRecruiters, and b) didn't need DynamoDB to actually work (we wrote
+this feature before adding DynamoDB to the mix of tech). 
+
+###### Runs Table
+The idea of the `Run` table was to capture statistics about a given run (basically stuff you see in the function's 
+response).  One could imagine a simple API that would scan the run table and return to a CLI or web client.  We never 
+got to it, but decided to leave the table definition in place so at least the idea was captured.  There's no cost
+(that I know of) for an unwritten/read DynamoDB table.  
+
+#### Log messages are not separated by alias
+AWS doesn't magically write the function alias into log records that appear in CloudWatch logs.  Therefore, it's 
+difficult to be sure which alias' messages you're looking at.  We do write a log as the process starts, which looks
+something like this:
+```
+2018-07-18T15:52:51.979Z	a04d0fd9-8aa2-11e8-9030-ad46d7b7496e	#### Function ARN: arn:aws:lambda:us-east-1:000000000000:function:awscodestar-xxx-xxx-xxx-SlinkMainFunction-XXXXXXXX:STAGE 
+```
+It will be followed by the logs for that run, but there's nothing to prevent logs from being intermingled if another
+invocation occurs.  There is a card to address this, but we never got to it.
+ 
+#### CodeStar is an odd beast
+CodeStar is basically a wizard that creates a repo, and a CI/CD pipeline pointing to that repo on your behalf.  It 
+magically starts building the code in your repo and deploying it.  However, it occupies kind-of an "uncanny valley" 
+of automation.  If you wanted to move the project to a different region for some reason, that won't be straightforward:  
+you can't just grab the CI/CD CloudFormation template and run it as-is, because it contains a CodeStar resource that 
+can't actually be created from CloudFormation (yeah, you will get an error message if you try). 
+
+That aside, there are some ways to have CodeStar point to a different repo than the one it originally created.
+If you act as though you want to do an update on the CI/CD CloudFormation stack created by CodeStar, you'll see that
+a couple of parameters refer to repository details (URL and token, at least).
+
+#### The Code in the project is not what CodeStar wanted us to have
+CodeStar created our Lambda/Node project using _Express_ for some reason, rather than just a handler method, as with
+traditional Lambda/Javascript functions.  We converted it to just use `index.js::handler methods`.  Express seemed 
+like an additional level of indirection and complication that was not needed.
 
 
 ## Team Practices ##
