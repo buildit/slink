@@ -27,10 +27,10 @@ Resources:
       AutoPublishAlias: STAGE
       Environment:
         Variables:
-          RUN_TABLE: !Ref RunTable
-          LAST_RUN_DATE_TABLE: !Ref LastRunDateTable
-          INTRODUCTIONS_TABLE: Introductions
-          ACTIVATIONS_TABLE: Activations
+          RUN_TABLE: !Ref Runs
+          LAST_RUN_DATE_TABLE: !Ref LastRunDate
+          INTRODUCTIONS_TABLE: !Ref Introductions
+          ACTIVATIONS_TABLE: !Ref Activations
           LOCAL_DYNAMO_IP: ''
       Role:
         Fn::ImportValue:
@@ -42,7 +42,7 @@ Resources:
             Method: get
             Path: /slink
 
-  RunTable:
+  Runs:
     Type: "AWS::DynamoDB::Table"
     Properties:
       AttributeDefinitions:
@@ -63,7 +63,7 @@ Resources:
         ReadCapacityUnits: "5"
         WriteCapacityUnits: "5"
 
-  LastRunDateTable:
+  LastRunDate:
     Type: "AWS::DynamoDB::Table"
     Properties:
       AttributeDefinitions:
@@ -79,7 +79,7 @@ Resources:
         WriteCapacityUnits: "5"
 
 
-  Applicant:
+  Introductions:
     Type: "AWS::DynamoDB::Table"
     Properties:
       AttributeDefinitions:
@@ -100,7 +100,7 @@ Resources:
         ReadCapacityUnits: "5"
         WriteCapacityUnits: "5"
 
-  ActivatedApplicant:
+  Activations:
     Type: "AWS::DynamoDB::Table"
     Properties:
       AttributeDefinitions:
