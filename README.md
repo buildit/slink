@@ -22,7 +22,8 @@ in the same way as say Java's Maven or Gradle, when in doubt, run `npm` commands
 working with first, since that's what is actually built by the CI/CD pipeline.
 
 ## Running Lambda Functions Locally via "SAM Local" ##
-There is a CodeStar-managed CodePipeline in AWS that runs tests and deploys the function(s) in this package.  But what if you want to run/test locally?
+There is a CodeStar-managed CodePipeline in AWS that runs tests and deploys the function(s) in this package.  But what 
+if you want to run/test locally?
 
 #### To Work with AWS from the command-line
 - [Install and configure the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/installing.html) 
@@ -89,17 +90,33 @@ If you get a `Requested resource not found` error, then you probably screwed up 
 The code is automatically built and deployed by CodeStar when code is committed to `master`.  Currently, branches
 are not built by the CI/CD system.
 
-Please see the [CodeStar Dashboard](https://console.aws.amazon.com/codestar/home?region=us-east-1#/projects/buildit-slink/dashboard) to check deployment status.  
+Please see the [CodeStar Dashboard](https://console.aws.amazon.com/codestar/home?region=us-east-1#/projects/buildit-slink/dashboard) 
+to check deployment status.  
 Contact a team member, if you don't have access.
+
+## Lambda "Environments" and Promotions ##
+
+### Environments ###
+Lambda doesn't support environments per-se.  Instead, Amazon maintains a linear version history of a given Lambda's 
+code, and uses ["aliases"] (https://docs.aws.amazon.com/lambda/latest/dg/versioning-aliases.html) to tag versions.  
+Amazon maintains an alias called `$LATEST` that is automatically moved to a new version.  However, developers can
+create and use any number of aliases and then use the alias(es) to execute a given version of a Lambda.
+
+Specifically for Slink, there is a `STAGE` alias that is automatically moved to the latest version of the function 
+on each successful build.  `STAGE` always corresponds to the `$LATEST` automatic alias.
+
+There is a separate, _manually maintained_ alias called `PROD`.  The reason the `PROD` alias 
+is moved manually is to allow for controlled promotion of the Lambda once it is proven out in staging.
+
+Note that the `PROD` alias is executed by the scheduled CloudWatch Event.  The `STAGE` alias can only be executed
+using the Lambda's URL or in the Lambda console:
+
+`https://<see codestart project page>/Stage/slink`
 
 
 ## Team Practices ##
-- We track work using Github issues and the [project board](https://github.com/buildit/slink/projects/1).
-- We use trunk-based development using `master` as "trunk".  
-- We encourage the use of _short-lived_ Feature Branches followed by Pull Requests (PRs).
-- PR author performs the merge, and we prefer at least one approval from a PR reviewer before merge.
-- We encourage Github "squash merges" for branches with messy commits. 
-- Minor fixes/doc changes, etc, can go straight to `master`.
+See (Contributing)[./CONTRIBUTING.md]
+
 
 # Original CodeStar Content    
 <details>
