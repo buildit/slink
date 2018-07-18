@@ -3,7 +3,7 @@
 const introduction = require('./introduction');
 const activation = require('./activation');
 const config = require('./config');
-const runDao = require('./lastrundatedao');
+const runDao = require('./dao/lastrundatedao');
 const timeSource = require('./timesource');
 
 

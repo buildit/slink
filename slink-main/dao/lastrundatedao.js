@@ -1,9 +1,12 @@
 'use strict';
 
-const aws = require('./aws');
-const config = require('./config');
+const aws = require('../aws');
+const config = require('../config');
 
 async function write(requestId, runSerialDate) {
+  const table = process.env.LAST_RUN_DATE_TABLE;
+  console.trace(`Writing to table: ${table}`);
+
   const params = {
     Item: {
       alias: {
@@ -16,7 +19,7 @@ async function write(requestId, runSerialDate) {
         N: `${runSerialDate}`
       }
     },
-    TableName: process.env.LAST_RUN_DATE_TABLE
+    TableName: table
   };
   return aws.putDynamoDbItem(params);
 }

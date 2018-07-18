@@ -1,11 +1,11 @@
 'use strict';
 
-const aws = require('../../aws');
-const lastRunDateDao = require('../../lastrundatedao');
-const config = require('../../config');
+const aws = require('../../../aws');
+const lastRunDateDao = require('../../../dao/lastrundatedao');
+const config = require('../../../config');
 
-jest.mock('../../aws');
-jest.mock('../../config');
+jest.mock('../../../aws');
+jest.mock('../../../config');
 
 describe('Run DAO', () => {
   beforeEach(() => {

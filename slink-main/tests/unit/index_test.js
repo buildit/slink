@@ -5,13 +5,13 @@ const index = require('../../index');
 const introduction = require('../../introduction');
 const activation = require('../../activation');
 const config = require('../../config');
-const runDao = require('../../lastrundatedao');
+const runDao = require('../../dao/lastrundatedao');
 const timeSource = require('../../timesource');
 
 jest.mock('../../introduction');
 jest.mock('../../activation');
 jest.mock('../../config');
-jest.mock('../../lastrundatedao');
+jest.mock('../../dao/lastrundatedao');
 jest.mock('../../timesource');
 
 const context = {
