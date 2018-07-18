@@ -5,7 +5,7 @@ const asyncThrottle = require('async-throttle');
 const R = require('ramda');
 const config = require('./config');
 
-const CONCURRENT_APPLICANTS = 3;
+const CONCURRENT_APPLICANTS = 4;
 
 /**
  * Obtains applicant data, including summary, detail, and properties.
