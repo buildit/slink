@@ -1,8 +1,34 @@
 # Slink Project #
 _Slink_ is a SmartRecruiters to SAP integration service.  It is implemented using AWS Lambda, using the Javascript/Node "flavor", and is built and deployed using AWS' CodeStar CI/CD product.
 
-# Building and Deploying #
+```
+                         +--------------------+
+                         |  CloudWatch Event  |
+                         +--------------------+
+                                   |
+                                   |  Scheduled Trigger
+                                   |
+                                   |
++-----------------+   GET   +------v------+    POST    +---------+
+| SmartRecruiters <---------+    Lambda   +------------>   SAP   |
++-----------------+         +-------------+            +---------+
+                                   |
+                                   |
+                                   |
+                                   |
+                                   |
+                            +------v------+
+                            |   DynamoDB  |
+                            +-------------+
+                         (State/Medata/Stats)
 
+```
+
+A scheduled CloudWatch Event triggers the Lambda function, which queries SmartRecruiters for candidates in certain 
+states, converts them to "applicants", and then posts them to SAP, to either "introduce" them to SAP, or to "activate" 
+them in SAP.  Minimal data about the runs, introductions, and activations is stored in DynamoDB.
+
+# Building and Deploying #
 
 ## Dependencies ##
 - Node 8.10+ / NPM 5.6.0+
