@@ -27,7 +27,7 @@ Resources:
       AutoPublishAlias: STAGE
       Environment:
         Variables:
-          RUN_TABLE: !Ref Runs
+          RUNS_TABLE: !Ref Runs
           LAST_RUN_DATE_TABLE: !Ref LastRunDate
           INTRODUCTIONS_TABLE: !Ref Introductions
           ACTIVATIONS_TABLE: !Ref Activations

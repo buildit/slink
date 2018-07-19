@@ -7,7 +7,7 @@ const config = require('../../../config');
 jest.mock('../../../aws');
 jest.mock('../../../config');
 
-describe('Applicant DAO', () => {
+describe('Introductions DAO', () => {
   beforeEach(() => {
     config.params.LAMBDA_ALIAS = { value: 'baz' };
     process.env.INTRODUCTIONS_TABLE = 'Introductions';
@@ -19,23 +19,15 @@ describe('Applicant DAO', () => {
     await applicantDao.write({
       srCandidateId: 'candidateId',
       slinkResumeNumber: 'resumeNumber',
-      sapEmployeeId: 'employeeId'
+      sapEmployeeId: 12345
     });
 
     const params = {
       Item: {
-        alias: {
-          S: 'baz'
-        },
-        srCandidateId: {
-          S: 'candidateId'
-        },
-        slinkResumeNumber: {
-          S: 'resumeNumber'
-        },
-        sapEmployeeId: {
-          N: 'employeeId'
-        }
+        alias: 'baz',
+        srCandidateId: 'candidateId',
+        slinkResumeNumber: 'resumeNumber',
+        sapEmployeeId: 12345
       },
       TableName: 'Introductions'
     };

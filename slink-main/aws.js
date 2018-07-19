@@ -14,7 +14,7 @@ const getParams = async (paramPath, awsRegion) => awsParamStore.getParametersByP
 
 const putDynamoDbItem = async (params) => {
   const dynamoDb = createDynamoDb();
-  return dynamoDb.putItem(params).promise();
+  return dynamoDb.put(params).promise();
 };
 
 const getDynamoDbItem = async (params) => {
@@ -24,14 +24,14 @@ const getDynamoDbItem = async (params) => {
 
 function createDynamoDb() {
   if (process.env.LOCAL_DYNAMO_IP === '' || process.env.LOCAL_DYNAMO_IP.length === 0) {
-    return new AWS.DynamoDB();
+    return new AWS.DynamoDB.DocumentClient();
   }
 
   const url = `http://${process.env.LOCAL_DYNAMO_IP}:8000`;
   console.info('NOTE:  Using local DynamoDb url:', url);
   const localEndpoint = { endpoint: new AWS.Endpoint(url) };
 
-  return new AWS.DynamoDB(localEndpoint);
+  return new AWS.DynamoDB.DocumentClient(localEndpoint);
 }
 
 module.exports = {
