@@ -98,6 +98,8 @@ describe('Applicant activation process', () => {
 
     const results = await activation.process();
 
+    expect(smartrecruiters.getApplicants).toHaveBeenCalledWith('OFFERED', 'Onboarding');
+
     expect(sapActivateEmployee.execute).toHaveBeenCalledWith(successApplicant1);
     expect(sapActivateEmployee.execute).toHaveBeenCalledWith(successApplicant2);
     expect(sapActivateEmployee.execute).toHaveBeenCalledWith(sapFailApplicant);

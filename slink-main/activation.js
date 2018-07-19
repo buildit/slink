@@ -7,7 +7,7 @@ const util = require('./util');
 
 const process = async () => {
   console.info('### Starting ACTIVATION process');
-  const applicants = await sr.getApplicants({ subStatus: 'ONBOARDING' });
+  const applicants = await sr.getApplicants('OFFERED', 'Onboarding');
   console.info(`Activation: Collected ${applicants.length} applicants from SmartRecruiters`);
 
   const splitByFte = util.split(applicant => applicant.fullTime === true);

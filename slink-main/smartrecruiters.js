@@ -9,17 +9,12 @@ const CONCURRENT_APPLICANTS = 4;
 
 /**
  * Obtains applicant data, including summary, detail, and properties.
- * @param updatedAfter Date/time (ISO format) to restrict returned applicants (pass through to SR).
  * @param status SR status filter.
  * @param subStatus SR substatus filter.
  * @param limit Maximum results to return from SR.
  * @return {Promise<any[]>}
  */
-const getApplicants = async ({
-  status = 'OFFERED',
-  subStatus = 'Offer Accepted',
-  limit = 100
-} = {}) => {
+const getApplicants = async (status, subStatus, limit = 100) => {
   const baseUrl = config.params.SR_SUMMARY_URL.value;
   const queryString = `status=${status}&subStatus=${subStatus}&limit=${limit}`;
   const fullUrl = `${baseUrl}?${queryString}`;

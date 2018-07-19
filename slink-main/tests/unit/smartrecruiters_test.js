@@ -29,7 +29,7 @@ describe('Get candidate summary', () => {
   it('builds applicant if required data is present', async () => {
     get.mockResolvedValueOnce(testmodels.sr.jobProperties);
 
-    const response = await smartrecruiters.getApplicants();
+    const response = await smartrecruiters.getApplicants('OFFERED', 'Offer Accepted');
 
     expectSmartRecruitersCalls();
     expect(response[0]).toEqual(testmodels.applicant);
@@ -44,24 +44,12 @@ describe('Get candidate summary', () => {
     });
     get.mockResolvedValueOnce(jobPropertiesWithEmployeeId);
 
-    const response = await smartrecruiters.getApplicants();
+    const response = await smartrecruiters.getApplicants('OFFERED', 'Offer Accepted');
 
     expectSmartRecruitersCalls();
     const applicantWithEmployeeId = Object.assign({}, testmodels.applicant);
     applicantWithEmployeeId.employeeId = 12345;
     expect(response[0]).toEqual(applicantWithEmployeeId);
-  });
-
-  it('can take different query parameters', async () => {
-    const query = {
-      updatedAfter: '2018-07-01', status: 'OFFERED', subStatus: 'onboarding', limit: 100
-    };
-    get.mockResolvedValueOnce(testmodels.sr.jobProperties);
-    const response = await smartrecruiters.getApplicants(query);
-    expect(response.length).toBeGreaterThan(0);
-    const queryString = `status=${query.status}&subStatus=${query.subStatus}&limit=${query.limit}`;
-    expect(get.mock.calls[0][0])
-      .toBe(`${config.params.SR_SUMMARY_URL.value}?${queryString}`);
   });
 
   it('throws an exception on failure', () => {

@@ -11,7 +11,7 @@ const util = require('./util');
  */
 const process = async () => {
   console.info('### Starting INTRODUCTION process');
-  const applicants = await sr.getApplicants();
+  const applicants = await sr.getApplicants('OFFERED', 'Offer Accepted');
 
   const splitByFte = util.split(applicant => applicant.fullTime === true);
   const splitByNeedsIntroduction = util.split(applicant => applicant.employeeId === null);

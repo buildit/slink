@@ -118,6 +118,8 @@ describe('Applicant introduction process', () => {
 
     const results = await introduction.process();
 
+    expect(smartrecruiters.getApplicants).toHaveBeenCalledWith('OFFERED', 'Offer Accepted');
+
     expect(util.generateResumeNumber).toHaveBeenCalledTimes(4);
 
     expect(sapAddEmployee.execute).toHaveBeenCalledWith(successApplicant1, 1111);
