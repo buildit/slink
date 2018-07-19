@@ -23,10 +23,21 @@ const process = async () => {
   const applicantsActivatedInSap =
     await Promise.all(ftesWithId.matches
       .map(async (fteWithId) => {
+        const sanitizeApplicant = util.sanitizeApplicant(fteWithId);
+
+        const readApplicant = await activatedApplicantDao.read(fteWithId.id);
+        if (Object.keys(readApplicant).length !== 0) {
+          return {
+            applicant: sanitizeApplicant,
+            status: 'Skipped',
+            reason: 'Already activated'
+          };
+        }
+
         const sapStatus = await sapActivateEmployee.execute(fteWithId);
 
         const result = {
-          applicant: util.sanitizeApplicant(fteWithId),
+          applicant: sanitizeApplicant,
           status: (sapStatus ? 'Succeeded' : 'Failed')
         };
 
@@ -46,13 +57,16 @@ const process = async () => {
 
   const successfulActivations = applicantsActivatedInSap.filter(item => item.status === 'Succeeded');
   const unsuccessfulActivations = applicantsActivatedInSap.filter(item => item.status === 'Failed');
+  const skippedActivations = applicantsActivatedInSap.filter(item => item.status === 'Skipped');
 
   const result = {
     attempted: successfulActivations.length + unsuccessfulActivations.length,
     successful: successfulActivations.length,
+    skipped: skippedActivations.length,
     unsuccessful: unsuccessfulActivations.length,
     successfulApplicants: successfulActivations,
-    unsuccessfulApplicants: unsuccessfulActivations
+    unsuccessfulApplicants: unsuccessfulActivations,
+    skippedApplicants: skippedActivations
   };
 
   console.info(`Activation process complete. Results: ${JSON.stringify(result)}`);

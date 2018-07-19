@@ -49,7 +49,7 @@ const execute = async (applicant) => {
  *        the "SR-SAP Integration Spec Overview" document that can
  *        be found in Confluence (http://tinyurl.com/ycxhsfoj).
  * @param applicant Applicant built from SR data.
- * @returns fully filled-out body that can be posted to SAP
+ * @return {{inputs: {EmployeeNumber: (number|null|string|*), ChangedBy: string, DOJ: string, Action: string, Comments: string, Company: string, External_AppId: string}}}
  */
 function buildPostBody(applicant) {
   return {

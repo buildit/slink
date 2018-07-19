@@ -13,25 +13,34 @@ const AWS = require('aws-sdk');
 const getParams = async (paramPath, awsRegion) => awsParamStore.getParametersByPath(paramPath, { region: awsRegion });
 
 const putDynamoDbItem = async (params) => {
-  const dynamoDb = createDynamoDb();
+  const dynamoDb = createDynamoDbDocClient();
   return dynamoDb.put(params).promise();
 };
 
+// TODO:  convert read to doc client
 const getDynamoDbItem = async (params) => {
   const dynamoDb = createDynamoDb();
   return dynamoDb.getItem(params).promise();
 };
 
-function createDynamoDb() {
+function createDynamoDbDocClient() {
   if (process.env.LOCAL_DYNAMO_IP === '' || process.env.LOCAL_DYNAMO_IP.length === 0) {
     return new AWS.DynamoDB.DocumentClient();
   }
+  return new AWS.DynamoDB.DocumentClient(buildLocalEndpoint());
+}
 
+function createDynamoDb() {
+  if (process.env.LOCAL_DYNAMO_IP === '' || process.env.LOCAL_DYNAMO_IP.length === 0) {
+    return new AWS.DynamoDB();
+  }
+  return new AWS.DynamoDB(buildLocalEndpoint());
+}
+
+function buildLocalEndpoint() {
   const url = `http://${process.env.LOCAL_DYNAMO_IP}:8000`;
   console.info('NOTE:  Using local DynamoDb url:', url);
-  const localEndpoint = { endpoint: new AWS.Endpoint(url) };
-
-  return new AWS.DynamoDB.DocumentClient(localEndpoint);
+  return { endpoint: new AWS.Endpoint(url) };
 }
 
 module.exports = {

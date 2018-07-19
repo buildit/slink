@@ -19,11 +19,12 @@ describe('Applicant activation process', () => {
     smartrecruiters.getApplicants.mockClear();
     sapActivateEmployee.execute.mockClear();
     activationsDao.write.mockClear();
+    activationsDao.read.mockClear();
   });
 
   it('calls SAP for each FTE Applicant from SmartRecruiters, and activates each Employee', async () => {
     const successApplicant1 = {
-      id: 'guid1',
+      id: 'successGuid1',
       employeeId: 1000,
       lastName: 'One',
       firstName: 'Applicant',
@@ -36,7 +37,7 @@ describe('Applicant activation process', () => {
       }
     };
     const successApplicant2 = {
-      id: 'guid2',
+      id: 'successGuid2',
       employeeId: 1001,
       lastName: 'Two',
       firstName: 'Applicant',
@@ -62,7 +63,7 @@ describe('Applicant activation process', () => {
       }
     };
     const sapFailApplicant = {
-      id: 'guid3',
+      id: 'sapFailGuid',
       employeeId: 1002,
       lastName: 'Three',
       firstName: 'SAP Employee ID Failure',
@@ -75,11 +76,18 @@ describe('Applicant activation process', () => {
       }
     };
     const contractorApplicant = {
-      id: 'guid4',
+      id: 'contractorGuid',
       employeeId: 1003,
       lastName: 'Four',
       firstName: 'Contractor Applicant',
       fullTime: false
+    };
+    const alreadyActivatedApplicant = {
+      id: 'alreadyActivatedGuid',
+      employeeId: 1005,
+      lastName: 'Five',
+      firstName: 'Activated Applicant',
+      fullTime: true
     };
 
     const applicants = [
@@ -87,16 +95,25 @@ describe('Applicant activation process', () => {
       contractorApplicant,
       successApplicant2,
       noEmployeeIdCandidate,
-      sapFailApplicant
+      sapFailApplicant,
+      alreadyActivatedApplicant
     ];
 
     smartrecruiters.getApplicants.mockResolvedValueOnce(applicants);
 
+    const activationItem = {
+      someProperty: 'someValue'
+    };
+    activationsDao.read.mockReturnValueOnce({});
     sapActivateEmployee.execute.mockReturnValueOnce(true);
+    activationsDao.read.mockReturnValueOnce({});
     sapActivateEmployee.execute.mockReturnValueOnce(true);
+    activationsDao.read.mockReturnValueOnce({});
     sapActivateEmployee.execute.mockReturnValueOnce(false);
+    activationsDao.read.mockReturnValueOnce(activationItem);
 
     const results = await activation.process();
+    console.log(results);
 
     expect(smartrecruiters.getApplicants).toHaveBeenCalledWith('OFFERED', 'Onboarding');
 
@@ -105,15 +122,15 @@ describe('Applicant activation process', () => {
     expect(sapActivateEmployee.execute).toHaveBeenCalledWith(sapFailApplicant);
 
     expect(activationsDao.write)
-      .toHaveBeenCalledWith({ srCandidateId: 'guid1', sapEmployeeId: 1000 });
+      .toHaveBeenCalledWith({ srCandidateId: 'successGuid1', sapEmployeeId: 1000 });
     expect(activationsDao.write)
-      .toHaveBeenCalledWith({ srCandidateId: 'guid2', sapEmployeeId: 1001 });
+      .toHaveBeenCalledWith({ srCandidateId: 'successGuid2', sapEmployeeId: 1001 });
 
     expect(sapActivateEmployee.execute).toHaveBeenCalledTimes(3);
     expect(activationsDao.write).toHaveBeenCalledTimes(2);
 
     expect(results.attempted)
-      .toBe(applicants.length - 2); // Contractors and already-introduced applicants are not processed
+      .toBe(applicants.length - [noEmployeeIdCandidate, contractorApplicant, alreadyActivatedApplicant].length);
 
     expect(results.successful)
       .toBe(2);
@@ -134,12 +151,20 @@ describe('Applicant activation process', () => {
       status: 'Failed',
       reason: 'SAP post failure'
     };
+    const skippedResult = {
+      applicant: util.sanitizeApplicant(alreadyActivatedApplicant),
+      status: 'Skipped',
+      reason: 'Already activated'
+    };
 
     expect(results.successfulApplicants)
       .toEqual([successResult1, successResult2]);
 
     expect(results.unsuccessfulApplicants)
       .toEqual([sapFailResult]);
+
+    expect(results.skippedApplicants)
+      .toEqual([skippedResult]);
   });
 });
 
