@@ -207,6 +207,16 @@ traditional Lambda/Javascript functions.  We converted it to just use `index.js:
 like an additional level of indirection and complication that was not needed.
 
 
+#### Handy Local DynamoDB commands
+`aws dynamodb list-tables --endpoint-url http://localhost:8000`
+
+`aws dynamodb scan --table-name Activations --endpoint-url http://localhost:8000 --output text`
+
+`aws dynamodb delete-table --table-name Activations --endpoint-url http://localhost:8000`
+
+Note that you can delete a single table and then re-run the create script.  It will error out on the tables that
+are still present, but create any missing ones.
+
 ## Team Practices ##
 See (Contributing)[./CONTRIBUTING.md]
 
