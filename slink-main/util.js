@@ -11,7 +11,8 @@ const sanitizeApplicant = applicant => R.pick(['id', 'lastName', 'firstName'], a
  */
 function generateResumeNumber() {
   const min = 350000; // determined by choosing a number significantly higher than that used for manual Postman tests.
-  const max = 9999999999; // Max allowed by API, and should give us enough integer space to mostly avoid duplicates.
+  // const max = 9999999999; // Max allowed by API, and should give us enough integer space to mostly avoid duplicates.
+  const max = 99999999; // Max allowed by API is 8 digit resume number
   return Math.floor((Math.random() * (max - min)) + min);
 }
 

@@ -111,7 +111,7 @@ See [AWS docs](https://github.com/awslabs/aws-sam-cli#invoke-functions-locally).
 Adding up all the above, the command to run locally is:
 
 ```$bash
-LOCAL_DYNAMO_IP=10.1.1.22
+LOCAL_DYNAMO_IP=10.1.1.22 \
 LAST_RUN_DATE_TABLE=LastRunDate \
 RUNS_TABLE=Runs \
 INTRODUCTIONS_TABLE=Introductions \

@@ -62,3 +62,9 @@ typings/
 
 # Intellij environment settings
 .idea/
+
+# local vs code debug launches 
+launch.json
+
+# lock file
+package-lock.json
