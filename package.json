@@ -27,7 +27,9 @@
       "**/tests/**/*_test.js?(x)"
     ],
     "testEnvironment": "node",
-    "verbose": true
+    "verbose": true,
+    "collectCoverage": true,
+    "collectCoverageFrom": ["slink-main/**/*.{js,jsx}"]
   },
   "precommit": [
     "eslint",

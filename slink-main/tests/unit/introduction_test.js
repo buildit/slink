@@ -120,7 +120,8 @@ describe('Applicant introduction process', () => {
 
     expect(smartrecruiters.getApplicants).toHaveBeenCalledWith('OFFERED', 'Offer Accepted');
 
-    expect(util.generateResumeNumber).toHaveBeenCalledTimes(4);
+    /* NOTE: It'll call 5 times including one failure because of retry logic */
+    expect(util.generateResumeNumber).toHaveBeenCalledTimes(5);
 
     expect(sapAddEmployee.execute).toHaveBeenCalledWith(successApplicant1, 1111);
     expect(sapAddEmployee.execute).toHaveBeenCalledWith(srFailApplicant, 6666);
@@ -130,7 +131,8 @@ describe('Applicant introduction process', () => {
     expect(introductionsDao.write).toHaveBeenCalledWith({ srCandidateId: 'guid1', slinkResumeNumber: 1111, sapEmployeeId: 1010101 });
     expect(introductionsDao.write).toHaveBeenCalledWith({ srCandidateId: 'guid2', slinkResumeNumber: 2222, sapEmployeeId: 2020202 });
 
-    expect(sapAddEmployee.execute).toHaveBeenCalledTimes(4);
+    /* NOTE: It's 5 including one failed because of retry logic */
+    expect(sapAddEmployee.execute).toHaveBeenCalledTimes(5);
     expect(introductionsDao.write).toHaveBeenCalledTimes(3);
 
     expect(smartrecruiters.storeEmployeeId).not.toHaveBeenCalledWith(3333, 'job3', null);
