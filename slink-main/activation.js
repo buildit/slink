@@ -1,24 +1,36 @@
 'use strict';
 
+const log = require('./log');
+const {
+  LOG_INFO,
+  STATUS_SKIPPED,
+  STATUS_SUCCESS,
+  STATUS_FAILURE,
+  REASON_ALREADY_ACTIVATED,
+  REASON_SAP_POST_FAILURE,
+  SR_OFFERED,
+  SR_ONBOARDING
+} = require('./constants');
+
 const sr = require('./smartrecruiters');
 const sapActivateEmployee = require('./sap/activateemployee');
 const activatedApplicantDao = require('./dao/activationsdao');
 const util = require('./util');
 
 const process = async () => {
-  console.info('### Starting ACTIVATION process');
-  const applicants = await sr.getApplicants('OFFERED', 'Onboarding');
-  console.info(`Activation: Collected ${applicants.length} applicants from SmartRecruiters`);
+  log(LOG_INFO, '### Starting ACTIVATION process');
+  const applicants = await sr.getApplicants(SR_OFFERED, SR_ONBOARDING);
+  log(LOG_INFO, `Activation: Collected ${applicants.length} applicants from SmartRecruiters`);
 
   const splitByFte = util.split(applicant => applicant.fullTime === true);
   const ftes = splitByFte(applicants);
 
-  console.info(`Non-FTE applicants skipped: ${ftes.rejects.length}`);
+  log(LOG_INFO, `Non-FTE applicants skipped: ${ftes.rejects.length}`);
 
   const splitByEmployeeId = util.split(fte => fte.employeeId !== null);
   const ftesWithId = splitByEmployeeId(ftes.matches);
 
-  console.info(`Employees with no employee ID skipped: ${ftesWithId.rejects.length}`);
+  log(LOG_INFO, `Employees with no employee ID skipped: ${ftesWithId.rejects.length}`);
 
   const applicantsActivatedInSap =
     await Promise.all(ftesWithId.matches
@@ -29,8 +41,8 @@ const process = async () => {
         if (Object.keys(readApplicant).length !== 0) {
           return {
             applicant: sanitizeApplicant,
-            status: 'Skipped',
-            reason: 'Already activated'
+            status: STATUS_SKIPPED,
+            reason: REASON_ALREADY_ACTIVATED
           };
         }
 
@@ -38,7 +50,7 @@ const process = async () => {
 
         const result = {
           applicant: sanitizeApplicant,
-          status: (sapStatus ? 'Succeeded' : 'Failed')
+          status: (sapStatus ? STATUS_SUCCESS : STATUS_FAILURE)
         };
 
         if (sapStatus) {
@@ -49,15 +61,15 @@ const process = async () => {
           });
         } else {
           // sap failure of some sort - to be clarified later
-          result.reason = 'SAP post failure';
+          result.reason = REASON_SAP_POST_FAILURE;
         }
 
         return result;
       }));
 
-  const successfulActivations = applicantsActivatedInSap.filter(item => item.status === 'Succeeded');
-  const unsuccessfulActivations = applicantsActivatedInSap.filter(item => item.status === 'Failed');
-  const skippedActivations = applicantsActivatedInSap.filter(item => item.status === 'Skipped');
+  const successfulActivations = applicantsActivatedInSap.filter(item => item.status === STATUS_SUCCESS);
+  const unsuccessfulActivations = applicantsActivatedInSap.filter(item => item.status === STATUS_FAILURE);
+  const skippedActivations = applicantsActivatedInSap.filter(item => item.status === STATUS_SKIPPED);
 
   const result = {
     attempted: successfulActivations.length + unsuccessfulActivations.length,
@@ -69,7 +81,7 @@ const process = async () => {
     skippedApplicants: skippedActivations
   };
 
-  console.info(`Activation process complete. Results: ${JSON.stringify(result)}`);
+  log(LOG_INFO, `Activation process complete. Results: ${JSON.stringify(result)}`);
 
   return result;
 };

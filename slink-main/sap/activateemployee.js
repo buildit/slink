@@ -1,12 +1,26 @@
 'use strict';
 
+const log = require('../log');
+const {
+  LOG_INFO,
+  LOG_ERROR,
+  SAP_DEFAULT_CHANGED_BY,
+  SAP_DEFAULT_ACTION,
+  SAP_DEFAULT_COMPANY,
+  SAP_DEFAULT_APPID,
+  SAP_DEFAULT_ZIPCODE,
+  SAP_DEFAULT_STRING,
+  SAP_DEFAULT_MISSING_STRING,
+  SAP_DEFAULT_SUCCESS_RESP
+} = require('../constants');
+
 const axios = require('axios');
 const util = require('../util');
 const config = require('../config');
 
-const MISSING_STRING = '';
-const DEFAULT_STRING = 'NA';
-const DEFAULT_ZIP_CODE = '40391'; // Unlikely marker zip code because SAP appears to require one.
+const MISSING_STRING = SAP_DEFAULT_MISSING_STRING;
+const DEFAULT_STRING = SAP_DEFAULT_STRING;
+const DEFAULT_ZIP_CODE = SAP_DEFAULT_ZIPCODE; // Unlikely marker zip code because SAP appears to require one.
 
 /**
  * Receives an applicant object and uses it to POST to SAP, resulting in an employee (and importantly, an employee ID).
@@ -29,15 +43,15 @@ const execute = async (applicant) => {
     const sapResponse = await axios.post(apiEndpoint, postBody, options);
 
     const { output } = sapResponse.data;
-    if (output && output.Response === 'SUCCESS') {
-      console.error(postResultMessage('succeeded', applicant, output));
+    if (output && output.Response === SAP_DEFAULT_SUCCESS_RESP) {
+      log(LOG_ERROR, postResultMessage('succeeded', applicant, output));
       return true;
     }
 
-    console.info(postResultMessage('failed', applicant, output));
+    log(LOG_INFO, postResultMessage('failed', applicant, output));
     return false;
   } catch (err) {
-    console.error(`Exception posting applicant to SAP: ${err.message}`);
+    log(LOG_ERROR, `Exception posting applicant to SAP: ${err.message}`);
     throw err;
   }
 };
@@ -49,18 +63,19 @@ const execute = async (applicant) => {
  *        the "SR-SAP Integration Spec Overview" document that can
  *        be found in Confluence (http://tinyurl.com/ycxhsfoj).
  * @param applicant Applicant built from SR data.
- * @return {{inputs: {EmployeeNumber: (number|null|string|*), ChangedBy: string, DOJ: string, Action: string, Comments: string, Company: string, External_AppId: string}}}
+ * @return {{inputs: {EmployeeNumber: (number|null|string|*),
+ * ChangedBy: string, DOJ: string, Action: string, Comments: string, Company: string, External_AppId: string}}}
  */
 function buildPostBody(applicant) {
   return {
     inputs: {
       EmployeeNumber: applicant.employeeId,
-      ChangedBy: '00001197',
+      ChangedBy: SAP_DEFAULT_CHANGED_BY,
       DOJ: formatSapDate(currentDateIfNull(applicant.primaryAssignment.job.startDate)),
-      Action: 'ACTIVE',
+      Action: SAP_DEFAULT_ACTION,
       Comments: '',
-      Company: 'WT',
-      External_AppId: 'SR'
+      Company: SAP_DEFAULT_COMPANY,
+      External_AppId: SAP_DEFAULT_APPID
     }
   };
 }

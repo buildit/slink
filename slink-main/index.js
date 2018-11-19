@@ -1,5 +1,11 @@
 'use strict';
 
+const log = require('./log');
+const {
+  LOG_INFO,
+  LOG_ERROR
+} = require('./constants');
+
 const introduction = require('./introduction');
 const activation = require('./activation');
 const config = require('./config');
@@ -9,8 +15,8 @@ const timeSource = require('./timesource');
 
 
 module.exports.handler = async (event, context, callback) => {
-  console.info(`#### Function ARN:  ${context.invokedFunctionArn}`);
-  console.info(`#### Request ID:  ${context.awsRequestId}`);
+  log(LOG_INFO, `#### Function ARN:  ${context.invokedFunctionArn}`);
+  log(LOG_INFO, `#### Request ID:  ${context.awsRequestId}`);
 
   const serialTime = timeSource.getSerialTime();
 
@@ -52,7 +58,7 @@ module.exports.handler = async (event, context, callback) => {
 async function writeLastRunDateRecord(context, serialDateTime) {
   try {
     const requestId = context.awsRequestId;
-    console.info('Writing last run date item to DynamoDb, requestId:', requestId);
+    log(LOG_INFO, 'Writing last run date item to DynamoDb, requestId:', requestId);
     await lastRunDateDao.write(requestId, serialDateTime);
   } catch (e) {
     console.error('Error writing last run date item to DynamoDb', e);
@@ -63,10 +69,10 @@ async function writeLastRunDateRecord(context, serialDateTime) {
 async function writeRunRecord(context, serialDateTime, response) {
   try {
     const requestId = context.awsRequestId;
-    console.info('Writing run item to DynamoDb, requestId:', requestId);
+    log(LOG_INFO, 'Writing run item to DynamoDb, requestId:', requestId);
     await runsDao.write(requestId, serialDateTime, response);
   } catch (e) {
-    console.error('Error writing run item to DynamoDb', e);
+    log(LOG_ERROR, 'Error writing run item to DynamoDb', e);
     throw e;
   }
 }

@@ -10,7 +10,7 @@ const util = require('../../util');
 
 jest.mock('../../smartrecruiters');
 jest.mock('../../sap/activateemployee');
-jest.mock('../../dao/activationsdao')
+jest.mock('../../dao/activationsdao');
 
 util.generateResumeNumber = jest.fn();
 

@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "test": "jest",
-    "eslint": "./node_modules/.bin/eslint **/*.js *.js"
+    "eslint": "./node_modules/.bin/eslint 'slink-main/*.js' 'slink-main/dao/*.js' 'slink-main/sap/*.js' 'slink-main/tests/unit/*.js' 'slink-main/tests/int/*.js' 'slink-main/tests/unit/sap/*.js' 'slink-main/tests/unit/dao/*.js'"
   },
   "devDependencies": {
     "eslint": "^4.19.1",

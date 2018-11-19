@@ -1,12 +1,23 @@
 'use strict';
 
+const log = require('../log');
+const {
+  LOG_INFO,
+  LOG_ERROR,
+  SAP_DEFAULT_ZIPCODE,
+  SAP_DEFAULT_STRING,
+  SAP_DEFAULT_MISSING_STRING,
+  SAP_DEFAULT_FAILURE_FLAGS,
+  SAP_DEFAULT_SUCCESS_FLAGS
+} = require('../constants');
+
 const axios = require('axios');
 const util = require('../util');
 const config = require('../config');
 
-const MISSING_STRING = '';
-const DEFAULT_STRING = 'NA';
-const DEFAULT_ZIP_CODE = '40391'; // Unlikely marker zip code because SAP appears to require one.
+const MISSING_STRING = SAP_DEFAULT_MISSING_STRING;
+const DEFAULT_STRING = SAP_DEFAULT_STRING;
+const DEFAULT_ZIP_CODE = SAP_DEFAULT_ZIPCODE; // Unlikely marker zip code because SAP appears to require one.
 
 /**
  * Receives an applicant object and uses it to POST to SAP, resulting in an employee (and importantly, an employee ID).
@@ -30,19 +41,19 @@ const execute = async (applicant, resumeNumber) => {
     const sapResponse = await axios.post(apiEndpoint, postBody, options);
 
     const { output } = sapResponse.data;
-    if (output && output.ReturnFlag === 'F') {
-      console.error(postResultMessage('failed', applicant, resumeNumber, output));
+    if (output && 'ReturnFlag' in output && SAP_DEFAULT_FAILURE_FLAGS.indexOf(output.ReturnFlag) !== -1) {
+      log(LOG_ERROR, postResultMessage('failed', applicant, resumeNumber, output));
       return null;
-    } else if (output && ( output.ReturnFlag === 'T' || output.ReturnFlag === 'S') ) {
-      console.info(postResultMessage('succeeded', applicant, resumeNumber, output));
+    } else if (output && 'ReturnFlag' in output && SAP_DEFAULT_SUCCESS_FLAGS.indexOf(output.ReturnFlag) !== -1) {
+      log(LOG_INFO, postResultMessage('succeeded', applicant, resumeNumber, output));
       return output.EmployeeId;
     }
-    
 
-    console.error(postResultMessage('indeterminate', applicant, resumeNumber, output));
+
+    log(LOG_ERROR, postResultMessage('indeterminate', applicant, resumeNumber, output));
     return null;
   } catch (err) {
-    console.error(`Exception posting applicant to SAP: ${err.message}`, err);
+    log(LOG_ERROR, `Exception posting applicant to SAP: ${err.message}`, err);
     throw err;
   }
 };

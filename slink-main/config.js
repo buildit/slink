@@ -1,5 +1,12 @@
 'use strict';
 
+const log = require('./log');
+const {
+  LOG_WARN,
+  LOG_ERROR,
+  AWS_DEFAULT_REGION
+} = require('./constants');
+
 const aws = require('./aws');
 
 const localParams = {
@@ -70,13 +77,13 @@ const loadConfigParams = async (context) => {
 
   // the environment doesn't know which AWS region we are running in so default it to us-east-1
   if (awsRegion === undefined) {
-    awsRegion = 'us-east-1';
-    console.warn(`#### Defaulting to ${awsRegion} region for AWS API calls`);
+    awsRegion = AWS_DEFAULT_REGION;
+    log(LOG_WARN, `#### Defaulting to ${awsRegion} region for AWS API calls`);
   }
 
   try {
     const ssmParams = await aws.getParams(paramPath);
-    // console.log(`SSM Params: ${JSON.stringify(ssmParams)}`);
+    // log(LOG_INFO, `SSM Params: ${JSON.stringify(ssmParams)}`);
 
     // Load all param values in our configParams list
     const keys = Object.keys(localParams);
@@ -95,7 +102,7 @@ const loadConfigParams = async (context) => {
     localParams.LAMBDA_ALIAS = { value: alias };
     return localParams;
   } catch (e) {
-    console.error(`Problem accessing SSM parameters for ${paramPath}`, e);
+    log(LOG_ERROR, `Problem accessing SSM parameters for ${paramPath}`, e);
     return null;
   }
 };

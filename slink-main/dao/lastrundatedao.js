@@ -1,11 +1,14 @@
 'use strict';
 
+const log = require('../log');
+const { LOG_INFO } = require('../constants');
+
 const aws = require('../aws');
 const config = require('../config');
 
 async function write(requestId, runSerialDate) {
   const table = process.env.LAST_RUN_DATE_TABLE;
-  console.info(`Writing to table: ${table}`);
+  log(LOG_INFO, `Writing to table: ${table}`);
 
   const params = {
     Item: {

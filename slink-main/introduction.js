@@ -1,5 +1,16 @@
 'use strict';
 
+const log = require('./log');
+const {
+  LOG_INFO,
+  SR_OFFERED,
+  SR_OFFER_ACCEPTED,
+  STATUS_SUCCESS,
+  STATUS_FAILURE,
+  REASON_SAP_POST_FAILURE,
+  REASON_SR_POST_FAILURE
+} = require('./constants');
+
 const sr = require('./smartrecruiters');
 const sapAddEmployee = require('./sap/addemployee');
 const introductionsDao = require('./dao/introductionsdao');
@@ -10,16 +21,16 @@ const util = require('./util');
  * @returns {Promise<{successfulApplicants: Array}>}
  */
 const process = async () => {
-  console.info('### Starting INTRODUCTION process');
-  const applicants = await sr.getApplicants('OFFERED', 'Offer Accepted');
+  log(LOG_INFO, '### Starting INTRODUCTION process');
+  const applicants = await sr.getApplicants(SR_OFFERED, SR_OFFER_ACCEPTED);
 
   const splitByFte = util.split(applicant => applicant.fullTime === true);
   const splitByNeedsIntroduction = util.split(applicant => applicant.employeeId === null);
 
   const ftes = splitByFte(applicants);
-  console.info(`Non-FTE applicants skipped: ${ftes.rejects.length}`);
+  log(LOG_INFO, `Non-FTE applicants skipped: ${ftes.rejects.length}`);
   const ftesNeedingIntroduction = splitByNeedsIntroduction(ftes.matches);
-  console.info(`Already-introduced applicants skipped: ${ftesNeedingIntroduction.rejects.length}`);
+  log(LOG_INFO, `Already-introduced applicants skipped: ${ftesNeedingIntroduction.rejects.length}`);
 
   const applicantsIntroducedToSap =
     await Promise.all(ftesNeedingIntroduction.matches
@@ -40,23 +51,23 @@ const process = async () => {
         async function addEmployee() {
           const sanitizedApplicant = util.sanitizeApplicant(applicant);
           const resumeNumber = util.generateResumeNumber();
-          console.info(`Posting applicant to SAP.  Resume number: ${resumeNumber}, applicant: ${JSON.stringify(sanitizedApplicant)}`);
+          log(LOG_INFO, `Posting applicant to SAP.  Resume number: ${resumeNumber}, applicant: ${JSON.stringify(sanitizedApplicant)}`);
           const employeeId = await sapAddEmployee.execute(applicant, resumeNumber);
 
           if (employeeId != null) {
-            console.info('Writing item to introduction table for candidate', applicant.id);
+            log(LOG_INFO, 'Writing item to introduction table for candidate', applicant.id);
             await writeIntroductionRecord(applicant, resumeNumber, employeeId);
 
-            console.info('Posting SAP employee ID to SmartRecruiters for candidate', applicant.id);
+            log(LOG_INFO, 'Posting SAP employee ID to SmartRecruiters for candidate', applicant.id);
             sanitizedApplicant.employeeId = employeeId;
             const srSuccess = await postEmployeeIdToSmartRecruiters(employeeId, applicant);
 
             const results = {
               applicant: sanitizedApplicant,
-              status: (srSuccess ? 'Succeeded' : 'Failed')
+              status: (srSuccess ? STATUS_SUCCESS : STATUS_FAILURE)
             };
             if (!srSuccess) {
-              results.reason = 'SR post failure';
+              results.reason = REASON_SR_POST_FAILURE;
             }
             return results;
           }
@@ -67,27 +78,25 @@ const process = async () => {
              * But it can't guarantee subsequent call will give success from the api
              */
             failureFlag = true;
-            /* trialCount += 1;
-             * console.info(`SAP post failure, trying again TRIAL NO: ${trialCount}`);
-             * addEmployee(); */
           }
           return {
             applicant: sanitizedApplicant,
-            status: 'Failed',
-            reason: 'SAP post failure'
+            status: STATUS_FAILURE,
+            reason: REASON_SAP_POST_FAILURE
           };
         }
         let employee = await addEmployee();
         if (failureFlag) {
           trialCount += 1;
           failureFlag = false;
+          log(LOG_INFO, `${REASON_SAP_POST_FAILURE}, trying again TRIAL NO: ${trialCount}`);
           employee = await addEmployee();
         }
         return employee;
       }));
 
-  const successfulApplicants = applicantsIntroducedToSap.filter(item => item.status === 'Succeeded');
-  const unsuccessfulApplicants = applicantsIntroducedToSap.filter(item => item.status === 'Failed');
+  const successfulApplicants = applicantsIntroducedToSap.filter(item => item.status === STATUS_SUCCESS);
+  const unsuccessfulApplicants = applicantsIntroducedToSap.filter(item => item.status === STATUS_FAILURE);
 
   const result = {
     attempted: successfulApplicants.length + unsuccessfulApplicants.length,
@@ -97,13 +106,13 @@ const process = async () => {
     unsuccessfulApplicants
   };
 
-  console.info(`Introduction process complete. Results: ${JSON.stringify(result)}`);
+  log(LOG_INFO, `Introduction process complete. Results: ${JSON.stringify(result)}`);
 
   return result;
 };
 
 async function postEmployeeIdToSmartRecruiters(employeeId, applicant) {
-  console.info(`Preparing to add SAP employee id to Smart Recruiters: ${employeeId}`);
+  log(LOG_INFO, `Preparing to add SAP employee id to Smart Recruiters: ${employeeId}`);
   return sr.storeEmployeeId(
     applicant.id,
     applicant.primaryAssignment.job.id,

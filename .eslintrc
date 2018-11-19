@@ -21,6 +21,7 @@
         "ignoreTemplateLiterals": true
       }
     ],
+    "object-shorthand": ["error", "always", { "ignoreConstructors": true }],
     "brace-style": [
       "error",
       "1tbs"

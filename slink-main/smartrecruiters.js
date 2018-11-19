@@ -1,5 +1,8 @@
 'use strict';
 
+const log = require('./log');
+const { LOG_INFO, LOG_ERROR } = require('./constants');
+
 const axios = require('axios');
 const asyncThrottle = require('async-throttle');
 const R = require('ramda');
@@ -18,11 +21,11 @@ const getApplicants = async (status, subStatus, limit = 100) => {
   const baseUrl = config.params.SR_SUMMARY_URL.value;
   const queryString = `status=${status}&subStatus=${subStatus}&limit=${limit}`;
   const fullUrl = `${baseUrl}?${queryString}`;
-  console.info('SR query:', fullUrl);
+  log(LOG_INFO, 'SR query:', fullUrl);
 
   const candidateSummaries = await srGet(fullUrl);
   const throttle = asyncThrottle(CONCURRENT_APPLICANTS); // Avoid 429
-  console.info(`Converting ${candidateSummaries.content.length} candidates to applicants, ${CONCURRENT_APPLICANTS} at a time`);
+  log(LOG_INFO, `Converting ${candidateSummaries.content.length} candidates to applicants, ${CONCURRENT_APPLICANTS} at a time`);
   return Promise.all(candidateSummaries.content.map(candidate => throttle(async () => toApplicant(candidate))));
 };
 
@@ -101,14 +104,14 @@ const storeEmployeeId = async (applicantId, jobId, sapId) => {
 
     const srResponse = await axios.put(apiEndpoint, putBody, options);
     if (srResponse && srResponse.status === 204) {
-      console.info(`Smart Recruiters post succeeded.  Applicant:  ${applicantId}, SAP employee id: ${sapId}`);
+      log(LOG_INFO, `Smart Recruiters post succeeded.  Applicant:  ${applicantId}, SAP employee id: ${sapId}`);
       return true;
     }
 
-    console.error(`Smart Recruiters post failed.  ApplicantId:  ${applicantId}, employee id: ${sapId}, Response: ${JSON.stringify(srResponse)}`);
+    log(LOG_ERROR, `Smart Recruiters post failed.  ApplicantId:  ${applicantId}, employee id: ${sapId}, Response: ${JSON.stringify(srResponse)}`);
     return false;
   } catch (err) {
-    console.error(`Exception posting applicant employee id to Smart Recruiters: ${err.message}`);
+    log(LOG_ERROR, `Exception posting applicant employee id to Smart Recruiters: ${err.message}`);
     throw err;
   }
 };
@@ -126,11 +129,11 @@ async function srGet(url) {
     return reply.data;
   } catch (err) {
     if (err.response) {
-      console.error(`Error response from SmartRecruiters API. Status: ${err.response.status}, URL: ${url}, Headers: ${JSON.stringify(err.response.headers)}, Error: ${err}`);
+      log(LOG_ERROR, `Error response from SmartRecruiters API. Status: ${err.response.status}, URL: ${url}, Headers: ${JSON.stringify(err.response.headers)}, Error: ${err}`);
     } else if (err.request) {
-      console.error(`Error calling SmartRecruiters API. Status: ${err.request}, Error: ${err}`);
+      log(LOG_ERROR, `Error calling SmartRecruiters API. Status: ${err.request}, Error: ${err}`);
     } else {
-      console.error('Unexpected error interacting with SmartRecruiters', err.message);
+      log(LOG_ERROR, 'Unexpected error interacting with SmartRecruiters', err.message);
     }
     throw err;
   }

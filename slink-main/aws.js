@@ -1,5 +1,11 @@
 'use strict';
 
+const log = require('./log');
+const {
+  LOG_INFO,
+  DYNAMO_DEFAULT_PORT
+} = require('./constants');
+
 const awsParamStore = require('aws-param-store');
 const AWS = require('aws-sdk');
 
@@ -38,8 +44,8 @@ function createDynamoDb() {
 }
 
 function buildLocalEndpoint() {
-  const url = `http://${process.env.LOCAL_DYNAMO_IP}:8000`;
-  console.info('NOTE:  Using local DynamoDb url:', url);
+  const url = `http://${process.env.LOCAL_DYNAMO_IP}:${DYNAMO_DEFAULT_PORT}`;
+  log(LOG_INFO, 'NOTE:  Using local DynamoDb url:', url);
   return { endpoint: new AWS.Endpoint(url) };
 }
 
