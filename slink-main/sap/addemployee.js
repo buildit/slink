@@ -215,9 +215,11 @@ function currentDateIfNull(date) {
 }
 
 function postResultMessage(disposition, applicant, resumeNumber, output) {
-  const msg = `SAP post ${disposition}.  Applicant:  ${JSON.stringify(util.sanitizeApplicant(applicant))}, Resume number: ${resumeNumber}, Response: ${JSON.stringify(output)}`;
-  notification(REASON_SAP_POST_FAILURE, msg);
-  return msg;
+  if (disposition === 'failed') {
+    const msg = `Resume number: ${resumeNumber}, Applicant: ${JSON.stringify(util.sanitizeApplicant(applicant))}`;
+    notification(REASON_SAP_POST_FAILURE, msg);
+  }
+  return `SAP post ${disposition}.  Applicant:  ${JSON.stringify(util.sanitizeApplicant(applicant))}, Resume number: ${resumeNumber}, Response: ${JSON.stringify(output)}`;
 }
 
 module.exports = {
