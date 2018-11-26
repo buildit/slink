@@ -2,6 +2,7 @@
 
 const log = require('./log');
 const { LOG_INFO, LOG_ERROR } = require('./constants');
+const notification = require('./notification');
 
 const axios = require('axios');
 const asyncThrottle = require('async-throttle');
@@ -107,7 +108,7 @@ const storeEmployeeId = async (applicantId, jobId, sapId) => {
       log(LOG_INFO, `Smart Recruiters post succeeded.  Applicant:  ${applicantId}, SAP employee id: ${sapId}`);
       return true;
     }
-
+    notification('Smart recruiter post failed', `ApplicantId:  ${applicantId}, employee id: ${sapId}, Response: ${JSON.stringify(srResponse)}`);
     log(LOG_ERROR, `Smart Recruiters post failed.  ApplicantId:  ${applicantId}, employee id: ${sapId}, Response: ${JSON.stringify(srResponse)}`);
     return false;
   } catch (err) {

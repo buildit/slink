@@ -1,6 +1,7 @@
 'use strict';
 
 const log = require('../log');
+const notification = require('../notification');
 const {
   LOG_INFO,
   LOG_ERROR,
@@ -8,7 +9,8 @@ const {
   SAP_DEFAULT_STRING,
   SAP_DEFAULT_MISSING_STRING,
   SAP_DEFAULT_FAILURE_FLAGS,
-  SAP_DEFAULT_SUCCESS_FLAGS
+  SAP_DEFAULT_SUCCESS_FLAGS,
+  REASON_SAP_POST_FAILURE
 } = require('../constants');
 
 const axios = require('axios');
@@ -213,7 +215,9 @@ function currentDateIfNull(date) {
 }
 
 function postResultMessage(disposition, applicant, resumeNumber, output) {
-  return `SAP post ${disposition}.  Applicant:  ${JSON.stringify(util.sanitizeApplicant(applicant))}, Resume number: ${resumeNumber}, Response: ${JSON.stringify(output)}`;
+  const msg = `SAP post ${disposition}.  Applicant:  ${JSON.stringify(util.sanitizeApplicant(applicant))}, Resume number: ${resumeNumber}, Response: ${JSON.stringify(output)}`;
+  notification(REASON_SAP_POST_FAILURE, msg);
+  return msg;
 }
 
 module.exports = {
