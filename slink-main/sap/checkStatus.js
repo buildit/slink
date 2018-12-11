@@ -22,10 +22,10 @@ async function checkStatus() {
     };
     const response = await axios.get(apiEndPoint, options);
     if (response.status !== 200) {
-      log(LOG_ERROR, `Exception occured while checking the backend status: ${JSON.stringify(response)}`);
+      log(LOG_ERROR, 'Exception occured while checking the backend status: ', response.data, response);
       throw new Error(SAP_BACKEND_DOWN_EXCEPTION);
     } else if (response.status === 200) {
-      log(LOG_ERROR, `Exception occured while checking the backend status: ${JSON.stringify(response)}`);
+      log(LOG_ERROR, 'Exception occured while checking the backend status: ', response.data, response);
       const responseTime = Date.now() - currentTimestamp;
       if (responseTime > SAP_BACKEND_TIMEOUT_THRESHOLD) {
         log(LOG_ERROR, 'Exception occured while checking the backend status timeout');
@@ -33,7 +33,7 @@ async function checkStatus() {
         throw new Error(SAP_BACKEND_DOWN_EXCEPTION);
       }
     } else {
-      log(LOG_ERROR, `Exception occured while checking the backend status: ${JSON.stringify(response)}`);
+      log(LOG_ERROR, 'Exception occured while checking the backend status: ', response.data, response);
       throw new Error(SAP_BACKEND_DOWN_EXCEPTION);
     }
     return true;
