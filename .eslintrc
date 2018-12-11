@@ -30,6 +30,7 @@
     "no-underscore-dangle": 0,
     "no-console": 0,
     "no-restricted-syntax": 0,
+    "no-await-in-loop": 0,
     "comma-dangle": 0,
     "import/no-unresolved": "off",
     "no-use-before-define": [

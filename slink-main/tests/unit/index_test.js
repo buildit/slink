@@ -8,6 +8,7 @@ const config = require('../../config');
 const lastRunDateDao = require('../../dao/lastrundatedao');
 const runsDao = require('../../dao/runsdao');
 const timeSource = require('../../timesource');
+const checkStatus = require('../../sap/checkStatus');
 
 jest.mock('../../introduction');
 jest.mock('../../activation');
@@ -15,6 +16,7 @@ jest.mock('../../config');
 jest.mock('../../dao/lastrundatedao');
 jest.mock('../../dao/runsdao');
 jest.mock('../../timesource');
+jest.mock('../../sap/checkStatus');
 
 const context = {
   invokedFunctionArn: 'unit-test',
@@ -29,6 +31,7 @@ describe('Handler invocation', () => {
     introduction.process.mockClear();
     activation.process.mockClear();
     timeSource.getSerialTime.mockClear();
+    checkStatus.mockClear();
   });
 
   it('runs introduction process and gives successful response', async () => {
@@ -39,6 +42,7 @@ describe('Handler invocation', () => {
       successfulApplicants: [{ id: 'abc-123' }],
       unsuccessfulApplicants: [{ id: 'xyz-890' }]
     };
+    checkStatus.mockResolvedValue(true);
     introduction.process.mockResolvedValue(introductionResult);
 
     const activationResult = {

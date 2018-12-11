@@ -1,6 +1,9 @@
 'use strict';
 
 // const introduction = require('../../introduction');
+const {
+  SAP_POST_FAILURE_RETRY_THRESHOLD
+} = require('../../constants');
 
 const sapAddEmployee = require('../../sap/addemployee');
 const introductionsDao = require('../../dao/introductionsdao');
@@ -114,14 +117,22 @@ describe('Applicant introduction process', () => {
 
     // Error case.  Need to handle in a more detailed way.
     util.generateResumeNumber.mockReturnValueOnce(3333);
+
+    sapAddEmployee.execute.mockReturnValueOnce(null);
+
+    util.generateResumeNumber.mockReturnValue(9999);
+
+    for (let i = 0; i < (SAP_POST_FAILURE_RETRY_THRESHOLD * 2) - 1; i += 1) {
+      sapAddEmployee.execute.mockReturnValueOnce(6060606);
+    }
     sapAddEmployee.execute.mockReturnValueOnce(null);
 
     const results = await introduction.process();
 
     expect(smartrecruiters.getApplicants).toHaveBeenCalledWith('OFFERED', 'Offer Accepted');
 
-    /* NOTE: It'll call 5 times including one failure because of retry logic */
-    expect(util.generateResumeNumber).toHaveBeenCalledTimes(5);
+    expect(util.generateResumeNumber).toHaveBeenCalledTimes(4
+                                                          + (SAP_POST_FAILURE_RETRY_THRESHOLD * results.unsuccessful));
 
     expect(sapAddEmployee.execute).toHaveBeenCalledWith(successApplicant1, 1111);
     expect(sapAddEmployee.execute).toHaveBeenCalledWith(srFailApplicant, 6666);
@@ -131,9 +142,11 @@ describe('Applicant introduction process', () => {
     expect(introductionsDao.write).toHaveBeenCalledWith({ srCandidateId: 'guid1', slinkResumeNumber: 1111, sapEmployeeId: 1010101 });
     expect(introductionsDao.write).toHaveBeenCalledWith({ srCandidateId: 'guid2', slinkResumeNumber: 2222, sapEmployeeId: 2020202 });
 
-    /* NOTE: It's 5 including one failed because of retry logic */
-    expect(sapAddEmployee.execute).toHaveBeenCalledTimes(5);
-    expect(introductionsDao.write).toHaveBeenCalledTimes(3);
+    expect(sapAddEmployee.execute).toHaveBeenCalledTimes(4
+                                                       + (SAP_POST_FAILURE_RETRY_THRESHOLD * results.unsuccessful));
+    /* -1 because one sap failure, first trials: 4, retry: 3*2, -1 */
+    expect(introductionsDao.write).toHaveBeenCalledTimes(2
+                                                       + (SAP_POST_FAILURE_RETRY_THRESHOLD * results.unsuccessful));
 
     expect(smartrecruiters.storeEmployeeId).not.toHaveBeenCalledWith(3333, 'job3', null);
 
@@ -172,4 +185,3 @@ describe('Applicant introduction process', () => {
       .toEqual([srFailResult, sapFailResult]);
   });
 });
-

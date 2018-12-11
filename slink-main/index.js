@@ -13,6 +13,7 @@ const lastRunDateDao = require('./dao/lastrundatedao');
 const runsDao = require('./dao/runsdao');
 const timeSource = require('./timesource');
 
+const checkStatus = require('./sap/checkStatus');
 
 module.exports.handler = async (event, context, callback) => {
   log(LOG_INFO, `#### Function ARN:  ${context.invokedFunctionArn}`);
@@ -23,9 +24,10 @@ module.exports.handler = async (event, context, callback) => {
   try {
     await config.loadConfigParams(context);
 
+    await checkStatus();
+
     const introductionResult = await introduction.process();
     const activationResult = await activation.process();
-
 
     const response = {
       statusCode: 200,

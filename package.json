@@ -29,7 +29,8 @@
     "testEnvironment": "node",
     "verbose": true,
     "collectCoverage": true,
-    "collectCoverageFrom": ["slink-main/**/*.{js,jsx}"]
+    "collectCoverageFrom": ["slink-main/**/*.{js,jsx}"],
+    "setupTestFrameworkScriptFile": "<rootDir>slink-main/tests/unit/globals.js"
   },
   "precommit": [
     "eslint",
