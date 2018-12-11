@@ -1,13 +1,8 @@
 'use strict';
 
-const SAP_BACKEND_TIMEOUT_THRESHOLD = 50;
+const SAP_BACKEND_TIMEOUT_THRESHOLD = 200;
 const SAP_BACKEND_DOWN_EXCEPTION = 'SAP BACKEND DOWN';
 
-/* FIXME: Currently test cases are designed with different logic (i.e.
-   some functions are returning value's specific times and not dynamic
-   Need to change test cases in order to pass with dynamic threshold
-   )
- */
 const SAP_POST_FAILURE_RETRY_THRESHOLD = 5;
 
 const LOG_INFO = 'INFO';
