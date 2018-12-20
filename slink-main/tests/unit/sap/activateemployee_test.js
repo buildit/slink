@@ -73,8 +73,7 @@ describe('Building an execute() post body', () => {
     expect(inputs.DOJ).toEqual('06-22-2018');
     expect(inputs.Action).toEqual('ACTIVE');
     expect(inputs.Comments).toEqual('');
-    expect(inputs.Company).toEqual('WT');
+    expect(inputs.Company || inputs.company).toEqual('WT');
     expect(inputs.External_AppId).toEqual('SR');
   });
 });
-

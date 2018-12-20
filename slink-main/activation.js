@@ -17,6 +17,7 @@ const sapActivateEmployee = require('./sap/activateemployee');
 const activatedApplicantDao = require('./dao/activationsdao');
 const util = require('./util');
 
+
 const process = async () => {
   log(LOG_INFO, '### Starting ACTIVATION process');
   const applicants = await sr.getApplicants(SR_OFFERED, SR_ONBOARDING);
@@ -29,7 +30,6 @@ const process = async () => {
 
   const splitByEmployeeId = util.split(fte => fte.employeeId !== null);
   const ftesWithId = splitByEmployeeId(ftes.matches);
-
   log(LOG_INFO, `Employees with no employee ID skipped: ${ftesWithId.rejects.length}`);
 
   const applicantsActivatedInSap =
@@ -45,7 +45,6 @@ const process = async () => {
             reason: REASON_ALREADY_ACTIVATED
           };
         }
-
         const sapStatus = await sapActivateEmployee.execute(fteWithId);
 
         const result = {

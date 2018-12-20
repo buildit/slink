@@ -28,8 +28,10 @@ const DEFAULT_ZIP_CODE = SAP_DEFAULT_ZIPCODE; // Unlikely marker zip code becaus
  * @returns {Promise<boolean>} Employee ID.
  */
 const execute = async (applicant) => {
+  console.log(config.params.SAP_ADD_EMPLOYEE_URL.value);
+  console.log(config.params.SAP_ACTIVATE_EMPLOYEE_URL.value);
   try {
-    const apiEndpoint = config.params.SAP_ADD_EMPLOYEE_URL.value;
+    const apiEndpoint = config.params.SAP_ACTIVATE_EMPLOYEE_URL.value;
     const options = {
       method: 'POST',
       headers: {
@@ -40,6 +42,7 @@ const execute = async (applicant) => {
     };
 
     const postBody = buildPostBody(applicant);
+    console.log(postBody);
     const sapResponse = await axios.post(apiEndpoint, postBody, options);
 
     const { output } = sapResponse.data;
@@ -74,7 +77,7 @@ function buildPostBody(applicant) {
       DOJ: formatSapDate(currentDateIfNull(applicant.primaryAssignment.job.startDate)),
       Action: SAP_DEFAULT_ACTION,
       Comments: '',
-      Company: SAP_DEFAULT_COMPANY,
+      company: SAP_DEFAULT_COMPANY,
       External_AppId: SAP_DEFAULT_APPID
     }
   };
@@ -92,7 +95,7 @@ function currentDateIfNull(date) {
 }
 
 function postResultMessage(disposition, applicant, output) {
-  return `SAP post ${disposition}.  Applicant:  ${JSON.stringify(util.sanitizeApplicant(applicant))}, Response: ${JSON.stringify(output)}`;
+  return `SAP post activation ${disposition}.  Applicant:  ${JSON.stringify(util.sanitizeApplicant(applicant))}, Response: ${JSON.stringify(output)}`;
 }
 
 module.exports = {
