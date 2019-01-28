@@ -1,6 +1,7 @@
 'use strict';
 
 const log = require('./log');
+const notification = require('./notification');
 const {
   LOG_INFO,
   LOG_ERROR
@@ -39,6 +40,7 @@ module.exports.handler = async (event, context, callback) => {
       }
     };
 
+    notification('NOTIFICATION', JSON.stringify({ introductionResult, activationResult }));
     await writeLastRunDateRecord(context, serialTime);
     await writeRunRecord(context, serialTime, response);
 

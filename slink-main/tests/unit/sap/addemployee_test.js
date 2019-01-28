@@ -49,7 +49,7 @@ describe('execute()', () => {
     axios.post.mockResolvedValue(mockResponseGood);
 
     const result = await sapAddEmployee.execute(testmodels.applicant, 111);
-    expect(result).toEqual('123456');
+    expect(result).toEqual({ EmployeeId: '123456', ReturnFlag: 'T', ReturnMessage: 'some return message' });
   });
 
   it('returns null if a bad response', async () => {

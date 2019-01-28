@@ -1,6 +1,5 @@
 'use strict';
 
-// const introduction = require('../../introduction');
 const {
   SAP_POST_FAILURE_RETRY_THRESHOLD
 } = require('../../constants');
@@ -104,26 +103,25 @@ describe('Applicant introduction process', () => {
     smartrecruiters.getApplicants.mockResolvedValueOnce(applicants);
 
     util.generateResumeNumber.mockReturnValueOnce(1111);
-    sapAddEmployee.execute.mockReturnValueOnce(1010101);
+    sapAddEmployee.execute.mockReturnValueOnce({ EmployeeId: 1010101, ReturnMessage: '' });
     smartrecruiters.storeEmployeeId.mockReturnValueOnce(true);
 
     util.generateResumeNumber.mockReturnValueOnce(6666);
-    sapAddEmployee.execute.mockReturnValueOnce(6060606);
+    sapAddEmployee.execute.mockReturnValueOnce({ EmployeeId: 6060606, ReturnMessage: '' });
     smartrecruiters.storeEmployeeId.mockReturnValueOnce(false);
 
     util.generateResumeNumber.mockReturnValueOnce(2222);
-    sapAddEmployee.execute.mockReturnValueOnce(2020202);
+    sapAddEmployee.execute.mockReturnValueOnce({ EmployeeId: 2020202, ReturnMessage: '' });
     smartrecruiters.storeEmployeeId.mockReturnValueOnce(true);
 
     // Error case.  Need to handle in a more detailed way.
     util.generateResumeNumber.mockReturnValueOnce(3333);
-
     sapAddEmployee.execute.mockReturnValueOnce(null);
 
     util.generateResumeNumber.mockReturnValue(9999);
 
     for (let i = 0; i < (SAP_POST_FAILURE_RETRY_THRESHOLD * 2) - 1; i += 1) {
-      sapAddEmployee.execute.mockReturnValueOnce(6060606);
+      sapAddEmployee.execute.mockReturnValueOnce({ EmployeeId: 6060606, ReturnMessage: '' });
     }
     sapAddEmployee.execute.mockReturnValueOnce(null);
 
@@ -170,7 +168,8 @@ describe('Applicant introduction process', () => {
     const sapFailResult = {
       applicant: util.sanitizeApplicant(sapFailApplicant),
       status: 'Failed',
-      reason: 'SAP post failure'
+      reason: 'SAP post failure',
+      message: 'Unexpected error check log for more details'
     };
     const srFailResult = {
       applicant: Object.assign(util.sanitizeApplicant(srFailApplicant), { employeeId: 6060606 }),

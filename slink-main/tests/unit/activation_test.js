@@ -113,7 +113,6 @@ describe('Applicant activation process', () => {
     activationsDao.read.mockReturnValueOnce(activationItem);
 
     const results = await activation.process();
-    console.log(results);
 
     expect(smartrecruiters.getApplicants).toHaveBeenCalledWith('OFFERED', 'Onboarding');
 

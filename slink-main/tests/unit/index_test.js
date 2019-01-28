@@ -17,6 +17,7 @@ jest.mock('../../dao/lastrundatedao');
 jest.mock('../../dao/runsdao');
 jest.mock('../../timesource');
 jest.mock('../../sap/checkStatus');
+jest.mock('../../notification');
 
 const context = {
   invokedFunctionArn: 'unit-test',

@@ -28,8 +28,6 @@ const DEFAULT_ZIP_CODE = SAP_DEFAULT_ZIPCODE; // Unlikely marker zip code becaus
  * @returns {Promise<boolean>} Employee ID.
  */
 const execute = async (applicant) => {
-  console.log(config.params.SAP_ADD_EMPLOYEE_URL.value);
-  console.log(config.params.SAP_ACTIVATE_EMPLOYEE_URL.value);
   try {
     const apiEndpoint = config.params.SAP_ACTIVATE_EMPLOYEE_URL.value;
     const options = {
@@ -42,7 +40,6 @@ const execute = async (applicant) => {
     };
 
     const postBody = buildPostBody(applicant);
-    console.log(postBody);
     const sapResponse = await axios.post(apiEndpoint, postBody, options);
 
     const { output } = sapResponse.data;
