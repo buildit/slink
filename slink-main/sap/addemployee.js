@@ -1,7 +1,6 @@
 'use strict';
 
 const log = require('../log');
-const notification = require('../notification');
 const {
   LOG_INFO,
   LOG_ERROR,
@@ -9,8 +8,7 @@ const {
   SAP_DEFAULT_STRING,
   SAP_DEFAULT_MISSING_STRING,
   SAP_DEFAULT_FAILURE_FLAGS,
-  SAP_DEFAULT_SUCCESS_FLAGS,
-  REASON_SAP_POST_FAILURE
+  SAP_DEFAULT_SUCCESS_FLAGS
 } = require('../constants');
 
 const axios = require('axios');
@@ -48,9 +46,8 @@ const execute = async (applicant, resumeNumber) => {
       return null;
     } else if (output && 'ReturnFlag' in output && SAP_DEFAULT_SUCCESS_FLAGS.indexOf(output.ReturnFlag) !== -1) {
       log(LOG_INFO, postResultMessage('succeeded', applicant, resumeNumber, output));
-      return output.EmployeeId;
+      return output;
     }
-
 
     log(LOG_ERROR, postResultMessage('indeterminate', applicant, resumeNumber, output));
     return null;
@@ -215,10 +212,6 @@ function currentDateIfNull(date) {
 }
 
 function postResultMessage(disposition, applicant, resumeNumber, output) {
-  if (disposition === 'failed') {
-    const msg = `Resume number: ${resumeNumber}, Applicant: ${JSON.stringify(util.sanitizeApplicant(applicant))}`;
-    notification(REASON_SAP_POST_FAILURE, msg);
-  }
   return `SAP post ${disposition}.  Applicant:  ${JSON.stringify(util.sanitizeApplicant(applicant))}, Resume number: ${resumeNumber}, Response: ${JSON.stringify(output)}`;
 }
 

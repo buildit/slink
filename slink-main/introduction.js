@@ -38,7 +38,8 @@ const process = async () => {
       const resumeNumber = util.generateResumeNumber();
 
       log(LOG_INFO, `Posting applicant to SAP.  Resume number: ${resumeNumber}, applicant: ${JSON.stringify(sanitizedApplicant)}`);
-      const employeeId = await sapAddEmployee.execute(applicant, resumeNumber);
+      const output = await sapAddEmployee.execute(applicant, resumeNumber);
+      const employeeId = !output ? null : output.EmployeeId;
       if (employeeId != null) {
         log(LOG_INFO, 'Writing item to introduction table for candidate', applicant.id);
         await writeIntroductionRecord(applicant, resumeNumber, employeeId);
@@ -59,7 +60,8 @@ const process = async () => {
       return {
         applicant: sanitizedApplicant,
         status: STATUS_FAILURE,
-        reason: REASON_SAP_POST_FAILURE
+        reason: REASON_SAP_POST_FAILURE,
+        message: output ? output.returnMessage : 'Unexpected error check log for more details'
       };
     }));
     return result;

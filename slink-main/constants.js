@@ -1,6 +1,6 @@
 'use strict';
 
-const SAP_BACKEND_TIMEOUT_THRESHOLD = 2000;
+const SAP_BACKEND_TIMEOUT_THRESHOLD = 4000;
 const SAP_BACKEND_DOWN_EXCEPTION = 'SAP BACKEND DOWN';
 
 const SAP_POST_FAILURE_RETRY_THRESHOLD = 5;
@@ -35,26 +35,6 @@ const SAP_DEFAULT_MISSING_STRING = '';
 const SAP_DEFAULT_SUCCESS_RESP = 'SUCCESS';
 const SAP_DEFAULT_FAILURE_FLAGS = ['F'];
 const SAP_DEFAULT_SUCCESS_FLAGS = ['T', 'S'];
-
-/* These are the default values for SAP Post fields
- * NOTE: Since SAP is not validating these fields commented
- */
-/* const SAP_DEFAULT_VALUE_DOB = '01-Jan-1900';
- * const SAP_DEFAULT_MIDDLE_NAME = '';
- * const SAP_DEFAULT_APPLICANT_GROUP = '5';
- * const SAP_DEFAULT_PERSONAL_AREA = 'USGA';
- * const SAP_DEFAULT_FORM_OF_ADDRESS = '1';
- * const SAP_DEFAULT_NATIONALITY = 'US';
- * const SAP_DEFAULT_LANGUAGE = 'EN';
- * const SAP_DEFAULT_CHANGED_BY = '00001197';
- * const SAP_DEFAULT_RECRUITER_ID = '10068175';
- * const SAP_DEFAULT_APPID = 'SR';
- * const SAP_DEFAULT_PROACTIVE_FLAG = 'Y';
- * const SAP_DEFAULT_CAREER_BAND = 'B2';
- * const SAP_DEFAULT_REPORTING_MANAGER = '117543';
- * const SAP_DEFAULT_JOB_CODE = '0';
- * const SAP_DEFAULT_EDUCATION_TYPE = '03';
- * const SAP_DEFAULT_BRANCH_OF_STUDY = '00027_02'; */
 
 module.exports = {
   LOG_INFO,
