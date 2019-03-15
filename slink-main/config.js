@@ -34,6 +34,10 @@ const localParams = {
     name: 'smartrecruiters/EMPLOYEE_PROP_ID',
     value: undefined
   },
+  SR_EMPLOYEE_ACTIVATION_PROP_ID: {
+    name: 'smartrecruiters/ACTIVATION_PROP_ID',
+    value: undefined
+  },
   SR_JOB_PROPS_URL: {
     name: 'smartrecruiters/JOB_PROPS_URL',
     value: undefined

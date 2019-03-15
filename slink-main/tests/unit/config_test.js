@@ -42,6 +42,10 @@ describe('Handler invocation', () => {
         Value: '05f1b2eb-65f2-46c7-ad73-c7b8bd688c33'
       },
       {
+        Name: '/slink/STAGE/smartrecruiters/ACTIVATION_PROP_ID',
+        Value: '05f1b2eb-65f2-46c7-ad73-c7b8bd688c44'
+      },
+      {
         Name: '/slink/STAGE/smartrecruiters/JOB_PROPS_URL',
         Value: 'https://api.smartrecruiters.com/candidates/{candidateId}/jobs/{jobId}/properties'
       },
@@ -80,6 +84,10 @@ describe('Handler invocation', () => {
     SR_EMPLOYEE_PROP_ID: {
       name: 'smartrecruiters/EMPLOYEE_PROP_ID',
       value: '05f1b2eb-65f2-46c7-ad73-c7b8bd688c33'
+    },
+    SR_EMPLOYEE_ACTIVATION_PROP_ID: {
+      name: 'smartrecruiters/ACTIVATION_PROP_ID',
+      value: '05f1b2eb-65f2-46c7-ad73-c7b8bd688c44'
     },
     SR_JOB_PROPS_URL: {
       name: 'smartrecruiters/JOB_PROPS_URL',

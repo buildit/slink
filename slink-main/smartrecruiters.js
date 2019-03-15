@@ -115,6 +115,43 @@ const storeEmployeeId = async (applicantId, jobId, sapId) => {
   }
 };
 
+const storeActivatedDate = async (applicantId, jobId) => {
+  try {
+    const apiToken = config.params.SR_TOKEN.value;
+    let apiEndpoint = config.params.SR_ADD_PROP_URL.value;
+    apiEndpoint = apiEndpoint.replace('{candidateId}', applicantId);
+    apiEndpoint = apiEndpoint.replace('{jobId}', jobId);
+    apiEndpoint = apiEndpoint.replace('{propertyId}', config.params.SR_EMPLOYEE_ACTIVATION_PROP_ID.value);
+
+    const options = {
+      method: 'PUT',
+      headers: {
+        'X-SmartToken': apiToken,
+        'Content-Type': 'application/json'
+      },
+    };
+
+    const strArray = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const date = new Date();
+    const formattedDate = `${date.getDay().toString()}-${strArray[date.getMonth()]}-${date.getFullYear()}`;
+    const putBody = {
+      value: `${formattedDate}`
+    };
+
+    const srResponse = await axios.put(apiEndpoint, putBody, options);
+    if (srResponse && srResponse.status === 204) {
+      log(LOG_INFO, `Smart Recruiters post succeeded.  Applicant:  ${applicantId}, Date: ${formattedDate}`);
+      return true;
+    }
+    log(LOG_ERROR, `Smart Recruiters post failed.  ApplicantId:  ${applicantId}, Date: ${formattedDate}, Response: ${JSON.stringify(srResponse)}`);
+    return false;
+  } catch (err) {
+    log(LOG_ERROR, `Exception posting applicant employee id to Smart Recruiters: ${err.message}`);
+    throw err;
+  }
+};
+
+
 async function srGet(url) {
   try {
     const apiToken = config.params.SR_TOKEN.value;
@@ -162,5 +199,6 @@ function getCode(property) {
 
 module.exports = {
   getApplicants,
-  storeEmployeeId
+  storeEmployeeId,
+  storeActivatedDate
 };
