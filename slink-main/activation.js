@@ -54,6 +54,7 @@ const process = async () => {
 
         if (sapStatus) {
           // all good! save result to DB
+          await postEmployeeActivationToSmartRecruiters(fteWithId);
           await activatedApplicantDao.write({
             srCandidateId: fteWithId.id,
             sapEmployeeId: fteWithId.employeeId
@@ -84,6 +85,13 @@ const process = async () => {
 
   return result;
 };
+
+async function postEmployeeActivationToSmartRecruiters(applicant) {
+  return sr.storeActivatedDate(
+    applicant.id,
+    applicant.primaryAssignment.job.id
+  );
+}
 
 module.exports = {
   process
