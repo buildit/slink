@@ -1,9 +1,11 @@
+
 'use strict';
 
 const log = require('../log');
 const {
   LOG_INFO,
   LOG_ERROR,
+  LOG_DEBUG,
   SAP_DEFAULT_ZIPCODE,
   SAP_DEFAULT_STRING,
   SAP_DEFAULT_MISSING_STRING,
@@ -38,6 +40,7 @@ const execute = async (applicant, resumeNumber) => {
     };
 
     const postBody = buildPostBody(applicant, resumeNumber);
+    log(LOG_DEBUG, JSON.stringify(postBody));
     const sapResponse = await axios.post(apiEndpoint, postBody, options);
 
     const { output } = sapResponse.data;
