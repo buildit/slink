@@ -4,6 +4,7 @@ const log = require('../log');
 const {
   LOG_INFO,
   LOG_ERROR,
+  LOG_DEBUG,
   SAP_DEFAULT_CHANGED_BY,
   SAP_DEFAULT_ACTION,
   SAP_DEFAULT_COMPANY,
@@ -40,8 +41,8 @@ const execute = async (applicant) => {
     };
 
     const postBody = buildPostBody(applicant);
+    log(LOG_DEBUG, JSON.stringify(postBody));
     const sapResponse = await axios.post(apiEndpoint, postBody, options);
-
     const { output } = sapResponse.data;
     if (output && output.Response === SAP_DEFAULT_SUCCESS_RESP) {
       log(LOG_ERROR, postResultMessage('succeeded', applicant, output));
